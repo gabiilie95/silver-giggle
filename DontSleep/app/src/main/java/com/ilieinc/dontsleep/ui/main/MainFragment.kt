@@ -35,8 +35,6 @@ class MainFragment : Fragment(), WakeLockChangedEvent, DeviceAdminChangedEvent {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        WakeLockManager.wakeLockStatusChanged addSubscriber this
-        DeviceAdminReceiver.statusChangedEvent addSubscriber this
         return inflater.inflate(R.layout.main_fragment, container, false)
     }
 
@@ -44,13 +42,19 @@ class MainFragment : Fragment(), WakeLockChangedEvent, DeviceAdminChangedEvent {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         deviceManager = getSystemService(context!!, DevicePolicyManager::class.java)!!
+    }
+
+    override fun onStart() {
+        WakeLockManager.wakeLockStatusChanged addSubscriber this
+        DeviceAdminReceiver.statusChangedEvent addSubscriber this
+        super.onStart()
         initControls()
     }
 
-    override fun onDestroyView() {
+    override fun onStop() {
         WakeLockManager.wakeLockStatusChanged removeSubscriber this
         DeviceAdminReceiver.statusChangedEvent removeSubscriber this
-        super.onDestroyView()
+        super.onStop()
     }
 
     private fun initControls() {
