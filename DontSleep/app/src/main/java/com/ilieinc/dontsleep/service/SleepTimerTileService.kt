@@ -22,6 +22,7 @@ class SleepTimerTileService : TileService() {
     }
 
     override fun onStartListening() {
+        DeviceAdminHelper.init(applicationContext)
         refreshTileState()
         super.onStartListening()
     }

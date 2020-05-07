@@ -4,6 +4,7 @@ import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.ilieinc.dontsleep.R
+import com.ilieinc.dontsleep.util.DeviceAdminHelper
 
 class WidgetTileService : TileService() {
 
@@ -13,6 +14,7 @@ class WidgetTileService : TileService() {
     }
 
     override fun onStartListening() {
+        DeviceAdminHelper.init(applicationContext)
         changeTileState(WakeLockManager.awakeTimerActive)
         super.onStartListening()
     }

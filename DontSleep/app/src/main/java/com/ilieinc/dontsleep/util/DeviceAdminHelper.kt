@@ -5,9 +5,6 @@ import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
-import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ilieinc.dontsleep.receiver.DeviceAdminReceiver
@@ -18,7 +15,9 @@ object DeviceAdminHelper {
     lateinit var componentName: ComponentName
 
     fun init(context: Context) {
-        componentName = ComponentName(context, DeviceAdminReceiver::class.java)
+        if (!this::componentName.isInitialized) {
+            componentName = ComponentName(context, DeviceAdminReceiver::class.java)
+        }
     }
 
     fun createPermissionDialog(

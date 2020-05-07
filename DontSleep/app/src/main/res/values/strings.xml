@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">Don\'t Sleep!</string>
     <string name="tile_name">Keep Awake</string>
+    <string name="don_t_sleep_timer">Don\'t Sleep! Timer</string>
+    <string name="status">Status</string>
+    <string name="timeout">Timeout</string>
+    <string name="hours_minutes">(Hours, Minutes)</string>
+    <string name="sleep_timer">Sleep! Timer</string>
+    <string name="help">Help</string>
+    <string name="get_started">Get Started</string>
+    <string name="sleep_timer_label">Sleep Timer</string>
+    <string name="close">Close</string>
 </resources>
