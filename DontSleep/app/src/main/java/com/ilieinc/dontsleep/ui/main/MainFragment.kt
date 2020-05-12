@@ -88,8 +88,16 @@ class MainFragment : Fragment(), WakeLockChangedEvent, DeviceAdminChangedEvent {
     }
 
     private fun setAwakeStatus() {
-        setStatus(statusSwitch, WakeLockManager.awakeTimerActive) { compoundButton, checked ->
-            WakeLockManager.setAwakeWakeLockStatus(compoundButton.context, checked)
+        setStatus(
+            statusSwitch,
+            WakeLockManager.isWakeLockActive(WakeLockManager.AWAKE_WAKELOCK_TAG)
+        ) { compoundButton, checked ->
+            WakeLockManager.setWakeLockStatus(
+                compoundButton.context,
+                WakeLockManager.AWAKE_WAKELOCK_TAG,
+                checked,
+                false
+            )
         }
     }
 
@@ -122,9 +130,14 @@ class MainFragment : Fragment(), WakeLockChangedEvent, DeviceAdminChangedEvent {
         if (adminActive) {
             setStatus(
                 sleepTimerSwitch,
-                WakeLockManager.sleepTimerActive
+                WakeLockManager.isWakeLockActive(WakeLockManager.SLEEP_TIMER_WAKELOCK_TAG)
             ) { compoundButton, checked ->
-                WakeLockManager.setSleepTimerWakeLockStatus(compoundButton.context, checked)
+                WakeLockManager.setWakeLockStatus(
+                    compoundButton.context,
+                    WakeLockManager.SLEEP_TIMER_WAKELOCK_TAG,
+                    checked,
+                    true
+                )
             }
             setTimePicker(sleepTimerTimePicker, WakeLockManager.SLEEP_TIMER_WAKELOCK_TAG)
         } else {

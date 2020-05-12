@@ -2,6 +2,7 @@ package com.ilieinc.dontsleep.service
 
 import android.content.Context
 import android.os.PowerManager
+import android.os.PowerManager.WakeLock
 import com.ilieinc.dontsleep.model.WakeLockChangedEvent
 import com.ilieinc.dontsleep.timer.LockScreenWorker
 import com.ilieinc.dontsleep.timer.TimerManager
@@ -16,68 +17,61 @@ class WakeLockManager {
         const val AWAKE_WAKELOCK_TAG = "DontSleep::AwakeWakeLogTag"
         const val SLEEP_TIMER_WAKELOCK_TAG = "DontSleep::SleepTimerWakeLogTag"
 
-        private var awakeTimerWakeLock: PowerManager.WakeLock? = null
-        private var sleepTimerWakeLock: PowerManager.WakeLock? = null
+        private val wakeLocks = hashMapOf<String, WakeLock>()
 
-        val awakeTimerActive: Boolean
-            get() = awakeTimerWakeLock?.isHeld ?: false
-        val sleepTimerActive: Boolean
-            get() = sleepTimerWakeLock?.isHeld ?: false
+        fun isWakeLockActive(wakeLockName: String): Boolean {
+            return wakeLocks[wakeLockName]?.isHeld ?: false
+        }
 
-        fun setAwakeWakeLockStatus(context: Context, enabled: Boolean) {
-            if (enabled != awakeTimerActive) {
-                toggleAwakeWakeLock(context)
+        fun setWakeLockStatus(
+            context: Context,
+            wakeLockName: String,
+            enabled: Boolean,
+            turnOffScreen: Boolean
+        ) {
+            wakeLocks[wakeLockName].let { wakeLock ->
+                if (wakeLock == null || enabled != wakeLock.isHeld) {
+                    toggleWakeLock(context, wakeLockName, turnOffScreen)
+                }
             }
         }
 
-        fun setSleepTimerWakeLockStatus(context: Context, enabled: Boolean) {
-            if (enabled != sleepTimerActive) {
-                toggleSleepTimerWakeLock(context)
-            }
-        }
-
-        fun toggleAwakeWakeLock(context: Context) {
-            awakeTimerWakeLock = if (awakeTimerWakeLock == null) {
-                (context.getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-                    newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, AWAKE_WAKELOCK_TAG).apply {
-                        acquire(
-                            SharedPreferenceManager.getInstance(context)
-                                .getLong(AWAKE_WAKELOCK_TAG, 500000)
+        fun toggleWakeLock(context: Context, wakeLockName: String, turnOffScreen: Boolean) {
+            if (wakeLocks[wakeLockName] == null) {
+                wakeLocks[wakeLockName] =
+                    (context.getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+                        newWakeLock(
+                            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE,
+                            wakeLockName
                         )
                     }
-                }
-            } else {
-                awakeTimerWakeLock!!.release()
-                null
             }
-            wakeLockStatusChanged.invoke(AWAKE_WAKELOCK_TAG, awakeTimerActive)
-        }
-
-        fun toggleSleepTimerWakeLock(context: Context) {
-            val timeout = SharedPreferenceManager.getInstance(context)
-                .getLong(SLEEP_TIMER_WAKELOCK_TAG, 500000)
-            sleepTimerWakeLock = if (sleepTimerWakeLock == null) {
-                (context.getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-                    newWakeLock(
-                        PowerManager.SCREEN_BRIGHT_WAKE_LOCK,
-                        SLEEP_TIMER_WAKELOCK_TAG
-                    ).apply {
-                        acquire(timeout)
+            wakeLocks[wakeLockName]!!.let { currentWakeLock ->
+                if (!currentWakeLock.isHeld) {
+                    val timeout = SharedPreferenceManager.getInstance(context)
+                        .getLong(wakeLockName, 500000)
+                    wakeLocks[wakeLockName]!!.acquire(timeout)
+                    if (turnOffScreen) {
                         val lockScreenDateTime = Calendar.getInstance()
                         lockScreenDateTime.add(Calendar.MILLISECOND, timeout.toInt())
                         TimerManager.setTimedTask<LockScreenWorker>(
                             context,
                             lockScreenDateTime.time,
-                            SLEEP_TIMER_WAKELOCK_TAG
+                            wakeLockName
                         )
                     }
+                } else {
+                    currentWakeLock.release()
+                    if (turnOffScreen) {
+                        TimerManager.cancelTask(context, wakeLockName)
+                    }
+//                    wakeLocks.remove(wakeLockName)
                 }
-            } else {
-                sleepTimerWakeLock!!.release()
-                TimerManager.cancelTask(context, SLEEP_TIMER_WAKELOCK_TAG)
-                null
             }
-            wakeLockStatusChanged.invoke(SLEEP_TIMER_WAKELOCK_TAG, sleepTimerActive)
+            wakeLockStatusChanged.invoke(
+                wakeLockName,
+                wakeLocks[wakeLockName]!!.isHeld
+            )
         }
     }
 }

@@ -9,18 +9,22 @@ import com.ilieinc.dontsleep.util.DeviceAdminHelper
 class WidgetTileService : TileService() {
 
     override fun onClick() {
-        WakeLockManager.toggleAwakeWakeLock(applicationContext)
-        changeTileState(WakeLockManager.awakeTimerActive)
+        WakeLockManager.toggleWakeLock(
+            applicationContext,
+            WakeLockManager.AWAKE_WAKELOCK_TAG,
+            false
+        )
+        changeTileState(WakeLockManager.isWakeLockActive(WakeLockManager.AWAKE_WAKELOCK_TAG))
     }
 
     override fun onStartListening() {
         DeviceAdminHelper.init(applicationContext)
-        changeTileState(WakeLockManager.awakeTimerActive)
+        changeTileState(WakeLockManager.isWakeLockActive(WakeLockManager.AWAKE_WAKELOCK_TAG))
         super.onStartListening()
     }
 
     override fun onStopListening() {
-        changeTileState(WakeLockManager.awakeTimerActive)
+        changeTileState(WakeLockManager.isWakeLockActive(WakeLockManager.AWAKE_WAKELOCK_TAG))
         super.onStopListening()
     }
 

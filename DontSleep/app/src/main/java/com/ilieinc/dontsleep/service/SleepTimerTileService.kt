@@ -17,7 +17,11 @@ class SleepTimerTileService : TileService() {
     }
 
     override fun onClick() {
-        WakeLockManager.toggleSleepTimerWakeLock(applicationContext)
+        WakeLockManager.toggleWakeLock(
+            applicationContext,
+            WakeLockManager.SLEEP_TIMER_WAKELOCK_TAG,
+            true
+        )
         refreshTileState()
     }
 
@@ -37,7 +41,7 @@ class SleepTimerTileService : TileService() {
             ContextCompat.getSystemService(applicationContext, DevicePolicyManager::class.java)!!
         val adminActive = deviceManager.isAdminActive(DeviceAdminHelper.componentName)
         val state = if (adminActive) {
-            if (WakeLockManager.sleepTimerActive) {
+            if (WakeLockManager.isWakeLockActive(WakeLockManager.SLEEP_TIMER_WAKELOCK_TAG)) {
                 TileStates.On
             } else {
                 TileStates.Off
