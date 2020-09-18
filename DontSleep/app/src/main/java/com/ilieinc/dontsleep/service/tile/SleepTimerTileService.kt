@@ -1,12 +1,16 @@
-package com.ilieinc.dontsleep.service
+package com.ilieinc.dontsleep.service.tile
 
 import android.app.admin.DevicePolicyManager
+import android.content.Intent
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.core.content.ContextCompat
 import com.ilieinc.dontsleep.R
+import com.ilieinc.dontsleep.service.SleepService
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
+import com.ilieinc.dontsleep.util.StateHelper
+import com.ilieinc.dontsleep.util.StateHelper.SERVICE_ENABLED_EXTRA
 
 class SleepTimerTileService : TileService() {
 
@@ -16,12 +20,17 @@ class SleepTimerTileService : TileService() {
         Disabled,
     }
 
+    private val enabled
+        get() = StateHelper.isServiceRunning(this, SleepService::class.java)
+
     override fun onClick() {
-        WakeLockManager.toggleWakeLock(
-            applicationContext,
-            WakeLockManager.SLEEP_TIMER_WAKELOCK_TAG,
-            true
-        )
+        val intent = Intent(applicationContext, SleepService::class.java)
+        intent.putExtra(SERVICE_ENABLED_EXTRA, !enabled)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
         refreshTileState()
     }
 
@@ -41,7 +50,7 @@ class SleepTimerTileService : TileService() {
             ContextCompat.getSystemService(applicationContext, DevicePolicyManager::class.java)!!
         val adminActive = deviceManager.isAdminActive(DeviceAdminHelper.componentName)
         val state = if (adminActive) {
-            if (WakeLockManager.isWakeLockActive(WakeLockManager.SLEEP_TIMER_WAKELOCK_TAG)) {
+            if (enabled) {
                 TileStates.On
             } else {
                 TileStates.Off

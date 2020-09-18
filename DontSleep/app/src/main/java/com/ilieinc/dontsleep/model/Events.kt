@@ -2,8 +2,8 @@ package com.ilieinc.dontsleep.model
 
 import com.ilieinc.kotlinevents.IEvent
 
-interface WakeLockChangedEvent : IEvent {
-    fun onWakeLockChanged(wakeLock: String, active: Boolean)
+interface ServiceStatusChangedEvent : IEvent {
+    fun onServiceStatusChanged(serviceName: String, active: Boolean)
 }
 
 interface DeviceAdminChangedEvent : IEvent {

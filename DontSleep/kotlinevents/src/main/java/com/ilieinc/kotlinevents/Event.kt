@@ -1,7 +1,5 @@
 package com.ilieinc.kotlinevents
 
-import kotlin.reflect.cast
-
 class Event<T : IEvent>(eventType: Class<out T>) {
     private val type: Class<out T> = eventType
     private val subscribers = mutableListOf<T>()

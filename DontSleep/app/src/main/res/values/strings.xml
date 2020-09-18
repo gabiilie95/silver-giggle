@@ -10,4 +10,5 @@
     <string name="get_started">Get Started</string>
     <string name="sleep_timer_label">Sleep Timer</string>
     <string name="close">Close</string>
+    <string name="notification_text">Keeping device awake.</string>
 </resources>

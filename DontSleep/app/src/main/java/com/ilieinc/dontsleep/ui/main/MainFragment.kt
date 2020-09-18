@@ -10,19 +10,22 @@ import android.widget.CompoundButton
 import android.widget.Switch
 import android.widget.TimePicker
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat.startForegroundService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.model.DeviceAdminChangedEvent
-import com.ilieinc.dontsleep.model.WakeLockChangedEvent
+import com.ilieinc.dontsleep.model.ServiceStatusChangedEvent
 import com.ilieinc.dontsleep.receiver.DeviceAdminReceiver
-import com.ilieinc.dontsleep.service.WakeLockManager
+import com.ilieinc.dontsleep.service.SleepService
+import com.ilieinc.dontsleep.service.TimeoutService
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
 import com.ilieinc.dontsleep.util.DeviceAdminHelper.createPermissionDialog
 import com.ilieinc.dontsleep.util.SharedPreferenceManager
+import com.ilieinc.dontsleep.util.StateHelper.SERVICE_ENABLED_EXTRA
 import kotlinx.android.synthetic.main.main_fragment.*
 
-class MainFragment : Fragment(), WakeLockChangedEvent, DeviceAdminChangedEvent {
+class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEvent {
 
     companion object {
         fun newInstance() = MainFragment()
@@ -45,21 +48,21 @@ class MainFragment : Fragment(), WakeLockChangedEvent, DeviceAdminChangedEvent {
     }
 
     override fun onStart() {
-        WakeLockManager.wakeLockStatusChanged addSubscriber this
+        TimeoutService.serviceStatusChanged addSubscriber this
         DeviceAdminReceiver.statusChangedEvent addSubscriber this
         super.onStart()
         initControls()
     }
 
     override fun onStop() {
-        WakeLockManager.wakeLockStatusChanged removeSubscriber this
+        TimeoutService.serviceStatusChanged removeSubscriber this
         DeviceAdminReceiver.statusChangedEvent removeSubscriber this
         super.onStop()
     }
 
     private fun initControls() {
-        setAwakeStatus()
-        setTimePicker(timeoutTimePicker, WakeLockManager.AWAKE_WAKELOCK_TAG)
+        setTimeoutStatus()
+        setTimePicker(timeoutTimePicker, TimeoutService.TIMEOUT_TAG)
         setSleepTimerControls(deviceManager.isAdminActive(DeviceAdminHelper.componentName))
         initButtons()
     }
@@ -76,28 +79,31 @@ class MainFragment : Fragment(), WakeLockChangedEvent, DeviceAdminChangedEvent {
         }
     }
 
-    override fun onWakeLockChanged(wakeLock: String, active: Boolean) {
-        when (wakeLock) {
-            WakeLockManager.AWAKE_WAKELOCK_TAG -> {
+    override fun onServiceStatusChanged(serviceName: String, active: Boolean) {
+        when (serviceName) {
+            TimeoutService::class.java.name -> {
                 statusSwitch.isChecked = active
             }
-            WakeLockManager.SLEEP_TIMER_WAKELOCK_TAG -> {
+            SleepService::class.java.name -> {
                 sleepTimerSwitch.isChecked = active
             }
         }
     }
 
-    private fun setAwakeStatus() {
+    private fun setTimeoutStatus() {
         setStatus(
             statusSwitch,
-            WakeLockManager.isWakeLockActive(WakeLockManager.AWAKE_WAKELOCK_TAG)
+            TimeoutService.isRunning(requireContext())
         ) { compoundButton, checked ->
-            WakeLockManager.setWakeLockStatus(
-                compoundButton.context,
-                WakeLockManager.AWAKE_WAKELOCK_TAG,
-                checked,
-                false
-            )
+            val intent = Intent(requireContext(), TimeoutService::class.java)
+            intent.putExtra(SERVICE_ENABLED_EXTRA, checked)
+            startForegroundService(compoundButton.context, intent)
+//            ScreenTimeoutService.setWakeLockStatus(
+//                compoundButton.context,
+//                ScreenTimeoutService.AWAKE_WAKELOCK_TAG,
+//                checked,
+//                false
+//            )
         }
     }
 
@@ -130,16 +136,13 @@ class MainFragment : Fragment(), WakeLockChangedEvent, DeviceAdminChangedEvent {
         if (adminActive) {
             setStatus(
                 sleepTimerSwitch,
-                WakeLockManager.isWakeLockActive(WakeLockManager.SLEEP_TIMER_WAKELOCK_TAG)
+                SleepService.isRunning(requireContext())
             ) { compoundButton, checked ->
-                WakeLockManager.setWakeLockStatus(
-                    compoundButton.context,
-                    WakeLockManager.SLEEP_TIMER_WAKELOCK_TAG,
-                    checked,
-                    true
-                )
+                val intent = Intent(requireContext(), SleepService::class.java)
+                intent.putExtra(SERVICE_ENABLED_EXTRA, checked)
+                startForegroundService(compoundButton.context, intent)
             }
-            setTimePicker(sleepTimerTimePicker, WakeLockManager.SLEEP_TIMER_WAKELOCK_TAG)
+            setTimePicker(sleepTimerTimePicker, SleepService.SLEEP_TAG)
         } else {
             permissionButton.setOnClickListener {
                 val dialog = createPermissionDialog(activity!!) {
