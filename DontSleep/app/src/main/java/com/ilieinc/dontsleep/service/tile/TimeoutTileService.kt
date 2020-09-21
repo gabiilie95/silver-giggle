@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import androidx.core.content.ContextCompat
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.service.TimeoutService
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
@@ -17,11 +18,7 @@ class TimeoutTileService : TileService() {
     override fun onClick() {
         val intent = Intent(applicationContext, TimeoutService::class.java)
         intent.putExtra(SERVICE_ENABLED_EXTRA, !enabled)
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
-        }
+        ContextCompat.startForegroundService(this, intent)
         changeTileState(enabled)
     }
 

@@ -57,7 +57,7 @@
                             android:textStyle="bold" />
 
                         <Switch
-                            android:id="@+id/statusSwitch"
+                            android:id="@+id/timeoutSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
@@ -161,7 +161,7 @@
 
 
                         <Switch
-                            android:id="@+id/sleepTimerSwitch"
+                            android:id="@+id/sleepSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"

@@ -2,7 +2,11 @@ package com.ilieinc.dontsleep.util
 
 import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
+import com.ilieinc.dontsleep.service.TimeoutService
 import java.util.*
 
 
@@ -25,5 +29,23 @@ object StateHelper {
             }
         }
         return false
+    }
+
+    fun requestDrawOverPermission(context: Context) {
+        if (!Settings.canDrawOverlays(context)) {
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:" + context.packageName)
+            )
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } else {
+            val serviceIntent = Intent(context, TimeoutService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent)
+            } else {
+                context.startService(serviceIntent)
+            }
+        }
     }
 }

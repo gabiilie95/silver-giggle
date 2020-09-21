@@ -49,6 +49,7 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
 
     override fun onStart() {
         TimeoutService.serviceStatusChanged addSubscriber this
+        SleepService.serviceStatusChanged addSubscriber this
         DeviceAdminReceiver.statusChangedEvent addSubscriber this
         super.onStart()
         initControls()
@@ -56,6 +57,7 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
 
     override fun onStop() {
         TimeoutService.serviceStatusChanged removeSubscriber this
+        SleepService.serviceStatusChanged removeSubscriber this
         DeviceAdminReceiver.statusChangedEvent removeSubscriber this
         super.onStop()
     }
@@ -80,19 +82,21 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
     }
 
     override fun onServiceStatusChanged(serviceName: String, active: Boolean) {
-        when (serviceName) {
-            TimeoutService::class.java.name -> {
-                statusSwitch.isChecked = active
-            }
-            SleepService::class.java.name -> {
-                sleepTimerSwitch.isChecked = active
+        activity?.runOnUiThread {
+            when (serviceName) {
+                TimeoutService::class.java.name -> {
+                    timeoutSwitch.isChecked = active
+                }
+                SleepService::class.java.name -> {
+                    sleepSwitch.isChecked = active
+                }
             }
         }
     }
 
     private fun setTimeoutStatus() {
         setStatus(
-            statusSwitch,
+            timeoutSwitch,
             TimeoutService.isRunning(requireContext())
         ) { compoundButton, checked ->
             val intent = Intent(requireContext(), TimeoutService::class.java)
@@ -135,7 +139,7 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
         setSleepTimerControlsVisibility(adminActive)
         if (adminActive) {
             setStatus(
-                sleepTimerSwitch,
+                sleepSwitch,
                 SleepService.isRunning(requireContext())
             ) { compoundButton, checked ->
                 val intent = Intent(requireContext(), SleepService::class.java)
@@ -167,7 +171,7 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
         val permissionButtonVisibility = if (enabled) View.GONE else View.VISIBLE
 
         sleepTimerStatusText.visibility = statusFieldsVisibility
-        sleepTimerSwitch.visibility = statusFieldsVisibility
+        sleepSwitch.visibility = statusFieldsVisibility
         sleepTimerLayout.visibility = statusFieldsVisibility
         permissionButton.visibility = permissionButtonVisibility
     }

@@ -12,7 +12,7 @@ import com.ilieinc.dontsleep.util.DeviceAdminHelper
 import com.ilieinc.dontsleep.util.StateHelper
 import com.ilieinc.dontsleep.util.StateHelper.SERVICE_ENABLED_EXTRA
 
-class SleepTimerTileService : TileService() {
+class SleepTileService : TileService() {
 
     enum class TileStates {
         On,
@@ -26,11 +26,7 @@ class SleepTimerTileService : TileService() {
     override fun onClick() {
         val intent = Intent(applicationContext, SleepService::class.java)
         intent.putExtra(SERVICE_ENABLED_EXTRA, !enabled)
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
-        }
+        ContextCompat.startForegroundService(this, intent)
         refreshTileState()
     }
 

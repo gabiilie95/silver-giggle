@@ -9,6 +9,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.text.format.DateFormat
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.ilieinc.dontsleep.MainActivity
@@ -16,6 +17,7 @@ import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.service.SleepService
 import com.ilieinc.dontsleep.service.SleepService.Companion.SLEEP_TAG
 import com.ilieinc.dontsleep.service.TimeoutService
+import com.ilieinc.dontsleep.service.TimeoutService.Companion.TIMEOUT_TAG
 import java.lang.reflect.Method
 import java.util.*
 
@@ -48,13 +50,24 @@ object NotificationManager {
                 mainActivityIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
+            val timeout = Calendar.getInstance()
+            timeout.add(
+                Calendar.MILLISECOND,
+                SharedPreferenceManager.getInstance(context).getLong(TIMEOUT_TAG, 900000)
+                    .toInt()
+            )
             builder
                 .setSmallIcon(R.drawable.baseline_mobile_friendly_24)
                 .setContentTitle(context.getString(R.string.app_name))
-                .setContentText(context.getString(R.string.notification_text))
+                .setContentText(
+                    context.getString(
+                        R.string.timeout_notification_text,
+                        DateFormat.getTimeFormat(context).format(timeout.time)
+                    )
+                )
                 .setContentIntent(mainActivityPendingIntent)
                 .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
 //                .addAction(
 //                    R.mipmap.ic_close,
 //                    context.getString(R.string.close),
@@ -72,7 +85,8 @@ object NotificationManager {
                 mainActivityIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
-            val timeout = Calendar.getInstance().add(
+            val timeout = Calendar.getInstance()
+            timeout.add(
                 Calendar.MILLISECOND,
                 SharedPreferenceManager.getInstance(context).getLong(SLEEP_TAG, 900000)
                     .toInt()
@@ -80,10 +94,15 @@ object NotificationManager {
             builder
                 .setSmallIcon(R.drawable.baseline_timer_24)
                 .setContentTitle(context.getString(R.string.app_name))
-                .setContentText("Turning screen off at $timeout")
+                .setContentText(
+                    context.getString(
+                        R.string.sleep_notification_text,
+                        DateFormat.getTimeFormat(context).format(timeout.time)
+                    )
+                )
                 .setContentIntent(mainActivityPendingIntent)
                 .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         }
 
