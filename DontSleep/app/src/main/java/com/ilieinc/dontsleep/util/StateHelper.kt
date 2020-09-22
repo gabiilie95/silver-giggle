@@ -1,11 +1,13 @@
 package com.ilieinc.dontsleep.util
 
 import android.app.ActivityManager
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.core.content.ContextCompat
 import com.ilieinc.dontsleep.service.TimeoutService
 import java.util.*
 
@@ -29,6 +31,14 @@ object StateHelper {
             }
         }
         return false
+    }
+
+    inline fun <reified T> Context.startForegroundService() where T : Service {
+        ContextCompat.startForegroundService(this, Intent(this, T::class.java))
+    }
+
+    inline fun <reified T> Context.stopService() where T : Service {
+        stopService(Intent(this, T::class.java))
     }
 
     fun requestDrawOverPermission(context: Context) {

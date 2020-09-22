@@ -32,37 +32,40 @@ class TimeoutService : BaseService(
     private var overlay: View? = null
     override val serviceStatusChanged: Event<ServiceStatusChangedEvent> =
         SleepService.serviceStatusChanged
-    override val action: (enabled: Boolean) -> Unit = { enabled ->
-        if (enabled) {
-            val timeout = SharedPreferenceManager.getInstance(applicationContext)
-                .getLong(TIMEOUT_TAG, 500000)
-            if (StateHelper.deviceRequiresOverlay()) {
-                showOverlay()
-            } else {
-                val currentWakeLock =
-                    (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-                        newWakeLock(
-                            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE,
-                            TIMEOUT_WAKELOCK_TAG
-                        )
-                    }
-                currentWakeLock.acquire(timeout)
-                wakeLock.name = TIMEOUT_WAKELOCK_TAG
-                wakeLock.lock = currentWakeLock
-            }
-            val timeoutDateTime = Calendar.getInstance()
-            timeoutDateTime.add(Calendar.MILLISECOND, timeout.toInt())
-        } else {
-            if (StateHelper.deviceRequiresOverlay()) {
-                removeOverlay(getSystemService(Context.WINDOW_SERVICE) as WindowManager)
-            } else {
-                wakeLock.release()
-            }
-        }
-    }
 
     override fun initFields() {
         notification = NotificationManager.createScreenTimeoutNotification(this)
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        val timeout = SharedPreferenceManager.getInstance(applicationContext)
+            .getLong(TIMEOUT_TAG, 500000)
+        if (StateHelper.deviceRequiresOverlay()) {
+            showOverlay()
+        } else {
+            val currentWakeLock =
+                (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+                    newWakeLock(
+                        PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE,
+                        TIMEOUT_WAKELOCK_TAG
+                    )
+                }
+            currentWakeLock.acquire(timeout)
+            wakeLock.name = TIMEOUT_WAKELOCK_TAG
+            wakeLock.lock = currentWakeLock
+        }
+        val timeoutDateTime = Calendar.getInstance()
+        timeoutDateTime.add(Calendar.MILLISECOND, timeout.toInt())
+    }
+
+    override fun onDestroy() {
+        if (StateHelper.deviceRequiresOverlay()) {
+            removeOverlay(getSystemService(Context.WINDOW_SERVICE) as WindowManager)
+        } else {
+            wakeLock.release()
+        }
+        super.onDestroy()
     }
 
     private fun showOverlay() {

@@ -10,7 +10,6 @@ import com.ilieinc.dontsleep.model.ServiceStatusChangedEvent
 import com.ilieinc.dontsleep.timer.StopServiceWorker
 import com.ilieinc.dontsleep.timer.TimerManager
 import com.ilieinc.dontsleep.util.SharedPreferenceManager
-import com.ilieinc.dontsleep.util.StateHelper
 import com.ilieinc.kotlinevents.Event
 import java.util.*
 
@@ -22,7 +21,6 @@ abstract class BaseService(
     abstract val serviceStatusChanged: Event<ServiceStatusChangedEvent>
 
     protected lateinit var notification: Notification
-    protected abstract val action: (enabled: Boolean) -> Unit
     protected lateinit var timeoutDateTime: Calendar
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -40,34 +38,20 @@ abstract class BaseService(
             .getLong(serviceTag, 500000)
         timeoutDateTime.add(Calendar.MILLISECOND, timeout.toInt())
         serviceStatusChanged.invoke(serviceClass.name, true)
+        TimerManager.setTimedTask<StopServiceWorker>(
+            this,
+            timeoutDateTime.time,
+            serviceTag,
+            mutableMapOf(StopServiceWorker.SERVICE_NAME_EXTRA to serviceClass.name)
+        )
     }
 
     abstract fun initFields()
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.let {
-            val enabled = it.getBooleanExtra(StateHelper.SERVICE_ENABLED_EXTRA, false)
-            executeLogic(enabled)
-        }
-        return START_STICKY
-    }
-
-    private fun executeLogic(enabled: Boolean) {
-        action(enabled)
-        if (enabled) {
-            TimerManager.setTimedTask<StopServiceWorker>(
-                this,
-                timeoutDateTime.time,
-                serviceTag,
-                mutableMapOf(StopServiceWorker.SERVICE_NAME_EXTRA to TimeoutService::class.java.name)
-            )
-        } else {
-            TimerManager.cancelTask(this, SleepService.SLEEP_TAG)
-            stopSelf()
-        }
-    }
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
 
     override fun onDestroy() {
+        TimerManager.cancelTask(this, serviceTag)
         serviceStatusChanged.invoke(serviceClass.name, false)
         super.onDestroy()
     }

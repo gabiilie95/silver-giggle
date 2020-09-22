@@ -23,25 +23,28 @@ class SleepService : BaseService(
             StateHelper.isServiceRunning(context, SleepService::class.java)
     }
 
-    private var timeoutServiceIntent: Intent? = null
-
     override val serviceStatusChanged: Event<ServiceStatusChangedEvent> =
         Companion.serviceStatusChanged
-    override val action: (enabled: Boolean) -> Unit = { enabled ->
-        if (enabled) {
-            timeoutServiceIntent = Intent(this, TimeoutService::class.java)
-            timeoutServiceIntent?.let { ContextCompat.startForegroundService(this, it) }
-            TimerManager.setTimedTask<LockScreenWorker>(
-                this,
-                timeoutDateTime.time,
-                SLEEP_TAG
-            )
-        } else {
-            stopService(timeoutServiceIntent)
-        }
-    }
 
     override fun initFields() {
         notification = NotificationManager.createScreenSleepNotification(this)
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        ContextCompat.startForegroundService(
+            this,
+            Intent(this, TimeoutService::class.java)
+        )
+        TimerManager.setTimedTask<LockScreenWorker>(
+            this,
+            timeoutDateTime.time,
+            SLEEP_TAG
+        )
+    }
+
+    override fun onDestroy() {
+        stopService(Intent(this, TimeoutService::class.java))
+        super.onDestroy()
     }
 }

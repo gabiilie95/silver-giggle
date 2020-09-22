@@ -10,7 +10,6 @@ import android.widget.CompoundButton
 import android.widget.Switch
 import android.widget.TimePicker
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.content.ContextCompat.startForegroundService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.ilieinc.dontsleep.R
@@ -22,7 +21,8 @@ import com.ilieinc.dontsleep.service.TimeoutService
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
 import com.ilieinc.dontsleep.util.DeviceAdminHelper.createPermissionDialog
 import com.ilieinc.dontsleep.util.SharedPreferenceManager
-import com.ilieinc.dontsleep.util.StateHelper.SERVICE_ENABLED_EXTRA
+import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
+import com.ilieinc.dontsleep.util.StateHelper.stopService
 import kotlinx.android.synthetic.main.main_fragment.*
 
 class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEvent {
@@ -98,16 +98,12 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
         setStatus(
             timeoutSwitch,
             TimeoutService.isRunning(requireContext())
-        ) { compoundButton, checked ->
-            val intent = Intent(requireContext(), TimeoutService::class.java)
-            intent.putExtra(SERVICE_ENABLED_EXTRA, checked)
-            startForegroundService(compoundButton.context, intent)
-//            ScreenTimeoutService.setWakeLockStatus(
-//                compoundButton.context,
-//                ScreenTimeoutService.AWAKE_WAKELOCK_TAG,
-//                checked,
-//                false
-//            )
+        ) { _, checked ->
+            if (checked) {
+                requireContext().startForegroundService<TimeoutService>()
+            } else {
+                requireContext().stopService<TimeoutService>()
+            }
         }
     }
 
@@ -141,10 +137,12 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
             setStatus(
                 sleepSwitch,
                 SleepService.isRunning(requireContext())
-            ) { compoundButton, checked ->
-                val intent = Intent(requireContext(), SleepService::class.java)
-                intent.putExtra(SERVICE_ENABLED_EXTRA, checked)
-                startForegroundService(compoundButton.context, intent)
+            ) { _, checked ->
+                if (checked) {
+                    requireContext().startForegroundService<SleepService>()
+                } else {
+                    requireContext().stopService<SleepService>()
+                }
             }
             setTimePicker(sleepTimerTimePicker, SleepService.SLEEP_TAG)
         } else {
@@ -169,9 +167,6 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
     private fun setSleepTimerControlsVisibility(enabled: Boolean) {
         val statusFieldsVisibility = if (enabled) View.VISIBLE else View.GONE
         val permissionButtonVisibility = if (enabled) View.GONE else View.VISIBLE
-
-        sleepTimerStatusText.visibility = statusFieldsVisibility
-        sleepSwitch.visibility = statusFieldsVisibility
         sleepTimerLayout.visibility = statusFieldsVisibility
         permissionButton.visibility = permissionButtonVisibility
     }

@@ -1,14 +1,13 @@
 package com.ilieinc.dontsleep.service.tile
 
-import android.content.Intent
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import androidx.core.content.ContextCompat
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.service.TimeoutService
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
-import com.ilieinc.dontsleep.util.StateHelper.SERVICE_ENABLED_EXTRA
+import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
+import com.ilieinc.dontsleep.util.StateHelper.stopService
 
 class TimeoutTileService : TileService() {
 
@@ -16,25 +15,26 @@ class TimeoutTileService : TileService() {
         get() = TimeoutService.isRunning(this)
 
     override fun onClick() {
-        val intent = Intent(applicationContext, TimeoutService::class.java)
-        intent.putExtra(SERVICE_ENABLED_EXTRA, !enabled)
-        ContextCompat.startForegroundService(this, intent)
-        changeTileState(enabled)
+        if (!enabled) {
+            startForegroundService<TimeoutService>()
+        } else {
+            stopService<TimeoutService>()
+        }
+        refreshTileState()
     }
 
     override fun onStartListening() {
         DeviceAdminHelper.init(applicationContext)
-        changeTileState(enabled)
+        refreshTileState()
         super.onStartListening()
     }
 
     override fun onStopListening() {
-        changeTileState(enabled)
+        refreshTileState()
         super.onStopListening()
     }
 
-
-    private fun changeTileState(enabled: Boolean) {
+    private fun refreshTileState() {
         val tile = qsTile
         when (enabled) {
             true -> {

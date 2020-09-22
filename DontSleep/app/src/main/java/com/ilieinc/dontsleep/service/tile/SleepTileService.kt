@@ -1,7 +1,6 @@
 package com.ilieinc.dontsleep.service.tile
 
 import android.app.admin.DevicePolicyManager
-import android.content.Intent
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
@@ -10,7 +9,8 @@ import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.service.SleepService
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
 import com.ilieinc.dontsleep.util.StateHelper
-import com.ilieinc.dontsleep.util.StateHelper.SERVICE_ENABLED_EXTRA
+import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
+import com.ilieinc.dontsleep.util.StateHelper.stopService
 
 class SleepTileService : TileService() {
 
@@ -24,9 +24,11 @@ class SleepTileService : TileService() {
         get() = StateHelper.isServiceRunning(this, SleepService::class.java)
 
     override fun onClick() {
-        val intent = Intent(applicationContext, SleepService::class.java)
-        intent.putExtra(SERVICE_ENABLED_EXTRA, !enabled)
-        ContextCompat.startForegroundService(this, intent)
+        if (!enabled) {
+            startForegroundService<SleepService>()
+        } else {
+            stopService<SleepService>()
+        }
         refreshTileState()
     }
 
