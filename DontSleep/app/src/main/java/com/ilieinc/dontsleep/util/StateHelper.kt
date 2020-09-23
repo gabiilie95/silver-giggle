@@ -8,7 +8,6 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.ilieinc.dontsleep.R
 import java.util.*
 
 
@@ -18,7 +17,7 @@ object StateHelper {
     )
 
     fun deviceRequiresOverlay(): Boolean {
-        return true || overlayDevices.contains(Build.MANUFACTURER.toLowerCase(Locale.getDefault()))
+        return overlayDevices.contains(Build.MANUFACTURER.toLowerCase(Locale.getDefault()))
     }
 
     fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
@@ -43,6 +42,8 @@ object StateHelper {
         context: Context,
         title: String,
         message: String,
+        positiveButtonMessage: String,
+        negativeButtonMessage: String,
         successCallback: (() -> Unit)?
     ): MaterialAlertDialogBuilder {
         val dialogBuilder = MaterialAlertDialogBuilder(context)
@@ -58,8 +59,8 @@ object StateHelper {
         }
         dialogBuilder.setTitle(title)
             .setMessage(message)
-            .setPositiveButton(context.getString(R.string.yes), clickListener)
-            .setNegativeButton(context.getString(R.string.no), clickListener)
+            .setPositiveButton(positiveButtonMessage, clickListener)
+            .setNegativeButton(negativeButtonMessage, clickListener)
         return dialogBuilder
     }
 

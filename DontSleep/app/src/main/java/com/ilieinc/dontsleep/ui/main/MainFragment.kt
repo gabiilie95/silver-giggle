@@ -102,7 +102,7 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
     }
 
     override fun onDeviceAdminStatusChanged(active: Boolean) {
-        setSleepTimerControls(active)
+        setSleepTimerControls(!active)
     }
 
     private fun setStatus(
@@ -132,7 +132,9 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
                 val dialog = createDialog(
                     requireContext(),
                     requireContext().getString(R.string.draw_over_permission_grant_title),
-                    requireContext().getString(R.string.draw_over_permission_grant_body)
+                    requireContext().getString(R.string.draw_over_permission_grant_body),
+                    requireContext().getString(R.string.yes),
+                    requireContext().getString(R.string.no)
                 ) {
                     PermissionHelper.requestDrawOverPermission(requireContext())
                 }
@@ -160,7 +162,9 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
                 val dialog = createDialog(
                     requireContext(),
                     requireContext().getString(R.string.special_permission_grant_title),
-                    requireContext().getString(R.string.special_permission_grant_body)
+                    requireContext().getString(R.string.special_permission_grant_body),
+                    requireContext().getString(R.string.yes),
+                    requireContext().getString(R.string.no)
                 ) {
                     val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
                     intent.putExtra(

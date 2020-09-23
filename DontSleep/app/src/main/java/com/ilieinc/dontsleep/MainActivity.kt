@@ -1,12 +1,16 @@
 package com.ilieinc.dontsleep
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.ilieinc.dontsleep.ui.main.MainFragment
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
+import com.ilieinc.dontsleep.util.StateHelper
 import kotlinx.android.synthetic.main.main_activity.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,7 +35,23 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_rate -> {
-            //TODO("Not Implemented")
+            StateHelper.createDialog(
+                this,
+                "Rate this app",
+                "If you enjoy this app please feel free to rate it on the Google Play " +
+                        "Store, it would help me out a lot :)\n" +
+                        "For any feedback or suggestions either leave a review, " +
+                        "or contact me directly at gabiilie95@gmail.com",
+                "Rate App",
+                "Dismiss"
+            ) {
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("market://details?id=$packageName")
+                    )
+                )
+            }.show()
             true
         }
         else -> {
