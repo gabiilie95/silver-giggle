@@ -25,10 +25,12 @@ class TimerManager {
             constraints: Constraints? = null
         ) {
             Logger.info(
-                "Queueing up task: ${T::class.java.simpleName} at: ${SimpleDateFormat(
-                    "MM-dd-yyyy hh:mm:ss aa",
-                    Locale.US
-                ).format(requestTime.time)}."
+                "Queueing up task: ${T::class.java.simpleName} at: ${
+                    SimpleDateFormat(
+                        "MM-dd-yyyy hh:mm:ss aa",
+                        Locale.US
+                    ).format(requestTime.time)
+                }."
             )
             val request = OneTimeWorkRequest.Builder(T::class.java)
             request.addTag(tag ?: T::class.java.simpleName)
@@ -54,6 +56,7 @@ class TimerManager {
         }
 
         fun cancelTask(context: Context, tag: String) {
+            Logger.info("Cancelling work by tag $tag")
             val wm = WorkManager.getInstance(context)
             wm.cancelAllWorkByTag(tag)
         }

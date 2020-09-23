@@ -184,6 +184,7 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
                     requireContext().startForegroundService<SleepService>()
                 } else {
                     requireContext().stopService<SleepService>()
+                    SleepService.cancelLockWorker(requireContext())
                 }
             }
             setTimePicker(sleepTimerTimePicker, SleepService.SLEEP_TAG)
