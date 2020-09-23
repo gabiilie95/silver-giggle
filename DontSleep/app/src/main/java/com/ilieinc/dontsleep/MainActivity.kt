@@ -1,13 +1,13 @@
 package com.ilieinc.dontsleep
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.ilieinc.dontsleep.ui.main.MainFragment
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
+import com.ilieinc.dontsleep.util.Logger
 import com.ilieinc.dontsleep.util.StateHelper
 import kotlinx.android.synthetic.main.main_activity.*
 
@@ -45,12 +45,20 @@ class MainActivity : AppCompatActivity() {
                 "Rate App",
                 "Dismiss"
             ) {
-                startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("market://details?id=$packageName")
-                    )
-                )
+                val manager = ReviewManagerFactory.create(this)
+                manager.requestReviewFlow().apply {
+                    addOnCompleteListener { request ->
+                        if (request.isSuccessful) {
+                            val reviewInfo = request.result
+                            val flow = manager.launchReviewFlow(this@MainActivity, reviewInfo)
+                            flow.addOnCompleteListener { _ ->
+                                Logger.info("Review finished")
+                            }
+                        } else {
+                            Logger.info("Unable to show review")
+                        }
+                    }
+                }
             }.show()
             true
         }
