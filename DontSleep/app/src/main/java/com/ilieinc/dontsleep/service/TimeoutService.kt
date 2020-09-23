@@ -9,14 +9,13 @@ import android.view.View
 import android.view.WindowManager
 import com.ilieinc.dontsleep.model.NamedWakeLock
 import com.ilieinc.dontsleep.model.ServiceStatusChangedEvent
+import com.ilieinc.dontsleep.util.Logger
 import com.ilieinc.dontsleep.util.NotificationManager
-import com.ilieinc.dontsleep.util.SharedPreferenceManager
 import com.ilieinc.dontsleep.util.StateHelper
 import com.ilieinc.kotlinevents.Event
-import java.util.*
 
 class TimeoutService : BaseService(
-    this::class.java,
+    TimeoutService::class.java,
     TIMEOUT_TAG,
     1
 ) {
@@ -39,24 +38,11 @@ class TimeoutService : BaseService(
 
     override fun onCreate() {
         super.onCreate()
-        val timeout = SharedPreferenceManager.getInstance(applicationContext)
-            .getLong(TIMEOUT_TAG, 500000)
         if (StateHelper.deviceRequiresOverlay()) {
             showOverlay()
         } else {
-            val currentWakeLock =
-                (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-                    newWakeLock(
-                        PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE,
-                        TIMEOUT_WAKELOCK_TAG
-                    )
-                }
-            currentWakeLock.acquire(timeout)
-            wakeLock.name = TIMEOUT_WAKELOCK_TAG
-            wakeLock.lock = currentWakeLock
+            acquireWakeLock()
         }
-        val timeoutDateTime = Calendar.getInstance()
-        timeoutDateTime.add(Calendar.MILLISECOND, timeout.toInt())
     }
 
     override fun onDestroy() {
@@ -87,7 +73,21 @@ class TimeoutService : BaseService(
         params.gravity = Gravity.TOP or Gravity.START
         params.x = 0
         params.y = 0
+        Logger.info("Inserting overlay")
         windowManager.addView(overlay, params)
+    }
+
+    private fun acquireWakeLock() {
+        val currentWakeLock =
+            (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+                newWakeLock(
+                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE,
+                    TIMEOUT_WAKELOCK_TAG
+                )
+            }
+        currentWakeLock.acquire(timeout)
+        wakeLock.name = TIMEOUT_WAKELOCK_TAG
+        wakeLock.lock = currentWakeLock
     }
 
     private fun removeOverlay(windowManager: WindowManager) {

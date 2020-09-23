@@ -11,14 +11,13 @@ import com.ilieinc.dontsleep.util.StateHelper
 import com.ilieinc.kotlinevents.Event
 
 class SleepService : BaseService(
-    this::class.java,
-    SLEEP_SERVICE_STOP_TAG,
+    SleepService::class.java,
+    SLEEP_TAG,
     2
 ) {
     companion object {
         val serviceStatusChanged = Event(ServiceStatusChangedEvent::class.java)
         const val SLEEP_TAG = "DontSleep::SleepTag"
-        const val SLEEP_SERVICE_STOP_TAG = "DontSleep::SleepServiceStopTag"
         fun isRunning(context: Context) =
             StateHelper.isServiceRunning(context, SleepService::class.java)
     }

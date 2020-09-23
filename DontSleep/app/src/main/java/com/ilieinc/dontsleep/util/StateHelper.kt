@@ -3,18 +3,16 @@ package com.ilieinc.dontsleep.util
 import android.app.ActivityManager
 import android.app.Service
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
-import android.provider.Settings
 import androidx.core.content.ContextCompat
-import com.ilieinc.dontsleep.service.TimeoutService
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.ilieinc.dontsleep.R
 import java.util.*
 
 
 object StateHelper {
-    const val SERVICE_ENABLED_EXTRA = "ServiceEnabled"
-
     private val overlayDevices = arrayOf(
         "samsung"
     )
@@ -41,21 +39,55 @@ object StateHelper {
         stopService(Intent(this, T::class.java))
     }
 
-    fun requestDrawOverPermission(context: Context) {
-        if (!Settings.canDrawOverlays(context)) {
-            val intent = Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:" + context.packageName)
-            )
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(intent)
-        } else {
-            val serviceIntent = Intent(context, TimeoutService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(serviceIntent)
-            } else {
-                context.startService(serviceIntent)
+    fun createDialog(
+        context: Context,
+        title: String,
+        message: String,
+        successCallback: (() -> Unit)?
+    ): MaterialAlertDialogBuilder {
+        val dialogBuilder = MaterialAlertDialogBuilder(context)
+        val clickListener = DialogInterface.OnClickListener { dialog, which ->
+            when (which) {
+                DialogInterface.BUTTON_POSITIVE -> {
+                    successCallback?.invoke()
+                }
+                else -> {
+                    dialog.dismiss()
+                }
             }
         }
+        dialogBuilder.setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(context.getString(R.string.yes), clickListener)
+            .setNegativeButton(context.getString(R.string.no), clickListener)
+        return dialogBuilder
+    }
+
+    fun getTimeoutInfoDialog(
+        context: Context,
+        onChangeCallback: (() -> Unit)?
+    ): MaterialAlertDialogBuilder {
+        val dialogBuilder = MaterialAlertDialogBuilder(context)
+        val clickListener = DialogInterface.OnClickListener { dialog, which ->
+            when (which) {
+                DialogInterface.BUTTON_POSITIVE -> {
+                    dialog.dismiss()
+                }
+                DialogInterface.BUTTON_NEGATIVE -> {
+                    onChangeCallback?.invoke()
+                }
+            }
+        }
+        var message =
+            "This feature enables you to turn off your screen timeout with the click of a button.\n"
+        dialogBuilder.setTitle("Don't Sleep! Help").setPositiveButton("Ok", clickListener)
+        if (PermissionHelper.hasDrawOverPermission(context)) {
+            message += "You can revoke the draw over permission from this dialog."
+            dialogBuilder.setNegativeButton("Revoke Draw Over Permission", clickListener)
+        } else if (PermissionHelper.shouldRequestDrawOverPermission(context)) {
+            message += "In order to use this feature you need to allow draw over permissions."
+        }
+        dialogBuilder.setMessage(message)
+        return dialogBuilder
     }
 }

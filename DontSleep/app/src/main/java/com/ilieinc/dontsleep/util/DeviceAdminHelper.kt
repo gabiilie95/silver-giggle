@@ -20,29 +20,6 @@ object DeviceAdminHelper {
         }
     }
 
-    fun createPermissionDialog(
-        activity: Activity,
-        successCallback: (() -> Unit)?
-    ): MaterialAlertDialogBuilder {
-        val dialogBuilder = MaterialAlertDialogBuilder(activity)
-        val clickListener = DialogInterface.OnClickListener { dialog, which ->
-            when (which) {
-                DialogInterface.BUTTON_POSITIVE -> {
-                    successCallback?.invoke()
-                }
-                else -> {
-                    dialog.dismiss()
-                }
-            }
-        }
-        dialogBuilder.setTitle("Special Permission Grant").setMessage(
-            "In order to use this feature, you must grant a special permission to the application.\n" +
-                    "This permission allows the application to turn off your screen.\n\n" +
-                    "Do you want to continue?"
-        ).setPositiveButton("Yes", clickListener).setNegativeButton("No", clickListener)
-        return dialogBuilder
-    }
-
     fun getInfoDialog(
         activity: Activity,
         onChangeCallback: (() -> Unit)?

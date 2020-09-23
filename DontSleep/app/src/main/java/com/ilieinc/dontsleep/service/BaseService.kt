@@ -9,6 +9,7 @@ import android.os.IBinder
 import com.ilieinc.dontsleep.model.ServiceStatusChangedEvent
 import com.ilieinc.dontsleep.timer.StopServiceWorker
 import com.ilieinc.dontsleep.timer.TimerManager
+import com.ilieinc.dontsleep.util.Logger
 import com.ilieinc.dontsleep.util.SharedPreferenceManager
 import com.ilieinc.kotlinevents.Event
 import java.util.*
@@ -22,10 +23,12 @@ abstract class BaseService(
 
     protected lateinit var notification: Notification
     protected lateinit var timeoutDateTime: Calendar
+    protected var timeout: Long = 500000
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
+        Logger.info("Starting service $serviceClass")
         initFields()
         super.onCreate()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -33,9 +36,9 @@ abstract class BaseService(
         } else {
             startForeground(id, notification)
         }
-        timeoutDateTime = Calendar.getInstance()
-        val timeout = SharedPreferenceManager.getInstance(this)
+        timeout = SharedPreferenceManager.getInstance(this)
             .getLong(serviceTag, 500000)
+        timeoutDateTime = Calendar.getInstance()
         timeoutDateTime.add(Calendar.MILLISECOND, timeout.toInt())
         serviceStatusChanged.invoke(serviceClass.name, true)
         TimerManager.setTimedTask<StopServiceWorker>(

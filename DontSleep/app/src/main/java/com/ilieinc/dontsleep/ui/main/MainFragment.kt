@@ -19,8 +19,10 @@ import com.ilieinc.dontsleep.receiver.DeviceAdminReceiver
 import com.ilieinc.dontsleep.service.SleepService
 import com.ilieinc.dontsleep.service.TimeoutService
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
-import com.ilieinc.dontsleep.util.DeviceAdminHelper.createPermissionDialog
+import com.ilieinc.dontsleep.util.PermissionHelper
 import com.ilieinc.dontsleep.util.SharedPreferenceManager
+import com.ilieinc.dontsleep.util.StateHelper
+import com.ilieinc.dontsleep.util.StateHelper.createDialog
 import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
 import com.ilieinc.dontsleep.util.StateHelper.stopService
 import kotlinx.android.synthetic.main.main_fragment.*
@@ -44,7 +46,7 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        deviceManager = getSystemService(context!!, DevicePolicyManager::class.java)!!
+        deviceManager = getSystemService(requireContext(), DevicePolicyManager::class.java)!!
     }
 
     override fun onStart() {
@@ -63,15 +65,20 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
     }
 
     private fun initControls() {
-        setTimeoutStatus()
-        setTimePicker(timeoutTimePicker, TimeoutService.TIMEOUT_TAG)
-        setSleepTimerControls(deviceManager.isAdminActive(DeviceAdminHelper.componentName))
+        setTimeoutControls(PermissionHelper.shouldRequestDrawOverPermission(requireContext()))
+        setSleepTimerControls(PermissionHelper.shouldRequestAdminPermission(deviceManager))
         initButtons()
     }
 
     private fun initButtons() {
+        draw_over_permission_help_button.setOnClickListener {
+            val dialog = StateHelper.getTimeoutInfoDialog(requireActivity()) {
+                PermissionHelper.requestDrawOverPermission(requireContext())
+            }
+            dialog.show()
+        }
         helpButton.setOnClickListener {
-            val dialog = DeviceAdminHelper.getInfoDialog(activity!!) {
+            val dialog = DeviceAdminHelper.getInfoDialog(requireActivity()) {
                 deviceManager.removeActiveAdmin(DeviceAdminHelper.componentName)
             }
             dialog.show()
@@ -90,19 +97,6 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
                 SleepService::class.java.name -> {
                     sleepSwitch.isChecked = active
                 }
-            }
-        }
-    }
-
-    private fun setTimeoutStatus() {
-        setStatus(
-            timeoutSwitch,
-            TimeoutService.isRunning(requireContext())
-        ) { _, checked ->
-            if (checked) {
-                requireContext().startForegroundService<TimeoutService>()
-            } else {
-                requireContext().stopService<TimeoutService>()
             }
         }
     }
@@ -131,23 +125,43 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
         }
     }
 
-    private fun setSleepTimerControls(adminActive: Boolean) {
-        setSleepTimerControlsVisibility(adminActive)
-        if (adminActive) {
+    private fun setTimeoutControls(requiresPermission: Boolean) {
+        setTimeoutControlsVisibility(!requiresPermission)
+        if (requiresPermission) {
+            draw_over_permission_button.setOnClickListener {
+                val dialog = createDialog(
+                    requireContext(),
+                    requireContext().getString(R.string.draw_over_permission_grant_title),
+                    requireContext().getString(R.string.draw_over_permission_grant_body)
+                ) {
+                    PermissionHelper.requestDrawOverPermission(requireContext())
+                }
+                dialog.show()
+            }
+        } else {
             setStatus(
-                sleepSwitch,
-                SleepService.isRunning(requireContext())
+                timeoutSwitch,
+                TimeoutService.isRunning(requireContext())
             ) { _, checked ->
                 if (checked) {
-                    requireContext().startForegroundService<SleepService>()
+                    requireContext().startForegroundService<TimeoutService>()
                 } else {
-                    requireContext().stopService<SleepService>()
+                    requireContext().stopService<TimeoutService>()
                 }
             }
-            setTimePicker(sleepTimerTimePicker, SleepService.SLEEP_TAG)
-        } else {
+            setTimePicker(timeoutTimePicker, TimeoutService.TIMEOUT_TAG)
+        }
+    }
+
+    private fun setSleepTimerControls(requiresPermission: Boolean) {
+        setSleepTimerControlsVisibility(!requiresPermission)
+        if (requiresPermission) {
             permissionButton.setOnClickListener {
-                val dialog = createPermissionDialog(activity!!) {
+                val dialog = createDialog(
+                    requireContext(),
+                    requireContext().getString(R.string.special_permission_grant_title),
+                    requireContext().getString(R.string.special_permission_grant_body)
+                ) {
                     val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
                     intent.putExtra(
                         DevicePolicyManager.EXTRA_DEVICE_ADMIN,
@@ -161,7 +175,26 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
                 }
                 dialog.show()
             }
+        } else {
+            setStatus(
+                sleepSwitch,
+                SleepService.isRunning(requireContext())
+            ) { _, checked ->
+                if (checked) {
+                    requireContext().startForegroundService<SleepService>()
+                } else {
+                    requireContext().stopService<SleepService>()
+                }
+            }
+            setTimePicker(sleepTimerTimePicker, SleepService.SLEEP_TAG)
         }
+    }
+
+    private fun setTimeoutControlsVisibility(enabled: Boolean) {
+        val statusFieldsVisibility = if (enabled) View.VISIBLE else View.GONE
+        val permissionButtonVisibility = if (enabled) View.GONE else View.VISIBLE
+        timeout_body_layout.visibility = statusFieldsVisibility
+        draw_over_permission_button.visibility = permissionButtonVisibility
     }
 
     private fun setSleepTimerControlsVisibility(enabled: Boolean) {

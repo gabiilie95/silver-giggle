@@ -20,6 +20,7 @@ class StopServiceWorker(
         var result = Result.success()
         try {
             val service = inputData.getString(SERVICE_NAME_EXTRA)
+            Logger.info("Executing StopServiceWorker for $service")
             var serviceIntent: Intent? = null
             when (service) {
                 TimeoutService::class.java.name -> {
