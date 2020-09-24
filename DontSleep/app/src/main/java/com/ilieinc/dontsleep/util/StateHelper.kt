@@ -12,6 +12,12 @@ import java.util.*
 
 
 object StateHelper {
+    enum class TileStates {
+        On,
+        Off,
+        Disabled,
+    }
+
     private val overlayDevices = arrayOf(
         "samsung"
     )

@@ -6,6 +6,8 @@ import android.service.quicksettings.TileService
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.service.TimeoutService
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
+import com.ilieinc.dontsleep.util.PermissionHelper
+import com.ilieinc.dontsleep.util.StateHelper.TileStates
 import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
 import com.ilieinc.dontsleep.util.StateHelper.stopService
 
@@ -35,19 +37,44 @@ class TimeoutTileService : TileService() {
     }
 
     private fun refreshTileState() {
-        val tile = qsTile
-        when (enabled) {
-            true -> {
-                tile.label = "Don't Sleep!"
-                tile.state = Tile.STATE_ACTIVE
-                tile.icon = Icon.createWithResource(this, R.drawable.baseline_mobile_friendly_24)
-            }
-            false -> {
-                tile.label = "Sleep..."
-                tile.state = Tile.STATE_INACTIVE
-                tile.icon = Icon.createWithResource(this, R.drawable.baseline_mobile_off_24)
+        val tileState = if (PermissionHelper.shouldRequestDrawOverPermission(this)) {
+            TileStates.Disabled
+        } else {
+            if (enabled) {
+                TileStates.On
+            } else {
+                TileStates.Off
             }
         }
-        tile.updateTile()
+        qsTile.apply {
+            when (tileState) {
+                TileStates.On -> {
+                    label = "Don't Sleep!"
+                    state = Tile.STATE_ACTIVE
+                    icon =
+                        Icon.createWithResource(
+                            this@TimeoutTileService,
+                            R.drawable.baseline_mobile_friendly_24
+                        )
+                }
+                TileStates.Off -> {
+                    label = "Sleep..."
+                    state = Tile.STATE_INACTIVE
+                    icon = Icon.createWithResource(
+                        this@TimeoutTileService,
+                        R.drawable.baseline_mobile_off_24
+                    )
+                }
+                TileStates.Disabled -> {
+                    label = "Sleep..."
+                    state = Tile.STATE_UNAVAILABLE
+                    icon = Icon.createWithResource(
+                        this@TimeoutTileService,
+                        R.drawable.baseline_mobile_off_24
+                    )
+                }
+            }
+            updateTile()
+        }
     }
 }
