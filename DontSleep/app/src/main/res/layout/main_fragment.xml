@@ -7,22 +7,13 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.MainFragment">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/action_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="2dp"
-        android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight" />
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_above="@id/closeButton"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/closeButton"
-        app:layout_constraintTop_toBottomOf="@id/action_bar">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -40,7 +31,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/textView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -50,7 +41,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="@id/draw_over_permission_help_button" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/draw_over_permission_help_button"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
@@ -59,7 +50,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/draw_over_permission_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -74,7 +65,7 @@
                         android:visibility="gone"
                         app:layout_constraintTop_toBottomOf="@id/draw_over_permission_help_button">
 
-                        <TextView
+                        <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/textView2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -84,14 +75,14 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="@+id/timeoutSwitch" />
 
-                        <Switch
+                        <com.google.android.material.switchmaterial.SwitchMaterial
                             android:id="@+id/timeoutSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
+                        <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/textView3"
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
@@ -102,7 +93,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="@+id/timeoutTimePicker" />
 
-                        <TextView
+                        <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/textView4"
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
@@ -134,7 +125,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/textView10"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -144,7 +135,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="@id/helpButton" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/helpButton"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
@@ -153,7 +144,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/permissionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -168,14 +159,14 @@
                         android:visibility="gone"
                         app:layout_constraintTop_toBottomOf="@id/helpButton">
 
-                        <Switch
+                        <com.google.android.material.switchmaterial.SwitchMaterial
                             android:id="@+id/sleepSwitch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
+                        <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/sleepTimerStatusText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -185,7 +176,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="@id/sleepSwitch" />
 
-                        <TextView
+                        <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/textView8"
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
@@ -196,7 +187,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="@+id/sleepTimerTimePicker" />
 
-                        <TextView
+                        <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/textView9"
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
@@ -218,7 +209,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/closeButton"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="match_parent"

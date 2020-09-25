@@ -7,11 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
-import android.widget.Switch
 import android.widget.TimePicker
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.model.DeviceAdminChangedEvent
 import com.ilieinc.dontsleep.model.ServiceStatusChangedEvent
@@ -106,7 +106,7 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
     }
 
     private fun setStatus(
-        statusSwitch: Switch,
+        statusSwitch: SwitchMaterial,
         checked: Boolean,
         callback: (CompoundButton, Boolean) -> Unit
     ) {
