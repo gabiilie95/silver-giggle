@@ -8,11 +8,9 @@ import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import com.ilieinc.dontsleep.model.NamedWakeLock
-import com.ilieinc.dontsleep.model.ServiceStatusChangedEvent
 import com.ilieinc.dontsleep.util.Logger
 import com.ilieinc.dontsleep.util.NotificationManager
 import com.ilieinc.dontsleep.util.StateHelper
-import com.ilieinc.kotlinevents.Event
 
 class TimeoutService : BaseService(
     TimeoutService::class.java,
@@ -20,7 +18,7 @@ class TimeoutService : BaseService(
     1
 ) {
     companion object {
-        val serviceStatusChanged = Event(ServiceStatusChangedEvent::class.java)
+        var serviceStatusChangedCallback: ((serviceName: String, enabled: Boolean) -> Unit)? = null
         const val TIMEOUT_TAG = "DontSleep::TimeoutTag"
         const val TIMEOUT_WAKELOCK_TAG = "DontSleep::TimeoutServiceStopTag"
         private val wakeLock = NamedWakeLock()
@@ -28,9 +26,10 @@ class TimeoutService : BaseService(
             StateHelper.isServiceRunning(context, TimeoutService::class.java)
     }
 
+    override var serviceChangedCallback: ((serviceName: String, enabled: Boolean) -> Unit)? = null
+        get() = SleepService.serviceStatusChangedCallback
+
     private var overlay: View? = null
-    override val serviceStatusChanged: Event<ServiceStatusChangedEvent> =
-        SleepService.serviceStatusChanged
 
     override fun initFields() {
         notification = NotificationManager.createScreenTimeoutNotification(this)

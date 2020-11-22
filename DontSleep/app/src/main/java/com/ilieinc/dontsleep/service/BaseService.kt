@@ -6,12 +6,10 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
-import com.ilieinc.dontsleep.model.ServiceStatusChangedEvent
 import com.ilieinc.dontsleep.timer.StopServiceWorker
 import com.ilieinc.dontsleep.timer.TimerManager
 import com.ilieinc.dontsleep.util.Logger
 import com.ilieinc.dontsleep.util.SharedPreferenceManager
-import com.ilieinc.kotlinevents.Event
 import java.util.*
 
 abstract class BaseService(
@@ -19,7 +17,7 @@ abstract class BaseService(
     private val serviceTag: String,
     private val id: Int
 ) : Service() {
-    abstract val serviceStatusChanged: Event<ServiceStatusChangedEvent>
+    abstract var serviceChangedCallback: ((serviceName: String, enabled: Boolean) -> Unit)?
 
     protected lateinit var notification: Notification
     protected lateinit var timeoutDateTime: Calendar
@@ -40,7 +38,7 @@ abstract class BaseService(
             .getLong(serviceTag, 500000)
         timeoutDateTime = Calendar.getInstance()
         timeoutDateTime.add(Calendar.MILLISECOND, timeout.toInt())
-        serviceStatusChanged.invoke(serviceClass.name, true)
+        serviceChangedCallback?.invoke(serviceClass.name, true)
         TimerManager.setTimedTask<StopServiceWorker>(
             this,
             timeoutDateTime.time,
@@ -55,7 +53,7 @@ abstract class BaseService(
 
     override fun onDestroy() {
         TimerManager.cancelTask(this, serviceTag)
-        serviceStatusChanged.invoke(serviceClass.name, false)
+        serviceChangedCallback?.invoke(serviceClass.name, false)
         super.onDestroy()
     }
 }

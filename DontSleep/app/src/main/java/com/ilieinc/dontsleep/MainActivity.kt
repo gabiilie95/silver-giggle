@@ -1,28 +1,27 @@
 package com.ilieinc.dontsleep
 
+//import com.ilieinc.dontsleep.ui.main.MainFragment
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.play.core.review.ReviewManagerFactory
-import com.ilieinc.dontsleep.ui.main.MainFragment
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
 import com.ilieinc.dontsleep.util.Logger
 import com.ilieinc.dontsleep.util.StateHelper
-import kotlinx.android.synthetic.main.main_activity.*
 
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.main_activity)
+//        setContentView(R.layout.main_activity)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, MainFragment.newInstance())
+//                .replace(R.id.container, MainFragment.newInstance())
                 .commitNow()
         }
-        setSupportActionBar(action_bar)
+//        setSupportActionBar(action_bar)
         DeviceAdminHelper.init(applicationContext)
     }
 
