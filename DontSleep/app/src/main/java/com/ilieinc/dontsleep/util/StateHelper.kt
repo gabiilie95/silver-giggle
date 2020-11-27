@@ -19,7 +19,8 @@ object StateHelper {
     }
 
     private val overlayDevices = arrayOf(
-        "samsung"
+        "samsung",
+        "huawei"
     )
 
     fun deviceRequiresOverlay(): Boolean {
