@@ -4,15 +4,19 @@ import android.content.Context
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.PowerManager
+import android.text.format.DateFormat
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
+import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.model.NamedWakeLock
 import com.ilieinc.dontsleep.model.ServiceStatusChangedEvent
 import com.ilieinc.dontsleep.util.Logger
 import com.ilieinc.dontsleep.util.NotificationManager
+import com.ilieinc.dontsleep.util.SharedPreferenceManager
 import com.ilieinc.dontsleep.util.StateHelper
 import com.ilieinc.kotlinevents.Event
+import java.util.*
 
 class TimeoutService : BaseService(
     TimeoutService::class.java,
@@ -33,7 +37,22 @@ class TimeoutService : BaseService(
         SleepService.serviceStatusChanged
 
     override fun initFields() {
-        notification = NotificationManager.createScreenTimeoutNotification(this)
+        notification = NotificationManager.createTimeoutNotification<TimeoutService>(
+            this,
+            R.drawable.baseline_mobile_friendly_24,
+            getString(R.string.app_name),
+            getString(
+                R.string.timeout_notification_text,
+                DateFormat.getTimeFormat(this).format(Calendar.getInstance().apply {
+                    add(
+                        Calendar.MILLISECOND,
+                        SharedPreferenceManager.getInstance(this@TimeoutService)
+                            .getLong(TIMEOUT_TAG, 900000)
+                            .toInt()
+                    )
+                }.time)
+            )
+        )
     }
 
     override fun onCreate() {

@@ -23,7 +23,6 @@ class SleepTileService : TileService() {
             startForegroundService<SleepService>()
         } else {
             stopService<SleepService>()
-            SleepService.cancelLockWorker(this)
         }
         refreshTileState()
     }

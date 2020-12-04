@@ -9,40 +9,42 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.text.format.DateFormat
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.ilieinc.dontsleep.MainActivity
 import com.ilieinc.dontsleep.R
-import com.ilieinc.dontsleep.service.SleepService
-import com.ilieinc.dontsleep.service.SleepService.Companion.SLEEP_TAG
+import com.ilieinc.dontsleep.service.BaseService
 import com.ilieinc.dontsleep.service.TimeoutService
-import com.ilieinc.dontsleep.service.TimeoutService.Companion.TIMEOUT_TAG
 import java.lang.reflect.Method
-import java.util.*
 
 object NotificationManager {
+    const val STOP_COMMAND = "Stop"
 
-    fun createScreenTimeoutNotification(context: Context): Notification =
+    inline fun <reified T> createTimeoutNotification(
+        context: Context,
+        smallIcon: Int,
+        title: String,
+        text: String
+    ): Notification where T : BaseService =
         createStickyNotification<TimeoutService>(context) { builder ->
-//            val screenshotServiceIntent = Intent(context, ScreenshotService::class.java)
-//            screenshotServiceIntent.putExtra(FROM_NOTIFICATION_EXTRA, true)
-//            val screenshotServicePendingIntent =
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                    PendingIntent.getForegroundService(
-//                        context,
-//                        0,
-//                        screenshotServiceIntent,
-//                        PendingIntent.FLAG_UPDATE_CURRENT
-//                    )
-//                } else {
-//                    PendingIntent.getService(
-//                        context,
-//                        0,
-//                        screenshotServiceIntent,
-//                        PendingIntent.FLAG_UPDATE_CURRENT
-//                    )
-//                }
+            val stopServiceIntent = Intent(context, T::class.java)
+            stopServiceIntent.putExtra(STOP_COMMAND, true)
+            val stopServicePendingIntent =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    PendingIntent.getForegroundService(
+                        context,
+                        0,
+                        stopServiceIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+                } else {
+                    PendingIntent.getService(
+                        context,
+                        0,
+                        stopServiceIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+                }
             val mainActivityIntent = Intent(context, MainActivity::class.java)
             val mainActivityPendingIntent = PendingIntent.getActivity(
                 context,
@@ -50,59 +52,18 @@ object NotificationManager {
                 mainActivityIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
-            val timeout = Calendar.getInstance()
-            timeout.add(
-                Calendar.MILLISECOND,
-                SharedPreferenceManager.getInstance(context).getLong(TIMEOUT_TAG, 900000)
-                    .toInt()
-            )
             builder
-                .setSmallIcon(R.drawable.baseline_mobile_friendly_24)
-                .setContentTitle(context.getString(R.string.app_name))
-                .setContentText(
-                    context.getString(
-                        R.string.timeout_notification_text,
-                        DateFormat.getTimeFormat(context).format(timeout.time)
-                    )
-                )
+                .setSmallIcon(smallIcon)
+                .setContentTitle(title)
+                .setContentText(text)
                 .setContentIntent(mainActivityPendingIntent)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
-//                .addAction(
-//                    R.mipmap.ic_close,
-//                    context.getString(R.string.close),
-//                    killAppPendingIntent
-//                )
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-        }
-
-    fun createScreenSleepNotification(context: Context): Notification =
-        createStickyNotification<SleepService>(context) { builder ->
-            val mainActivityIntent = Intent(context, MainActivity::class.java)
-            val mainActivityPendingIntent = PendingIntent.getActivity(
-                context,
-                1,
-                mainActivityIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
-            )
-            val timeout = Calendar.getInstance()
-            timeout.add(
-                Calendar.MILLISECOND,
-                SharedPreferenceManager.getInstance(context).getLong(SLEEP_TAG, 900000)
-                    .toInt()
-            )
-            builder
-                .setSmallIcon(R.drawable.baseline_timer_24)
-                .setContentTitle(context.getString(R.string.app_name))
-                .setContentText(
-                    context.getString(
-                        R.string.sleep_notification_text,
-                        DateFormat.getTimeFormat(context).format(timeout.time)
-                    )
+                .addAction(
+                    0,
+                    context.getString(R.string.stop),
+                    stopServicePendingIntent
                 )
-                .setContentIntent(mainActivityPendingIntent)
-                .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         }
 

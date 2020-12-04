@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.DialogInterface
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.receiver.DeviceAdminReceiver
 
 object DeviceAdminHelper {
@@ -42,11 +43,15 @@ object DeviceAdminHelper {
         }
         var message =
             "When this feature is enabled you will not be able to uninstall the application before first revoking the administrator permission.\n"
-        dialogBuilder.setTitle("Sleep Timer Help").setPositiveButton("Ok", clickListener)
+        dialogBuilder.setTitle("Sleep Timer Help")
+            .setPositiveButton(activity.getString(R.string.ok), clickListener)
         val adminActive = deviceManager.isAdminActive(componentName)
         if (adminActive) {
-            message += "You can revoke the permission from this dialog in order to uninstall the application."
-            dialogBuilder.setNegativeButton("Revoke Admin Permission", clickListener)
+            message += activity.getString(R.string.revoke_permission_extra)
+            dialogBuilder.setNegativeButton(
+                activity.getString(R.string.revoke_admin_permission),
+                clickListener
+            )
         }
         dialogBuilder.setMessage(message)
         return dialogBuilder

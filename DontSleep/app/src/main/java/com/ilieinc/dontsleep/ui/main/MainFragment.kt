@@ -1,5 +1,6 @@
 package com.ilieinc.dontsleep.ui.main
 
+import android.app.AlertDialog
 import android.app.admin.DevicePolicyManager
 import android.content.Intent
 import android.os.Bundle
@@ -18,14 +19,14 @@ import com.ilieinc.dontsleep.model.ServiceStatusChangedEvent
 import com.ilieinc.dontsleep.receiver.DeviceAdminReceiver
 import com.ilieinc.dontsleep.service.SleepService
 import com.ilieinc.dontsleep.service.TimeoutService
-import com.ilieinc.dontsleep.util.DeviceAdminHelper
-import com.ilieinc.dontsleep.util.PermissionHelper
-import com.ilieinc.dontsleep.util.SharedPreferenceManager
-import com.ilieinc.dontsleep.util.StateHelper
+import com.ilieinc.dontsleep.util.*
 import com.ilieinc.dontsleep.util.StateHelper.createDialog
 import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
 import com.ilieinc.dontsleep.util.StateHelper.stopService
 import kotlinx.android.synthetic.main.main_fragment.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEvent {
 
@@ -129,16 +130,15 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
         setTimeoutControlsVisibility(!requiresPermission)
         if (requiresPermission) {
             draw_over_permission_button.setOnClickListener {
-                val dialog = createDialog(
+                createDialog(
                     requireContext(),
-                    requireContext().getString(R.string.draw_over_permission_grant_title),
-                    requireContext().getString(R.string.draw_over_permission_grant_body),
-                    requireContext().getString(R.string.yes),
-                    requireContext().getString(R.string.no)
+                    getString(R.string.draw_over_permission_grant_title),
+                    getString(R.string.draw_over_permission_grant_body),
+                    getString(R.string.yes),
+                    getString(R.string.no)
                 ) {
                     PermissionHelper.requestDrawOverPermission(requireContext())
-                }
-                dialog.show()
+                }.show()
             }
         } else {
             setStatus(
@@ -159,25 +159,57 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
         setSleepTimerControlsVisibility(!requiresPermission)
         if (requiresPermission) {
             permissionButton.setOnClickListener {
-                val dialog = createDialog(
+                createDialog(
                     requireContext(),
-                    requireContext().getString(R.string.special_permission_grant_title),
-                    requireContext().getString(R.string.special_permission_grant_body),
-                    requireContext().getString(R.string.yes),
-                    requireContext().getString(R.string.no)
+                    getString(R.string.special_permission_grant_title),
+                    getString(R.string.special_permission_grant_body),
+                    getString(R.string.yes),
+                    getString(R.string.no)
                 ) {
-                    val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
-                    intent.putExtra(
-                        DevicePolicyManager.EXTRA_DEVICE_ADMIN,
-                        DeviceAdminHelper.componentName
-                    )
-                    intent.putExtra(
-                        DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                        "Please allow this permission to allow the application to turn off the screen."
-                    )
-                    startActivityForResult(intent, DeviceAdminHelper.REQUEST_CODE)
-                }
-                dialog.show()
+                    val dialog = createDialog(
+                        requireContext(),
+                        getString(R.string.warning),
+                        getString(R.string.special_permission_grant_warning_body),
+                        getString(R.string.yes),
+                        getString(R.string.no)
+                    ) {
+                        val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+                        intent.putExtra(
+                            DevicePolicyManager.EXTRA_DEVICE_ADMIN,
+                            DeviceAdminHelper.componentName
+                        )
+                        intent.putExtra(
+                            DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                            "Please allow this permission to allow the application to turn off the screen."
+                        )
+                        startActivityForResult(intent, DeviceAdminHelper.REQUEST_CODE)
+                    }.create()
+                    dialog.setOnShowListener {
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                            ?.let { button ->
+                                GlobalScope.launch {
+                                    kotlin.runCatching {
+                                        var seconds = 10
+                                        val initialText = button.text
+                                        this@MainFragment.requireActivity().runOnUiThread {
+                                            button.isEnabled = false
+                                        }
+                                        do {
+                                            this@MainFragment.requireActivity().runOnUiThread {
+                                                button.text = "$initialText ($seconds)"
+                                            }
+                                            delay(1000)
+                                        } while (seconds-- > 0)
+                                        this@MainFragment.requireActivity().runOnUiThread {
+                                            button.text = initialText
+                                            button.isEnabled = true
+                                        }
+                                    }.onFailure { ex -> Logger.error(ex) }
+                                }
+                            }
+                    }
+                    dialog.show()
+                }.show()
             }
         } else {
             setStatus(
@@ -188,7 +220,6 @@ class MainFragment : Fragment(), ServiceStatusChangedEvent, DeviceAdminChangedEv
                     requireContext().startForegroundService<SleepService>()
                 } else {
                     requireContext().stopService<SleepService>()
-                    SleepService.cancelLockWorker(requireContext())
                 }
             }
             setTimePicker(sleepTimerTimePicker, SleepService.SLEEP_TAG)

@@ -18,4 +18,10 @@
     <string name="draw_over_permission_grant_body">Due to limitations from the manufacturer of your device, in order to use this feature, you must grant draw over other apps permission to the application.\nThis permission will only be used to keep the screen awake.\n\nDo you want to continue?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="ok">OK</string>
+    <string name="revoke_permission_extra">You can revoke the permission from this dialog in order to uninstall the application.</string>
+    <string name="revoke_admin_permission">Revoke Admin Permission</string>
+    <string name="warning">WARNING</string>
+    <string name="special_permission_grant_warning_body">You will not be able to uninstall the application until you revoke the administrator permission.\nYou can revoke the permission by clicking the \'Help\' button from the \'Sleep! Timer\' section of the app.\n\nDo you want to continue?</string>
+    <string name="stop">Stop</string>
 </resources>
