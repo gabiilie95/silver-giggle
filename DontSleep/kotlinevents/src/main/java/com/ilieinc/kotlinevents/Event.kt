@@ -17,7 +17,6 @@ class Event<T : IEvent>(eventType: Class<out T>) {
         subscribers.forEach {
             methods.forEach { method ->
                 val classMethod = it.javaClass.getMethod(method.name, *method.parameterTypes)
-                var i = 0
                 classMethod.invoke(
                     it,
                     *args

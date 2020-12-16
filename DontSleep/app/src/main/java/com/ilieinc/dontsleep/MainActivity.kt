@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(action_bar)
         DeviceAdminHelper.init(applicationContext)
         StateHelper.requestRatingIfNeeded(this)
-        StateHelper.runV13Hotfix(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

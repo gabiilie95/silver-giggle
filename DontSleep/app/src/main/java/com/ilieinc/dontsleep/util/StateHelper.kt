@@ -3,11 +3,9 @@ package com.ilieinc.dontsleep.util
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.Service
-import android.app.admin.DevicePolicyManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -30,8 +28,7 @@ object StateHelper {
     private const val RATING_SHOWN = "RatingShown"
 
     private val overlayDevices = arrayOf(
-        "samsung",
-        "huawei"
+        "samsung"
     )
 
     fun deviceRequiresOverlay(): Boolean {
@@ -134,26 +131,6 @@ object StateHelper {
                         )
                         sharedPreferences.edit(true) { putBoolean(RATING_SHOWN, true) }
                     }.show()
-            }
-        }
-    }
-
-    //TODO("Remove this")
-    @Deprecated("This should be removed in the next version")
-    fun runV13Hotfix(context: Context) {
-        val v13FixName = "V13FixRan"
-        val sharedPreferences = SharedPreferenceManager.getInstance(context)
-        kotlin.runCatching {
-            val packageVersion = context.packageManager.getPackageInfo(
-                context.packageName,
-                PackageManager.GET_META_DATA
-            ).versionCode
-            val v13FixRan = sharedPreferences.getBoolean(v13FixName, false)
-            if (packageVersion == 13 && !v13FixRan) {
-                val devicePolicyManager =
-                    ContextCompat.getSystemService(context, DevicePolicyManager::class.java)!!
-                devicePolicyManager.removeActiveAdmin(DeviceAdminHelper.componentName)
-                sharedPreferences.edit(true) { putBoolean(v13FixName, true) }
             }
         }
     }
