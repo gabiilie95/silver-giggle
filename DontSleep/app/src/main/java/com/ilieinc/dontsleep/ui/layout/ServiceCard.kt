@@ -20,7 +20,7 @@ import com.ilieinc.dontsleep.resource.typography
 import java.util.*
 
 @Composable
-fun ServiceCard(name: String, bodyVisible: Boolean, timeout) {
+fun ServiceCard(name: String, bodyVisible: Boolean) {
     val context = ContextAmbient.current
     val customView = remember {
         LayoutInflater.from(context).inflate(R.layout.spinner_time_picker, null)
