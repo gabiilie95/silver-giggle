@@ -51,11 +51,10 @@ class TimeoutTileService : TileService() {
                 TileStates.On -> {
                     label = "Don't Sleep!"
                     state = Tile.STATE_ACTIVE
-                    icon =
-                        Icon.createWithResource(
-                            this@TimeoutTileService,
-                            R.drawable.baseline_mobile_friendly_24
-                        )
+                    icon = Icon.createWithResource(
+                        this@TimeoutTileService,
+                        R.drawable.baseline_mobile_friendly_24
+                    )
                 }
                 TileStates.Off -> {
                     label = "Sleep..."

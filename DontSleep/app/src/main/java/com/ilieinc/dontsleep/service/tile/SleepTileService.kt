@@ -56,11 +56,10 @@ class SleepTileService : TileService() {
                 TileStates.On -> {
                     label = "Staying Awake!"
                     state = Tile.STATE_ACTIVE
-                    icon =
-                        Icon.createWithResource(
-                            this@SleepTileService,
-                            R.drawable.baseline_timer_24
-                        )
+                    icon = Icon.createWithResource(
+                        this@SleepTileService,
+                        R.drawable.baseline_timer_24
+                    )
                 }
                 TileStates.Off -> {
                     label = "Timer Disabled"
