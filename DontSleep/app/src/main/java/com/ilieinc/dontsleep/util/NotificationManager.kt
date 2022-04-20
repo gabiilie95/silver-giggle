@@ -35,14 +35,14 @@ object NotificationManager {
                         context,
                         0,
                         stopServiceIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                     )
                 } else {
                     PendingIntent.getService(
                         context,
                         0,
                         stopServiceIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                     )
                 }
             val mainActivityIntent = Intent(context, MainActivity::class.java)
@@ -50,7 +50,7 @@ object NotificationManager {
                 context,
                 1,
                 mainActivityIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
             builder
                 .setSmallIcon(smallIcon)
