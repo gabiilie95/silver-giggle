@@ -16,7 +16,7 @@ import com.ilieinc.dontsleep.util.StateHelper.stopService
 class SleepTileService : TileService() {
 
     private val enabled
-        get() = StateHelper.isServiceRunning(this, SleepService::class.java)
+        get() = SleepService.isRunning(this)
 
     override fun onClick() {
         if (!enabled) {

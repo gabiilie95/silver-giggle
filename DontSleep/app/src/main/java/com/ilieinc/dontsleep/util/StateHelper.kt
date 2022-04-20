@@ -32,7 +32,7 @@ object StateHelper {
     )
 
     fun deviceRequiresOverlay(): Boolean {
-        return overlayDevices.contains(Build.MANUFACTURER.toLowerCase(Locale.getDefault()))
+        return overlayDevices.contains(Build.MANUFACTURER.lowercase(Locale.getDefault()))
     }
 
     fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
@@ -76,34 +76,6 @@ object StateHelper {
             .setMessage(message)
             .setPositiveButton(positiveButtonMessage, clickListener)
             .setNegativeButton(negativeButtonMessage, clickListener)
-        return dialogBuilder
-    }
-
-    fun getTimeoutInfoDialog(
-        context: Context,
-        onChangeCallback: (() -> Unit)?
-    ): MaterialAlertDialogBuilder {
-        val dialogBuilder = MaterialAlertDialogBuilder(context)
-        val clickListener = DialogInterface.OnClickListener { dialog, which ->
-            when (which) {
-                DialogInterface.BUTTON_POSITIVE -> {
-                    dialog.dismiss()
-                }
-                DialogInterface.BUTTON_NEGATIVE -> {
-                    onChangeCallback?.invoke()
-                }
-            }
-        }
-        var message =
-            "This feature enables you to turn off your screen timeout with the click of a button.\n"
-        dialogBuilder.setTitle("Don't Sleep! Help").setPositiveButton("Ok", clickListener)
-        if (PermissionHelper.hasDrawOverPermission(context)) {
-            message += "You can revoke the draw over permission from this dialog."
-            dialogBuilder.setNegativeButton("Revoke Draw Over Permission", clickListener)
-        } else if (PermissionHelper.shouldRequestDrawOverPermission(context)) {
-            message += "In order to use this feature you need to allow draw over permissions."
-        }
-        dialogBuilder.setMessage(message)
         return dialogBuilder
     }
 

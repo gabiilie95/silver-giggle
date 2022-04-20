@@ -3,13 +3,12 @@ package com.ilieinc.dontsleep.service
 import android.content.Context
 import android.text.format.DateFormat
 import com.ilieinc.dontsleep.R
-import com.ilieinc.dontsleep.model.ServiceStatusChangedEvent
 import com.ilieinc.dontsleep.timer.LockScreenWorker
 import com.ilieinc.dontsleep.timer.TimerManager
 import com.ilieinc.dontsleep.util.NotificationManager
 import com.ilieinc.dontsleep.util.SharedPreferenceManager
 import com.ilieinc.dontsleep.util.StateHelper
-import com.ilieinc.kotlinevents.Event
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
 class SleepService : BaseService(
@@ -18,15 +17,14 @@ class SleepService : BaseService(
     2
 ) {
     companion object {
-        val serviceStatusChanged = Event(ServiceStatusChangedEvent::class.java)
         const val SLEEP_TAG = "DontSleep::SleepTag"
         const val SLEEP_SERVICE_STOP_TAG = "DontSleep::SleepServiceStopTag"
         fun isRunning(context: Context) =
             StateHelper.isServiceRunning(context, SleepService::class.java)
+        val serviceRunning = MutableStateFlow(false)
     }
 
-    override val serviceStatusChanged: Event<ServiceStatusChangedEvent> =
-        Companion.serviceStatusChanged
+    override val binder: ServiceBinder = ServiceBinder(this)
 
     override fun initFields() {
         notification = NotificationManager.createTimeoutNotification<SleepService>(
@@ -49,6 +47,7 @@ class SleepService : BaseService(
 
     override fun onCreate() {
         super.onCreate()
+        serviceRunning.tryEmit(true)
         TimerManager.setTimedTask<LockScreenWorker>(
             this,
             timeoutDateTime.time,
@@ -58,6 +57,7 @@ class SleepService : BaseService(
 
     override fun onDestroy() {
         TimerManager.cancelTask(this, SLEEP_SERVICE_STOP_TAG)
+        serviceRunning.tryEmit(false)
         super.onDestroy()
     }
 }

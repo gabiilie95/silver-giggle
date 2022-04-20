@@ -10,12 +10,11 @@ import android.view.View
 import android.view.WindowManager
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.model.NamedWakeLock
-import com.ilieinc.dontsleep.model.ServiceStatusChangedEvent
 import com.ilieinc.dontsleep.util.Logger
 import com.ilieinc.dontsleep.util.NotificationManager
 import com.ilieinc.dontsleep.util.SharedPreferenceManager
 import com.ilieinc.dontsleep.util.StateHelper
-import com.ilieinc.kotlinevents.Event
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
 class TimeoutService : BaseService(
@@ -24,17 +23,17 @@ class TimeoutService : BaseService(
     1
 ) {
     companion object {
-        val serviceStatusChanged = Event(ServiceStatusChangedEvent::class.java)
         const val TIMEOUT_TAG = "DontSleep::TimeoutTag"
         const val TIMEOUT_WAKELOCK_TAG = "DontSleep::TimeoutServiceStopTag"
         private val wakeLock = NamedWakeLock()
         fun isRunning(context: Context) =
             StateHelper.isServiceRunning(context, TimeoutService::class.java)
+        val serviceRunning = MutableStateFlow(false)
     }
 
+    override val binder: ServiceBinder = ServiceBinder(this)
+
     private var overlay: View? = null
-    override val serviceStatusChanged: Event<ServiceStatusChangedEvent> =
-        SleepService.serviceStatusChanged
 
     override fun initFields() {
         notification = NotificationManager.createTimeoutNotification<TimeoutService>(
@@ -57,6 +56,7 @@ class TimeoutService : BaseService(
 
     override fun onCreate() {
         super.onCreate()
+        serviceRunning.tryEmit(true)
         if (StateHelper.deviceRequiresOverlay()) {
             showOverlay()
         } else {
@@ -70,6 +70,7 @@ class TimeoutService : BaseService(
         } else {
             wakeLock.release()
         }
+        serviceRunning.tryEmit(false)
         super.onDestroy()
     }
 

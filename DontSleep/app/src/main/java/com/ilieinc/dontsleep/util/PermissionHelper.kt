@@ -1,6 +1,5 @@
 package com.ilieinc.dontsleep.util
 
-import android.app.admin.DevicePolicyManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -12,9 +11,6 @@ object PermissionHelper {
 
     fun shouldRequestDrawOverPermission(context: Context) =
         StateHelper.deviceRequiresOverlay() && !hasDrawOverPermission(context)
-
-    fun shouldRequestAdminPermission(deviceManager: DevicePolicyManager) =
-        !deviceManager.isAdminActive(DeviceAdminHelper.componentName)
 
     fun requestDrawOverPermission(context: Context) {
         val intent = Intent(
