@@ -1,6 +1,8 @@
 package com.ilieinc.dontsleep.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 
@@ -33,6 +35,20 @@ private val LightThemeColors = lightColorScheme(
 	inverseSurface = md_theme_light_inverseSurface,
 	inversePrimary = md_theme_light_inversePrimary,
 )
+
+private val LightColors = lightColors(
+	primary = md_theme_light_primary,
+	onPrimary = md_theme_light_onPrimary,
+	secondary = md_theme_light_secondary,
+	onSecondary = md_theme_light_onSecondary,
+	error = md_theme_light_error,
+	onError = md_theme_light_onError,
+	background = md_theme_light_background,
+	onBackground = md_theme_light_onBackground,
+	surface = md_theme_light_surface,
+	onSurface = md_theme_light_onSurface
+)
+
 private val DarkThemeColors = darkColorScheme(
 
 	primary = md_theme_dark_primary,
@@ -62,6 +78,20 @@ private val DarkThemeColors = darkColorScheme(
 	inverseSurface = md_theme_dark_inverseSurface,
 	inversePrimary = md_theme_dark_inversePrimary,
 )
+
+private val DarkColors = darkColors(
+	primary = md_theme_dark_primary,
+	onPrimary = md_theme_dark_onPrimary,
+	secondary = md_theme_dark_secondary,
+	onSecondary = md_theme_dark_onSecondary,
+	error = md_theme_dark_error,
+	onError = md_theme_dark_onError,
+	background = md_theme_dark_background,
+	onBackground = md_theme_dark_onBackground,
+	surface = md_theme_dark_surface,
+	onSurface = md_theme_dark_onSurface
+)
+
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
@@ -73,11 +103,19 @@ fun AppTheme(
         DarkThemeColors
     }
 
-    MaterialTheme(
-        colorScheme = colors,
-        typography = AppTypography,
-        content = content
-    )
+	MaterialTheme(
+		colorScheme = colors,
+		typography = AppTypography,
+	) {
+		androidx.compose.material.MaterialTheme(
+			colors = if (!useDarkTheme) {
+				LightColors
+			} else {
+				DarkColors
+			},
+			content = content
+		)
+	}
 }
 
 //data class CustomColor(val name:String, val color: Color, val harmonized: Boolean, var roles: ColorRoles)

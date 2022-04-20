@@ -6,6 +6,8 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.widget.TimePicker
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.SwitchColors
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -45,7 +47,7 @@ fun ActionCard(
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(5.dp)
+                .padding(10.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -74,9 +76,15 @@ fun ActionCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(text = "Status")
-                    Switch(
+                    //TODO("Replace with material3 switch. 04/20/2022 not refreshing correctly when switch state is updated.")
+                    androidx.compose.material.Switch(
                         checked = enabled,
-                        onCheckedChange = { viewModel.enabled.tryEmit(!enabled) })
+                        onCheckedChange = { viewModel.enabled.tryEmit(!enabled) },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                    androidx.compose.material3.SwitchDefaults.colors()
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
