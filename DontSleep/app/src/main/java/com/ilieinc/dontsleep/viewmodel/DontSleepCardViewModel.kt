@@ -17,8 +17,12 @@ class DontSleepCardViewModel(application: Application): CardViewModel(
 
     init {
         title.tryEmit("Don't Sleep!")
-        permissionRequired.tryEmit(PermissionHelper.shouldRequestDrawOverPermission(getApplication()))
+        refreshPermissionState()
         setSavedTime()
+    }
+
+    override fun refreshPermissionState() {
+        permissionRequired.tryEmit(PermissionHelper.shouldRequestDrawOverPermission(getApplication()))
     }
 
     override fun startService() {

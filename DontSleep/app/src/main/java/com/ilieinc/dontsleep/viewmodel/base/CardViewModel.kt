@@ -36,6 +36,8 @@ abstract class CardViewModel(application: Application, serviceRunning: MutableSt
         }
     }
 
+    abstract fun refreshPermissionState()
+
     protected fun setSavedTime(){
         val timeout = SharedPreferenceManager.getInstance(getApplication()).getLong(tag, 900000) / 1000 / 60
         hours.tryEmit((timeout / 60).toInt())

@@ -16,8 +16,12 @@ class SleepCardViewModel(application: Application) :
 
     init {
         title.tryEmit("Sleep!")
-        permissionRequired.tryEmit(!DeviceAdminHelper.adminPermissionGranted())
+        refreshPermissionState()
         setSavedTime()
+    }
+
+    override fun refreshPermissionState() {
+        permissionRequired.tryEmit(!DeviceAdminHelper.adminPermissionGranted())
     }
 
     override fun startService() {

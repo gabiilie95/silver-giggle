@@ -1,12 +1,22 @@
 package com.ilieinc.dontsleep.ui.compose.component
 
 import android.app.Activity
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MobileFriendly
+import androidx.compose.material.icons.filled.MobileScreenShare
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material.icons.outlined.StarRate
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.ilieinc.dontsleep.util.Logger
 
@@ -16,16 +26,23 @@ fun DontSleepTopAppBar() {
     var showRateDialog by remember { mutableStateOf(false) }
 
     SmallTopAppBar(title = {
-        Text(
-            "Don't Sleep!",
-            fontWeight = FontWeight.Bold
-        )
-    },
-        actions = {
-            IconButton(onClick = { showRateDialog = true }) {
-                Icon(Icons.Outlined.StarRate, "Rating Image")
-            }
-        })
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                Icons.Default.Smartphone,
+                "Title Icon",
+                tint = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.background)
+            )
+            Text(
+                modifier = Modifier.padding(start = 5.dp),
+                text = "Don't Sleep!",
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }, actions = {
+        IconButton(onClick = { showRateDialog = true }) {
+            Icon(Icons.Outlined.StarRate, "Rating Image")
+        }
+    })
     if (showRateDialog) {
         AlertDialog(onDismissRequest = { showRateDialog = false },
             title = { Text(text = "Rate this app") },

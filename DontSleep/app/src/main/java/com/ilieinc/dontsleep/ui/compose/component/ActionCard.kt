@@ -2,11 +2,9 @@
 
 package com.ilieinc.dontsleep.ui.compose.component
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.widget.TimePicker
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.SwitchColors
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -14,18 +12,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.ui.theme.AppTypography
-import com.ilieinc.dontsleep.viewmodel.*
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
-import com.ilieinc.dontsleep.viewmodel.base.HelpDialogViewModel
-import com.ilieinc.dontsleep.viewmodel.base.PermissionDialogViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun ActionCard(
@@ -75,7 +68,10 @@ fun ActionCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "Status")
+                    Text(
+                        text = "Status",
+                        fontWeight = FontWeight.Bold
+                    )
                     //TODO("Replace with material3 switch. 04/20/2022 not refreshing correctly when switch state is updated.")
                     androidx.compose.material.Switch(
                         checked = enabled,
@@ -84,7 +80,6 @@ fun ActionCard(
                             checkedThumbColor = MaterialTheme.colorScheme.primary
                         )
                     )
-                    androidx.compose.material3.SwitchDefaults.colors()
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -92,7 +87,10 @@ fun ActionCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text(text = "Timeout")
+                        Text(
+                            text = "Timeout",
+                            fontWeight = FontWeight.Bold
+                        )
                         Text(text = "(Hours, Minutes)")
                     }
                     AndroidView(
@@ -101,6 +99,7 @@ fun ActionCard(
                                 .inflate(R.layout.layout_time_picker, null)
                             val timePicker =
                                 layout.findViewById<TimePicker>(R.id.time_picker).apply {
+                                    isEnabled = !enabled
                                     setIs24HourView(true)
                                     this.hour = hours
                                     this.minute = minutes
@@ -109,6 +108,9 @@ fun ActionCard(
                                     }
                                 }
                             return@AndroidView timePicker
+                        },
+                        update = { timePicker ->
+                            timePicker.isEnabled = !enabled
                         }
                     )
                 }
