@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import com.google.android.material.snackbar.Snackbar
 import com.ilieinc.dontsleep.R
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
 object StateHelper {
@@ -23,10 +24,12 @@ object StateHelper {
 
     const val APP_START_COUNT = "AppStartCount"
     const val RATING_SHOWN = "RatingShown"
+    const val SHOULD_USE_DYNAMIC_COLORS = "ShouldUseDynamicColors"
 
     private val overlayDevices = arrayOf(
         "samsung"
     )
+    val useDynamicColors = MutableStateFlow(true)
 
     fun deviceRequiresOverlay(): Boolean {
         return overlayDevices.contains(Build.MANUFACTURER.lowercase(Locale.getDefault()))
@@ -57,6 +60,19 @@ object StateHelper {
                 val startNum = getInt(APP_START_COUNT, 0)
                 edit(true) { putInt(APP_START_COUNT, startNum + 1) }
             }
+        }
+    }
+
+    fun initDynamicColorsEnabledProperty(context: Context) {
+        with(SharedPreferenceManager.getInstance(context)) {
+            useDynamicColors.tryEmit(getBoolean(SHOULD_USE_DYNAMIC_COLORS, true))
+        }
+    }
+
+    fun setDynamicColorsEnabled(context: Context, enabled: Boolean) {
+        with(SharedPreferenceManager.getInstance(context)) {
+            edit(true){ putBoolean(SHOULD_USE_DYNAMIC_COLORS, enabled) }
+            useDynamicColors.tryEmit(enabled)
         }
     }
 }

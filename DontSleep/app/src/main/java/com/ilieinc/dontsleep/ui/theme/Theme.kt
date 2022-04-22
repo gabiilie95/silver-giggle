@@ -1,10 +1,12 @@
 package com.ilieinc.dontsleep.ui.theme
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 
 private val LightThemeColors = lightColorScheme(
 
@@ -34,19 +36,6 @@ private val LightThemeColors = lightColorScheme(
 	inverseOnSurface = md_theme_light_inverseOnSurface,
 	inverseSurface = md_theme_light_inverseSurface,
 	inversePrimary = md_theme_light_inversePrimary,
-)
-
-private val LightColors = lightColors(
-	primary = md_theme_light_primary,
-	onPrimary = md_theme_light_onPrimary,
-	secondary = md_theme_light_secondary,
-	onSecondary = md_theme_light_onSecondary,
-	error = md_theme_light_error,
-	onError = md_theme_light_onError,
-	background = md_theme_light_background,
-	onBackground = md_theme_light_onBackground,
-	surface = md_theme_light_surface,
-	onSurface = md_theme_light_onSurface
 )
 
 private val DarkThemeColors = darkColorScheme(
@@ -79,43 +68,30 @@ private val DarkThemeColors = darkColorScheme(
 	inversePrimary = md_theme_dark_inversePrimary,
 )
 
-private val DarkColors = darkColors(
-	primary = md_theme_dark_primary,
-	onPrimary = md_theme_dark_onPrimary,
-	secondary = md_theme_dark_secondary,
-	onSecondary = md_theme_dark_onSecondary,
-	error = md_theme_dark_error,
-	onError = md_theme_dark_onError,
-	background = md_theme_dark_background,
-	onBackground = md_theme_dark_onBackground,
-	surface = md_theme_dark_surface,
-	onSurface = md_theme_dark_onSurface
-)
-
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
+	useDynamicColors: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colors = if (!useDarkTheme) {
-        LightThemeColors
-    } else {
-        DarkThemeColors
-    }
+
+	val dynamicColor = useDynamicColors && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+	val colors = when {
+		dynamicColor && useDarkTheme -> {
+			dynamicDarkColorScheme(LocalContext.current)
+		}
+		dynamicColor && !useDarkTheme -> {
+			dynamicLightColorScheme(LocalContext.current)
+		}
+		useDarkTheme -> DarkThemeColors
+		else -> LightThemeColors
+	}
 
 	MaterialTheme(
 		colorScheme = colors,
 		typography = AppTypography,
-	) {
-		androidx.compose.material.MaterialTheme(
-			colors = if (!useDarkTheme) {
-				LightColors
-			} else {
-				DarkColors
-			},
-			content = content
-		)
-	}
+		content = content
+	)
 }
 
 //data class CustomColor(val name:String, val color: Color, val harmonized: Boolean, var roles: ColorRoles)
