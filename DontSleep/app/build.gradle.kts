@@ -39,8 +39,8 @@ android {
         applicationId = "com.ilieinc.dontsleep"
         minSdk = 24
         targetSdk = 31
-        versionCode = 18
-        versionName = "1.$versionCode"
+        versionCode = 19
+        versionName = "2.$versionCode"
         multiDexEnabled = true
     }
     buildFeatures {
@@ -49,7 +49,7 @@ android {
     compileOptions {
         // Flag to enable support for the new language APIs
         isCoreLibraryDesugaringEnabled = true
-        // Sets Java compatibility to Java 8
+        // Sets Java compatibility to Java 11
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
