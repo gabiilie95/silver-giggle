@@ -14,7 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-class SleepPermissionDialogViewModel(
+class ScreenTimeoutPermissionDialogViewModel(
     showDialog: MutableStateFlow<Boolean>,
     val activity: Activity
 ) : PermissionDialogViewModel(showDialog, activity.application) {

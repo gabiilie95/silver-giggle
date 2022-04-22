@@ -17,17 +17,17 @@ import com.ilieinc.dontsleep.util.StateHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
-class TimeoutService : BaseService(
-    TimeoutService::class.java,
+class WakeLockService : BaseService(
+    WakeLockService::class.java,
     TIMEOUT_TAG,
     1
 ) {
     companion object {
-        const val TIMEOUT_TAG = "DontSleep::TimeoutTag"
-        const val TIMEOUT_WAKELOCK_TAG = "DontSleep::TimeoutServiceStopTag"
+        const val TIMEOUT_TAG = "DontSleep::WakeLockTag"
+        const val TIMEOUT_WAKELOCK_TAG = "DontSleep::WakeLockServiceStopTag"
         private val wakeLock = NamedWakeLock()
         fun isRunning(context: Context) =
-            StateHelper.isServiceRunning(context, TimeoutService::class.java)
+            StateHelper.isServiceRunning(context, WakeLockService::class.java)
         val serviceRunning = MutableStateFlow(false)
     }
 
@@ -36,7 +36,7 @@ class TimeoutService : BaseService(
     private var overlay: View? = null
 
     override fun initFields() {
-        notification = NotificationManager.createTimeoutNotification<TimeoutService>(
+        notification = NotificationManager.createTimeoutNotification<WakeLockService>(
             this,
             R.drawable.baseline_mobile_friendly_24,
             getString(R.string.app_name),
@@ -45,7 +45,7 @@ class TimeoutService : BaseService(
                 DateFormat.getTimeFormat(this).format(Calendar.getInstance().apply {
                     add(
                         Calendar.MILLISECOND,
-                        SharedPreferenceManager.getInstance(this@TimeoutService)
+                        SharedPreferenceManager.getInstance(this@WakeLockService)
                             .getLong(TIMEOUT_TAG, 900000)
                             .toInt()
                     )

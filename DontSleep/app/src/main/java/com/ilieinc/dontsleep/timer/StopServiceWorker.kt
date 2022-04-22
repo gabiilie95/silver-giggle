@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.ilieinc.dontsleep.service.SleepService
-import com.ilieinc.dontsleep.service.TimeoutService
+import com.ilieinc.dontsleep.service.ScreenTimeoutService
+import com.ilieinc.dontsleep.service.WakeLockService
 import com.ilieinc.dontsleep.util.Logger
 
 class StopServiceWorker(
@@ -23,11 +23,11 @@ class StopServiceWorker(
             Logger.info("Executing StopServiceWorker for $service")
             var serviceIntent: Intent? = null
             when (service) {
-                TimeoutService::class.java.name -> {
-                    serviceIntent = Intent(applicationContext, TimeoutService::class.java)
+                WakeLockService::class.java.name -> {
+                    serviceIntent = Intent(applicationContext, WakeLockService::class.java)
                 }
-                SleepService::class.java.name -> {
-                    serviceIntent = Intent(applicationContext, SleepService::class.java)
+                ScreenTimeoutService::class.java.name -> {
+                    serviceIntent = Intent(applicationContext, ScreenTimeoutService::class.java)
                 }
             }
             serviceIntent?.let {

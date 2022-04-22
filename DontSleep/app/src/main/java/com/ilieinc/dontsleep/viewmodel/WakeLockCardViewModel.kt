@@ -1,19 +1,17 @@
 package com.ilieinc.dontsleep.viewmodel
 
 import android.app.Application
-import androidx.lifecycle.viewModelScope
-import com.ilieinc.dontsleep.service.TimeoutService
+import com.ilieinc.dontsleep.service.WakeLockService
 import com.ilieinc.dontsleep.util.PermissionHelper
 import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
 import com.ilieinc.dontsleep.util.StateHelper.stopService
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
-import kotlinx.coroutines.launch
 
-class DontSleepCardViewModel(application: Application): CardViewModel(
+class WakeLockCardViewModel(application: Application): CardViewModel(
     application,
-    TimeoutService.serviceRunning
+    WakeLockService.serviceRunning
 ) {
-    override val tag: String = TimeoutService.TIMEOUT_TAG
+    override val tag: String = WakeLockService.TIMEOUT_TAG
 
     init {
         title.tryEmit("Don't Sleep!")
@@ -26,10 +24,10 @@ class DontSleepCardViewModel(application: Application): CardViewModel(
     }
 
     override fun startService() {
-        getApplication<Application>().startForegroundService<TimeoutService>()
+        getApplication<Application>().startForegroundService<WakeLockService>()
     }
 
     override fun stopService() {
-        getApplication<Application>().stopService<TimeoutService>()
+        getApplication<Application>().stopService<WakeLockService>()
     }
 }

@@ -6,23 +6,22 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.core.content.ContextCompat
 import com.ilieinc.dontsleep.R
-import com.ilieinc.dontsleep.service.SleepService
+import com.ilieinc.dontsleep.service.ScreenTimeoutService
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
-import com.ilieinc.dontsleep.util.StateHelper
 import com.ilieinc.dontsleep.util.StateHelper.TileStates
 import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
 import com.ilieinc.dontsleep.util.StateHelper.stopService
 
-class SleepTileService : TileService() {
+class ScreenTimeoutTileService : TileService() {
 
     private val enabled
-        get() = SleepService.isRunning(this)
+        get() = ScreenTimeoutService.isRunning(this)
 
     override fun onClick() {
         if (!enabled) {
-            startForegroundService<SleepService>()
+            startForegroundService<ScreenTimeoutService>()
         } else {
-            stopService<SleepService>()
+            stopService<ScreenTimeoutService>()
         }
         refreshTileState()
     }
@@ -57,7 +56,7 @@ class SleepTileService : TileService() {
                     label = "Staying Awake!"
                     state = Tile.STATE_ACTIVE
                     icon = Icon.createWithResource(
-                        this@SleepTileService,
+                        this@ScreenTimeoutTileService,
                         R.drawable.baseline_timer_24
                     )
                 }
@@ -65,7 +64,7 @@ class SleepTileService : TileService() {
                     label = "Timer Disabled"
                     state = Tile.STATE_INACTIVE
                     icon = Icon.createWithResource(
-                        this@SleepTileService,
+                        this@ScreenTimeoutTileService,
                         R.drawable.baseline_timer_off_24
                     )
                 }
@@ -73,7 +72,7 @@ class SleepTileService : TileService() {
                     label = "Timer Disabled"
                     state = Tile.STATE_UNAVAILABLE
                     icon = Icon.createWithResource(
-                        this@SleepTileService,
+                        this@ScreenTimeoutTileService,
                         R.drawable.baseline_timer_off_24
                     )
                 }

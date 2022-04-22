@@ -20,17 +20,17 @@ fun CardHelpDialog(
 ) {
     val activity = LocalContext.current as Activity
     when (viewModel) {
-        is DontSleepCardViewModel -> {
+        is WakeLockCardViewModel -> {
             HelpDialog(
-                DontSleepHelpDialogViewModel(
+                WakeLockHelpDialogViewModel(
                     showDialog,
                     activity.application
                 )
             )
         }
-        is SleepCardViewModel -> {
+        is ScreenTimeoutCardViewModel -> {
             HelpDialog(
-                SleepCardHelpDialogViewModel(
+                ScreenTimeoutCardHelpDialogViewModel(
                     showDialog,
                     activity.application
                 )
@@ -46,17 +46,17 @@ fun CardPermissionDialog(
 ) {
     val activity = LocalContext.current as Activity
     when (viewModel) {
-        is DontSleepCardViewModel -> {
+        is WakeLockCardViewModel -> {
             PermissionDialog(
-                DontSleepPermissionDialogViewModel(
+                WakeLockPermissionDialogViewModel(
                     showPermissionDialog,
                     activity.application
                 )
             )
         }
-        is SleepCardViewModel -> {
+        is ScreenTimeoutCardViewModel -> {
             PermissionDialog(
-                SleepPermissionDialogViewModel(
+                ScreenTimeoutPermissionDialogViewModel(
                     showPermissionDialog,
                     activity
                 )

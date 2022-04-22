@@ -26,8 +26,8 @@ import com.ilieinc.dontsleep.ui.compose.component.ActionCard
 import com.ilieinc.dontsleep.ui.compose.component.DontSleepTopAppBar
 import com.ilieinc.dontsleep.ui.compose.component.OnLifecycleEvent
 import com.ilieinc.dontsleep.ui.theme.AppTheme
-import com.ilieinc.dontsleep.viewmodel.DontSleepCardViewModel
-import com.ilieinc.dontsleep.viewmodel.SleepCardViewModel
+import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
+import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,15 +62,15 @@ fun MainScreen() {
                     .fillMaxWidth()
                     .verticalScroll(scrollState)
             ) {
-                DontSleepTimerCard()
-                SleepTimerCard()
+                WakeLockTimerCard()
+                ScreenTimeoutTimerCard()
             }
         }
     }
 }
 
 @Composable
-fun DontSleepTimerCard(viewModel: DontSleepCardViewModel = viewModel()) {
+fun WakeLockTimerCard(viewModel: WakeLockCardViewModel = viewModel()) {
     val model = remember { viewModel }
     OnLifecycleEvent { _, event ->
         when (event) {
@@ -82,7 +82,7 @@ fun DontSleepTimerCard(viewModel: DontSleepCardViewModel = viewModel()) {
 }
 
 @Composable
-fun SleepTimerCard(viewModel: SleepCardViewModel = viewModel()) {
+fun ScreenTimeoutTimerCard(viewModel: ScreenTimeoutCardViewModel = viewModel()) {
     val model = remember { viewModel }
     val permissionGranted by DeviceAdminReceiver.permissionGranted.collectAsState()
     model.permissionRequired.tryEmit(!permissionGranted)

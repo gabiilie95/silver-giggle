@@ -1,18 +1,15 @@
 package com.ilieinc.dontsleep.viewmodel
 
 import android.app.Application
-import androidx.lifecycle.viewModelScope
-import com.ilieinc.dontsleep.service.SleepService
-import com.ilieinc.dontsleep.service.TimeoutService
+import com.ilieinc.dontsleep.service.ScreenTimeoutService
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
 import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
 import com.ilieinc.dontsleep.util.StateHelper.stopService
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
-import kotlinx.coroutines.launch
 
-class SleepCardViewModel(application: Application) :
-    CardViewModel(application, SleepService.serviceRunning) {
-    override val tag: String = SleepService.SLEEP_TAG
+class ScreenTimeoutCardViewModel(application: Application) :
+    CardViewModel(application, ScreenTimeoutService.serviceRunning) {
+    override val tag: String = ScreenTimeoutService.SLEEP_TAG
 
     init {
         title.tryEmit("Sleep!")
@@ -25,10 +22,10 @@ class SleepCardViewModel(application: Application) :
     }
 
     override fun startService() {
-        getApplication<Application>().startForegroundService<SleepService>()
+        getApplication<Application>().startForegroundService<ScreenTimeoutService>()
     }
 
     override fun stopService() {
-        getApplication<Application>().stopService<SleepService>()
+        getApplication<Application>().stopService<ScreenTimeoutService>()
     }
 }

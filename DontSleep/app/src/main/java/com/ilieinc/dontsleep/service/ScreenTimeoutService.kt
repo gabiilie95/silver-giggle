@@ -11,23 +11,23 @@ import com.ilieinc.dontsleep.util.StateHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
-class SleepService : BaseService(
-    SleepService::class.java,
+class ScreenTimeoutService : BaseService(
+    ScreenTimeoutService::class.java,
     SLEEP_TAG,
     2
 ) {
     companion object {
-        const val SLEEP_TAG = "DontSleep::SleepTag"
-        const val SLEEP_SERVICE_STOP_TAG = "DontSleep::SleepServiceStopTag"
+        const val SLEEP_TAG = "DontSleep::ScreenTimeoutTag"
+        const val SLEEP_SERVICE_STOP_TAG = "DontSleep::ScreenTimeoutServiceStopTag"
         fun isRunning(context: Context) =
-            StateHelper.isServiceRunning(context, SleepService::class.java)
+            StateHelper.isServiceRunning(context, ScreenTimeoutService::class.java)
         val serviceRunning = MutableStateFlow(false)
     }
 
     override val binder: ServiceBinder = ServiceBinder(this)
 
     override fun initFields() {
-        notification = NotificationManager.createTimeoutNotification<SleepService>(
+        notification = NotificationManager.createTimeoutNotification<ScreenTimeoutService>(
             this,
             R.drawable.baseline_timer_24,
             getString(R.string.app_name),
@@ -36,7 +36,7 @@ class SleepService : BaseService(
                 DateFormat.getTimeFormat(this).format(Calendar.getInstance().apply {
                     add(
                         Calendar.MILLISECOND,
-                        SharedPreferenceManager.getInstance(this@SleepService)
+                        SharedPreferenceManager.getInstance(this@ScreenTimeoutService)
                             .getLong(SLEEP_TAG, 900000)
                             .toInt()
                     )

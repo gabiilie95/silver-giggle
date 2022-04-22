@@ -14,7 +14,7 @@ import androidx.core.app.NotificationCompat
 import com.ilieinc.dontsleep.MainActivity
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.service.BaseService
-import com.ilieinc.dontsleep.service.TimeoutService
+import com.ilieinc.dontsleep.service.WakeLockService
 import java.lang.reflect.Method
 
 object NotificationManager {
@@ -26,7 +26,7 @@ object NotificationManager {
         title: String,
         text: String
     ): Notification where T : BaseService =
-        createStickyNotification<TimeoutService>(context) { builder ->
+        createStickyNotification<WakeLockService>(context) { builder ->
             val stopServiceIntent = Intent(context, T::class.java)
             stopServiceIntent.putExtra(STOP_COMMAND, true)
             val stopServicePendingIntent =

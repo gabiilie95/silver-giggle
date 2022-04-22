@@ -5,7 +5,7 @@ import com.ilieinc.dontsleep.util.PermissionHelper
 import com.ilieinc.dontsleep.viewmodel.base.PermissionDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class DontSleepPermissionDialogViewModel(
+class WakeLockPermissionDialogViewModel(
     showDialog: MutableStateFlow<Boolean>,
     application: Application
 ) : PermissionDialogViewModel(showDialog, application) {
