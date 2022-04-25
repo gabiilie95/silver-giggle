@@ -2,8 +2,6 @@ package com.ilieinc.dontsleep.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -93,74 +91,3 @@ fun AppTheme(
 		content = content
 	)
 }
-
-//data class CustomColor(val name:String, val color: Color, val harmonized: Boolean, var roles: ColorRoles)
-//data class ExtendedColors(val colors: Array<CustomColor>)
-//
-//fun setupErrorColors(colorScheme: ColorScheme, isLight: Boolean): ColorScheme {
-//    val harmonizedError =
-//        MaterialColors.harmonize(error, colorScheme.primary)
-//    val roles = MaterialColors.getColorRoles(harmonizedError, isLight)
-//    //returns a colorScheme with newly harmonized error colors
-//    return colorScheme.copy(
-//        error = roles.color,
-//        onError = roles.onColor,
-//        errorContainer = roles.colorContainer,
-//        onErrorContainer = roles.onColorContainer
-//    )
-//}
-//val initializeExtended = ExtendedColors(
-//	arrayOf(
-//))
-//
-//fun setupCustomColors(
-//    colorScheme: ColorScheme,
-//    isLight: Boolean
-//): ExtendedColors {
-//    initializeExtended.colors.forEach { customColor ->
-//        // Retrieve record
-//        val shouldHarmonize = customColor.harmonized
-//        // Blend or not
-//        if (shouldHarmonize) {
-//            val blendedColor =
-//                MaterialColors.harmonize(customColor.color, colorScheme.primary)
-//            customColor.roles = MaterialColors.getColorRoles(blendedColor, isLight)
-//        } else {
-//            customColor.roles = MaterialColors.getColorRoles(customColor.color, isLight)
-//        }
-//    }
-//    return initializeExtended
-//}
-//
-//val LocalExtendedColors = staticCompositionLocalOf {
-//    initializeExtended
-//}
-//
-//
-//@RequiresApi(Build.VERSION_CODES.S)
-//@Composable
-//fun HarmonizedTheme(
-//    useDarkTheme: Boolean = isSystemInDarkTheme(),
-//    isDynamic: Boolean = true,
-//    content: @Composable() () -> Unit
-//) {
-//    val colors = if (isDynamic) {
-//        val context = LocalContext.current
-//        if (useDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//    } else {
-//        if (useDarkTheme) DarkThemeColors else LightThemeColors
-//    }
-//    val colorsWithHarmonizedError = if(errorHarmonize) setupErrorColors(colors, !useDarkTheme) else colors
-//
-//    val extendedColors = setupCustomColors(colors, !useDarkTheme)
-//    CompositionLocalProvider(LocalExtendedColors provides extendedColors) {
-//        MaterialTheme(
-//            colorScheme = colorsWithHarmonizedError,
-//            typography = AppTypography,
-//            content = content
-//        )
-//    }
-//}
-//
-//object Extended {
-//}
