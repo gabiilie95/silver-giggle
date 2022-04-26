@@ -1,6 +1,7 @@
 package com.ilieinc.dontsleep.model
 
 import android.os.PowerManager
+import com.ilieinc.dontsleep.util.Logger
 
 data class NamedWakeLock(
     var name: String = "",
@@ -8,7 +9,9 @@ data class NamedWakeLock(
 ) {
     fun release() {
         name = ""
-        lock?.release()
+        runCatching {
+            lock?.release()
+        }.onFailure { ex -> Logger.error(ex) }
         lock = null
     }
 }
