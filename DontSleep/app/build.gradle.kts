@@ -5,25 +5,25 @@ plugins {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.21")
     implementation("androidx.appcompat:appcompat:1.4.1")
     implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.activity:activity:1.6.0-alpha01")
-    implementation("androidx.activity:activity-compose:1.6.0-alpha01")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.3")
+    implementation("androidx.activity:activity:1.6.0-alpha04")
+    implementation("androidx.activity:activity-compose:1.6.0-alpha03")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
     implementation("com.google.android.play:core-ktx:1.8.1")
     implementation("androidx.work:work-runtime:2.7.1")
     implementation("androidx.cardview:cardview:1.0.0")
-    implementation("com.google.android.material:material:1.7.0-alpha01")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
-    implementation("androidx.compose.ui:ui:1.2.0-alpha08")
+    implementation("com.google.android.material:material:1.7.0-alpha02")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+    implementation("androidx.compose.ui:ui:1.2.0-beta02")
     implementation("androidx.compose.ui:ui-tooling:1.1.1")
-    implementation("androidx.compose.compiler:compiler:1.2.0-alpha08")
+    implementation("androidx.compose.compiler:compiler:1.2.0-beta03")
     implementation("androidx.compose.foundation:foundation:1.1.1")
     implementation("androidx.compose.material:material:1.1.1")
-    implementation("androidx.compose.material3:material3:1.0.0-alpha10")
+    implementation("androidx.compose.material3:material3:1.0.0-alpha12")
     implementation("androidx.compose.material:material-icons-core:1.1.1")
     implementation("androidx.compose.material:material-icons-extended:1.1.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1")
@@ -54,7 +54,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0-alpha08"
+        kotlinCompilerExtensionVersion = "1.2.0-beta03"
     }
     buildTypes {
         getByName("release") {

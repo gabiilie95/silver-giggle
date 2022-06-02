@@ -3,14 +3,13 @@ package com.ilieinc.dontsleep.util
 
 import android.annotation.SuppressLint
 import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.ilieinc.dontsleep.MainActivity
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.service.BaseService
@@ -26,7 +25,10 @@ object NotificationManager {
         title: String,
         text: String
     ): Notification where T : BaseService =
-        createStickyNotification<WakeLockService>(context) { builder ->
+        createStickyNotification<WakeLockService>(
+            context,
+            NotificationManagerCompat.IMPORTANCE_MIN
+        ) { builder ->
             val stopServiceIntent = Intent(context, T::class.java)
             stopServiceIntent.putExtra(STOP_COMMAND, true)
             val stopServicePendingIntent =
@@ -58,7 +60,7 @@ object NotificationManager {
                 .setContentText(text)
                 .setContentIntent(mainActivityPendingIntent)
                 .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
                 .addAction(
                     0,
                     context.getString(R.string.stop),
@@ -81,35 +83,29 @@ object NotificationManager {
 
     inline fun <reified T> createStickyNotification(
         context: Context,
-        @SuppressLint("InlinedApi")
-        importance: Int = NotificationManager.IMPORTANCE_DEFAULT,
+        importance: Int = NotificationManagerCompat.IMPORTANCE_DEFAULT,
         builderActions: (NotificationCompat.Builder) -> Unit
     ): Notification {
-        val builder =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val notificationChannel = createNotificationChannel<T>(context, importance)
-                NotificationCompat.Builder(context, notificationChannel.id)
-            } else {
-                NotificationCompat.Builder(context)
-            }
+        val notificationChannel = createNotificationChannel<T>(context, importance)
+        val builder = NotificationCompat.Builder(context, notificationChannel.id)
         builderActions(builder)
         return builder.build()
     }
 
-    // This is needed for Android 8+
-    @RequiresApi(Build.VERSION_CODES.O)
     inline fun <reified T> createNotificationChannel(
         context: Context,
-        importance: Int = NotificationManager.IMPORTANCE_DEFAULT
-    ): NotificationChannel {
-        val notificationChannel = NotificationChannel(
-            "${T::class.qualifiedName}NotificationChannel",
-            "${T::class.simpleName} Notification",
-            importance
-        )
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(notificationChannel)
+        importance: Int = NotificationManagerCompat.IMPORTANCE_DEFAULT
+    ): NotificationChannelCompat {
+        val notificationChannel = with(
+            NotificationChannelCompat.Builder(
+                "${T::class.qualifiedName}NotificationChannel",
+                importance
+            )
+        ) {
+            setName("${T::class.simpleName} Notification")
+            build()
+        }
+        NotificationManagerCompat.from(context).createNotificationChannel(notificationChannel)
         return notificationChannel
     }
 }
