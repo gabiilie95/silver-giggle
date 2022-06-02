@@ -1,7 +1,6 @@
 package com.ilieinc.dontsleep.ui.theme
 import androidx.compose.ui.graphics.Color
 
-
 val md_theme_light_primary = Color(0xFF0060ab)
 val md_theme_light_onPrimary = Color(0xFFffffff)
 val md_theme_light_primaryContainer = Color(0xFFd2e4ff)
@@ -57,8 +56,6 @@ val md_theme_dark_inverseOnSurface = Color(0xFF1C1B1F)
 val md_theme_dark_inverseSurface = Color(0xFFE6E1E5)
 val md_theme_dark_inversePrimary = Color(0xFF0060ab)
 val md_theme_dark_shadow = Color(0xFF000000)
-
-
 
 val seed = Color(0xFF6750A4)
 val error = Color(0xFFB3261E)

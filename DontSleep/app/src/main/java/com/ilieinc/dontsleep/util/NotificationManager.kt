@@ -1,6 +1,5 @@
 package com.ilieinc.dontsleep.util
 
-
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
