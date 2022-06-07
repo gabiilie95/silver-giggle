@@ -61,4 +61,5 @@ android {
             isMinifyEnabled = false
         }
     }
+    namespace = "com.ilieinc.dontsleep"
 }
