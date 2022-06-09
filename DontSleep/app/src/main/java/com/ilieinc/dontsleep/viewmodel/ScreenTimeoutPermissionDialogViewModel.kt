@@ -1,14 +1,8 @@
 package com.ilieinc.dontsleep.viewmodel
 
 import android.app.Activity
-import android.app.Application
-import android.app.admin.DevicePolicyManager
-import android.content.Intent
-import androidx.core.app.ActivityCompat.startActivity
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.lifecycle.viewModelScope
 import com.ilieinc.dontsleep.util.DeviceAdminHelper
-import com.ilieinc.dontsleep.util.PermissionHelper
 import com.ilieinc.dontsleep.viewmodel.base.PermissionDialogViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class ScreenTimeoutPermissionDialogViewModel(
     showDialog: MutableStateFlow<Boolean>,
-    val activity: Activity
+    private val activity: Activity
 ) : PermissionDialogViewModel(showDialog, activity.application) {
     private var warningIsShowing = false
 

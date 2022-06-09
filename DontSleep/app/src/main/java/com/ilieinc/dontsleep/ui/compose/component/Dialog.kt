@@ -1,16 +1,12 @@
 package com.ilieinc.dontsleep.ui.compose.component
 
 import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
-import com.ilieinc.dontsleep.util.Logger
 import com.ilieinc.dontsleep.viewmodel.*
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 import com.ilieinc.dontsleep.viewmodel.base.HelpDialogViewModel

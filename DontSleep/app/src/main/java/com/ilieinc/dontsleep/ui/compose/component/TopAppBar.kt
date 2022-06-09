@@ -1,8 +1,6 @@
 package com.ilieinc.dontsleep.ui.compose.component
 
 import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -12,15 +10,15 @@ import androidx.compose.material.icons.outlined.InvertColors
 import androidx.compose.material.icons.outlined.InvertColorsOff
 import androidx.compose.material.icons.outlined.StarRate
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
-import com.google.android.play.core.review.ReviewManagerFactory
-import com.ilieinc.dontsleep.util.Logger
 import com.ilieinc.dontsleep.util.StateHelper
 import com.ilieinc.dontsleep.viewmodel.RatingDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

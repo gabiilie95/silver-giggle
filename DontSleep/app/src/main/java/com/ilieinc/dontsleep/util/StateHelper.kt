@@ -1,17 +1,12 @@
 package com.ilieinc.dontsleep.util
 
-import android.app.Activity
 import android.app.ActivityManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
-import com.google.android.material.snackbar.Snackbar
-import com.ilieinc.dontsleep.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
