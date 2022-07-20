@@ -29,7 +29,6 @@ import com.ilieinc.dontsleep.ui.theme.AppTheme
 import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
 import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     val activity = (LocalContext.current as? Activity)
