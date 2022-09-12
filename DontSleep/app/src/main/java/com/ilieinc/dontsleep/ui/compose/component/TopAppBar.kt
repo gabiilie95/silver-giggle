@@ -23,6 +23,7 @@ import com.ilieinc.dontsleep.util.StateHelper
 import com.ilieinc.dontsleep.viewmodel.RatingDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DontSleepTopAppBar() {
     val context = LocalContext.current
@@ -30,7 +31,7 @@ fun DontSleepTopAppBar() {
     val useDynamicColors by StateHelper.useDynamicColors.collectAsState()
     val showRateDialog = remember { MutableStateFlow(false) }
 
-    SmallTopAppBar(title = {
+    TopAppBar(title = {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 Icons.Default.Smartphone,

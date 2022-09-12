@@ -1,7 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.ilieinc.dontsleep.ui.compose.component
 
+import android.app.Application
 import android.view.LayoutInflater
 import android.widget.TimePicker
 import androidx.compose.foundation.layout.*
@@ -13,11 +12,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.ui.theme.AppTypography
+import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 
 @Composable
@@ -72,13 +73,9 @@ fun ActionCard(
                         text = "Status",
                         fontWeight = FontWeight.Bold
                     )
-                    //TODO("Replace with material3 switch. 04/20/2022 not refreshing correctly when switch state is updated.")
-                    androidx.compose.material.Switch(
+                    Switch(
                         checked = enabled,
-                        onCheckedChange = { viewModel.enabled.tryEmit(!enabled) },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.primary
-                        )
+                        onCheckedChange = { viewModel.enabled.tryEmit(!enabled) }
                     )
                 }
                 Row(
@@ -123,4 +120,10 @@ fun ActionCard(
     if (showPermissionDialog) {
         CardPermissionDialog(viewModel.showPermissionDialog, viewModel)
     }
+}
+
+@Preview
+@Composable
+fun ActionCardPreview() {
+    ActionCard(ScreenTimeoutCardViewModel(Application()))
 }
