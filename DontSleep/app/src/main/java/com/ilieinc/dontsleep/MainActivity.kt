@@ -24,9 +24,8 @@ class MainActivity : ComponentActivity() {
     private val notificationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {
-        SharedPreferenceManager.getInstance(this).edit {
+        SharedPreferenceManager.getInstance(this).edit(true) {
             putBoolean(PermissionHelper.PERMISSION_NOTIFICATION_SHOWN, true)
-            apply()
         }
     }
 
@@ -55,7 +54,6 @@ class MainActivity : ComponentActivity() {
         ) {
             PermissionHelper.requestNotificationPermission(notificationPermissionRequest)
         }
-        StateHelper.requestRatingIfNeeded(this)
+        StateHelper.updateRatingCountIfNeeded(this)
     }
-
 }

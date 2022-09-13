@@ -22,12 +22,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilieinc.dontsleep.MainActivity
 import com.ilieinc.dontsleep.receiver.DeviceAdminReceiver
-import com.ilieinc.dontsleep.ui.compose.component.ActionCard
-import com.ilieinc.dontsleep.ui.compose.component.DontSleepTopAppBar
-import com.ilieinc.dontsleep.ui.compose.component.OnLifecycleEvent
-import com.ilieinc.dontsleep.ui.compose.component.RequestNotificationButton
+import com.ilieinc.dontsleep.ui.compose.component.*
 import com.ilieinc.dontsleep.ui.theme.AppTheme
 import com.ilieinc.dontsleep.util.PermissionHelper
+import com.ilieinc.dontsleep.util.StateHelper.needToShowReviewSnackbar
+import com.ilieinc.dontsleep.util.StateHelper.showReviewSnackbar
 import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
 import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
 import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
@@ -46,14 +45,12 @@ fun MainScreen() {
     val notificationPermissionResult = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean -> hasNotificationPermission = isGranted }
-//    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     val scrollState = rememberScrollState()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { DontSleepTopAppBar() },
-//        snackbarHost = {
-//            SnackbarHost(snackbarHostState)
-//        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             Button(
                 modifier = Modifier
@@ -84,7 +81,16 @@ fun MainScreen() {
                 }
             }
         }
+        if (activity != null && needToShowReviewSnackbar(activity.applicationContext)) {
+            LaunchedEffect(snackbarHostState) {
+                showReviewSnackbar(
+                    activity.applicationContext,
+                    snackbarHostState
+                )
+            }
+        }
     }
+
 }
 
 @RequiresApi(33)
