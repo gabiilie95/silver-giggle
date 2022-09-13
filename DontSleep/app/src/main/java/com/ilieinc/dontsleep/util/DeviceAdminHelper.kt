@@ -36,5 +36,4 @@ object DeviceAdminHelper {
     fun removeActiveAdmin() {
         deviceManager.removeActiveAdmin(componentName)
     }
-
 }

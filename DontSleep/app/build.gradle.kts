@@ -39,7 +39,7 @@ android {
         applicationId = "com.ilieinc.dontsleep"
         minSdk = 24
         targetSdk = 33
-        versionCode = 22
+        versionCode = 23
         versionName = "2.$versionCode"
         multiDexEnabled = true
     }
