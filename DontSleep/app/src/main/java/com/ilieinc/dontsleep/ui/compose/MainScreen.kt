@@ -24,7 +24,6 @@ import com.ilieinc.dontsleep.MainActivity
 import com.ilieinc.dontsleep.receiver.DeviceAdminReceiver
 import com.ilieinc.dontsleep.ui.compose.component.*
 import com.ilieinc.dontsleep.ui.theme.AppTheme
-import com.ilieinc.dontsleep.util.PermissionHelper
 import com.ilieinc.dontsleep.util.StateHelper.needToShowReviewSnackbar
 import com.ilieinc.dontsleep.util.StateHelper.showReviewSnackbar
 import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
@@ -33,18 +32,11 @@ import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    hasNotificationPermission: Boolean,
+    notificationPermissionResult: ManagedActivityResultLauncher<String, Boolean>
+) {
     val activity = (LocalContext.current as? Activity)
-    var hasNotificationPermission by remember {
-        mutableStateOf(
-            PermissionHelper.hasNotificationPermission(
-                activity!!.applicationContext
-            )
-        )
-    }
-    val notificationPermissionResult = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean -> hasNotificationPermission = isGranted }
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollState = rememberScrollState()
     Scaffold(
@@ -138,6 +130,9 @@ fun ScreenTimeoutTimerCard(viewModel: ScreenTimeoutCardViewModel = viewModel()) 
 @Composable
 fun MainScreenPreview() {
     AppTheme {
-        MainScreen()
+        MainScreen(false, rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = {}
+        ))
     }
 }
