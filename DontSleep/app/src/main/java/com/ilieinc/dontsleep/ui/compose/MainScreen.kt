@@ -82,7 +82,6 @@ fun MainScreen(
             }
         }
     }
-
 }
 
 @RequiresApi(33)

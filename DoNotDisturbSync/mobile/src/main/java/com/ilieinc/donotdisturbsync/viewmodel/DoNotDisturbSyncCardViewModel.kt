@@ -1,0 +1,58 @@
+package com.ilieinc.donotdisturbsync.viewmodel
+
+import android.app.Application
+import androidx.core.content.edit
+import androidx.lifecycle.viewModelScope
+import com.ilieinc.donotdisturbsync.util.PermissionHelper
+import com.ilieinc.donotdisturbsync.util.SharedPreferenceManager
+import com.ilieinc.donotdisturbsync.viewmodel.base.CardViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+
+class DoNotDisturbSyncCardViewModel(application: Application): CardViewModel(application) {
+    companion object {
+        const val phoneToWearableTag = "PhoneToWearableSyncEnabled"
+        const val wearableToPhoneTag = "WearableToPhoneSyncEnabled"
+    }
+
+    var phoneToWearableSyncEnabled = MutableStateFlow(false)
+    var wearableToPhoneSyncEnabled = MutableStateFlow(false)
+
+    init {
+        title.tryEmit("Sync Status")
+        loadInitialState()
+        refreshPermissionState()
+        viewModelScope.launch {
+//            settingEnabled.collect { serviceRunning ->
+//                enabled.tryEmit(serviceRunning)
+//            }
+        }
+        viewModelScope.launch {
+            phoneToWearableSyncEnabled.collect { enabled ->
+                cardStatusChanged(enabled, phoneToWearableTag)
+            }
+        }
+        viewModelScope.launch {
+            wearableToPhoneSyncEnabled.collect { enabled ->
+                cardStatusChanged(enabled, wearableToPhoneTag)
+            }
+        }
+    }
+
+    private fun loadInitialState() {
+        with(SharedPreferenceManager.getInstance(getApplication())) {
+            phoneToWearableSyncEnabled.tryEmit(getBoolean(phoneToWearableTag, false))
+            wearableToPhoneSyncEnabled.tryEmit(getBoolean(wearableToPhoneTag, false))
+        }
+    }
+
+    override fun refreshPermissionState() {
+        permissionRequired.tryEmit(PermissionHelper.shouldRequestDrawOverPermission(getApplication()))
+    }
+
+    private fun cardStatusChanged(enabled: Boolean, tag: String) {
+        SharedPreferenceManager.getInstance(getApplication()).edit(true) {
+            putBoolean(tag, enabled)
+        }
+    }
+}
