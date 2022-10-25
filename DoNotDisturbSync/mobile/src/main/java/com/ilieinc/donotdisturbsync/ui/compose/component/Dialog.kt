@@ -22,7 +22,7 @@ fun CardHelpDialog(
     when (viewModel) {
         is DoNotDisturbSyncCardViewModel -> {
             HelpDialog(
-                WakeLockHelpDialogViewModel(
+                DoNotDisturbSyncHelpDialogViewModel(
                     showDialog,
                     activity.application
                 )

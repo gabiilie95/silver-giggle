@@ -11,7 +11,7 @@ class WakeLockPermissionDialogViewModel(
 ) : PermissionDialogViewModel(showDialog, application) {
 
     init {
-        title.tryEmit("Draw Over Permission Grant")
+        title.tryEmit("Do Not Disturb Access Permission Grant")
         description.tryEmit(
             "Due to limitations from the manufacturer of your device, in order to use this feature, you must grant draw over other apps permission to the application.\n" +
                     "This permission will only be used to keep the screen awake.\n\n" +
@@ -20,7 +20,7 @@ class WakeLockPermissionDialogViewModel(
     }
 
     override fun requestPermission() {
-        PermissionHelper.requestDrawOverPermission(getApplication())
+        PermissionHelper.requestNotificationPolicyAccessPermission(getApplication())
         showDialog.tryEmit(false)
     }
 }

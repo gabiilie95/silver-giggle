@@ -12,6 +12,6 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Do Not Disturb sync"
+rootProject.name = "Do Not Disturb Sync"
 include ':mobile'
 include ':wear'

@@ -3,6 +3,7 @@ package com.ilieinc.donotdisturbsync.viewmodel
 import android.app.Application
 import androidx.core.content.edit
 import androidx.lifecycle.viewModelScope
+import com.ilieinc.donotdisturbsync.util.NotificationUtils
 import com.ilieinc.donotdisturbsync.util.PermissionHelper
 import com.ilieinc.donotdisturbsync.util.SharedPreferenceManager
 import com.ilieinc.donotdisturbsync.viewmodel.base.CardViewModel
@@ -14,6 +15,8 @@ class DoNotDisturbSyncCardViewModel(application: Application): CardViewModel(app
         const val phoneToWearableTag = "PhoneToWearableSyncEnabled"
         const val wearableToPhoneTag = "WearableToPhoneSyncEnabled"
     }
+
+    val notificationUtils = NotificationUtils(application)
 
     var phoneToWearableSyncEnabled = MutableStateFlow(false)
     var wearableToPhoneSyncEnabled = MutableStateFlow(false)
@@ -47,12 +50,13 @@ class DoNotDisturbSyncCardViewModel(application: Application): CardViewModel(app
     }
 
     override fun refreshPermissionState() {
-        permissionRequired.tryEmit(PermissionHelper.shouldRequestDrawOverPermission(getApplication()))
+        permissionRequired.tryEmit(!PermissionHelper.hasNotificationPolicyAccessPermission(getApplication()))
     }
 
     private fun cardStatusChanged(enabled: Boolean, tag: String) {
         SharedPreferenceManager.getInstance(getApplication()).edit(true) {
             putBoolean(tag, enabled)
+            notificationUtils.changeDoNotDisturbStatus(enabled)
         }
     }
 }

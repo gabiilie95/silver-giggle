@@ -10,21 +10,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilieinc.donotdisturbsync.ui.compose.component.ActionCard
+import com.ilieinc.donotdisturbsync.ui.compose.component.OnLifecycleEvent
 import com.ilieinc.donotdisturbsync.viewmodel.DoNotDisturbSyncCardViewModel
 
 @Composable
 fun DoNotDisturbSyncCard(viewModel: DoNotDisturbSyncCardViewModel = viewModel()) {
     val model = remember { viewModel }
-//    val permissionGranted by DeviceAdminReceiver.permissionGranted.collectAsState()
-//    model.permissionRequired.tryEmit(!permissionGranted)
-//    OnLifecycleEvent { _, event ->
-//        when (event) {
-//            Lifecycle.Event.ON_RESUME -> model.refreshPermissionState()
-//            else -> {}
-//        }
-//    }
+    OnLifecycleEvent { _, event ->
+        when (event) {
+            Lifecycle.Event.ON_RESUME -> model.refreshPermissionState()
+            else -> {}
+        }
+    }
     val phoneToWearableSyncEnabled by model.phoneToWearableSyncEnabled.collectAsState()
     val wearableToPhoneSyncEnabled by model.wearableToPhoneSyncEnabled.collectAsState()
 

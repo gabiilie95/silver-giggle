@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
             val useDynamicColors by StateHelper.useDynamicColors.collectAsState()
             var hasNotificationPermission by remember {
                 mutableStateOf(
-                    PermissionHelper.hasNotificationPermission(
+                    PermissionHelper.hasNotificationPolicyAccessPermission(
                         this
                     )
                 )

@@ -5,7 +5,7 @@ import com.ilieinc.donotdisturbsync.util.PermissionHelper
 import com.ilieinc.donotdisturbsync.viewmodel.base.HelpDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class WakeLockHelpDialogViewModel(
+class DoNotDisturbSyncHelpDialogViewModel(
     showDialog: MutableStateFlow<Boolean>,
     application: Application
 ) :
@@ -19,7 +19,7 @@ class WakeLockHelpDialogViewModel(
     private fun setDetails() {
         description.tryEmit(buildString {
             append("This feature enables you to turn off your screen timeout with the click of a button.")
-            if (PermissionHelper.hasDrawOverPermission(getApplication())) {
+            if (PermissionHelper.hasNotificationPolicyAccessPermission(getApplication())) {
                 append("\nYou can revoke the draw over permission from this dialog.")
                 showRevokePermissionButton.tryEmit(true)
             }
@@ -27,7 +27,7 @@ class WakeLockHelpDialogViewModel(
     }
 
     override fun revokePermission() {
-        PermissionHelper.requestDrawOverPermission(getApplication())
+        PermissionHelper.requestNotificationPolicyAccessPermission(getApplication())
         showDialog.tryEmit(false)
     }
 }
