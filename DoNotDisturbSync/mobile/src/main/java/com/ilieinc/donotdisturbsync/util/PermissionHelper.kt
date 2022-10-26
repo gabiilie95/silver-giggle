@@ -4,11 +4,11 @@ import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.provider.Settings
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
+import com.ilieinc.common.util.SharedPreferenceManager
 
 object PermissionHelper {
     const val PERMISSION_NOTIFICATION_SHOWN = "PermissionNotificationShown"

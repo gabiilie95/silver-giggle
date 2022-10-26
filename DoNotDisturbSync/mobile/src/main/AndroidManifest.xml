@@ -27,6 +27,14 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <receiver
+            android:name="com.ilieinc.donotdisturbsync.receiver.NotificationPolicyChangeReceiver" android:process=":remote"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.app.action.INTERRUPTION_FILTER_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

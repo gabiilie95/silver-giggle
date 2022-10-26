@@ -1,4 +1,4 @@
-package com.ilieinc.donotdisturbsync.util
+package com.ilieinc.common.util
 
 import android.util.Log
 

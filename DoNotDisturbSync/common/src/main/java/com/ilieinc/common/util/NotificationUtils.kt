@@ -1,11 +1,10 @@
-package com.ilieinc.donotdisturbsync.util
+package com.ilieinc.common.util
 
 import android.app.Application
 import android.app.NotificationManager
 import android.app.NotificationManager.INTERRUPTION_FILTER_ALL
 import android.app.NotificationManager.INTERRUPTION_FILTER_NONE
 import android.content.Context
-
 
 class NotificationUtils(val application: Application) {
 

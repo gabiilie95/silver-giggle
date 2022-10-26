@@ -27,7 +27,6 @@ fun DoNotDisturbSyncCard(viewModel: DoNotDisturbSyncCardViewModel = viewModel())
     }
     val phoneToWearableSyncEnabled by model.phoneToWearableSyncEnabled.collectAsState()
     val wearableToPhoneSyncEnabled by model.wearableToPhoneSyncEnabled.collectAsState()
-
     ActionCard(model) {
         Column(
             Modifier

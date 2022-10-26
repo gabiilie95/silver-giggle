@@ -3,7 +3,6 @@
 package com.ilieinc.donotdisturbsync.ui.compose
 
 import android.app.Activity
-import android.os.Build
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ilieinc.donotdisturbsync.MainActivity
 import com.ilieinc.donotdisturbsync.ui.compose.component.*
 import com.ilieinc.donotdisturbsync.ui.theme.AppTheme
 import com.ilieinc.donotdisturbsync.util.StateHelper.needToShowReviewSnackbar
@@ -33,7 +31,7 @@ fun MainScreen(
     val scrollState = rememberScrollState()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { DontSleepTopAppBar() },
+        topBar = { ApplicationTopAppBar() },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             Button(

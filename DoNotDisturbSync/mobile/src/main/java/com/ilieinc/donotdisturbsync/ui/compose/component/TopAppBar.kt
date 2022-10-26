@@ -5,7 +5,11 @@ import android.os.Build
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Smartphone
+import androidx.compose.material.icons.filled.DoNotDisturb
+import androidx.compose.material.icons.filled.DoNotDisturbAlt
+import androidx.compose.material.icons.filled.DoNotDisturbOff
+import androidx.compose.material.icons.filled.DoNotDisturbOn
+import androidx.compose.material.icons.outlined.DoNotDisturbOn
 import androidx.compose.material.icons.outlined.InvertColors
 import androidx.compose.material.icons.outlined.InvertColorsOff
 import androidx.compose.material.icons.outlined.StarRate
@@ -25,7 +29,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DontSleepTopAppBar() {
+fun ApplicationTopAppBar() {
     val context = LocalContext.current
     val activity = (context as Activity)
     val useDynamicColors by StateHelper.useDynamicColors.collectAsState()
@@ -34,7 +38,7 @@ fun DontSleepTopAppBar() {
     TopAppBar(title = {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                Icons.Default.Smartphone,
+                Icons.Outlined.DoNotDisturbOn,
                 "Title Icon",
                 tint = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.background)
             )

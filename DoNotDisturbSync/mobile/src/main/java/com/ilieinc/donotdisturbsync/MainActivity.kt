@@ -13,16 +13,20 @@ import androidx.core.content.edit
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.elevation.SurfaceColors
+import com.ilieinc.donotdisturbsync.util.PermissionHelper
+import com.ilieinc.common.util.SharedPreferenceManager
+import com.ilieinc.donotdisturbsync.receiver.NotificationPolicyChangeReceiver
 import com.ilieinc.donotdisturbsync.ui.compose.MainScreen
 import com.ilieinc.donotdisturbsync.ui.theme.AppTheme
-import com.ilieinc.donotdisturbsync.util.PermissionHelper
-import com.ilieinc.donotdisturbsync.util.SharedPreferenceManager
 import com.ilieinc.donotdisturbsync.util.StateHelper
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        test()
+
         StateHelper.initDynamicColorsEnabledProperty(this)
         window.statusBarColor = SurfaceColors.SURFACE_0.getColor(this)
         window.navigationBarColor = SurfaceColors.SURFACE_2.getColor(this)
@@ -57,6 +61,10 @@ class MainActivity : ComponentActivity() {
             }
         }
         StateHelper.updateRatingCountIfNeeded(this)
+    }
+
+    private fun test() {
+        NotificationPolicyChangeReceiver.registerReceiver(this)
     }
 
     private fun setWindowInsetAppearance(
