@@ -1,9 +1,10 @@
-package com.ilieinc.donotdisturbsync.viewmodel
+package com.ilieinc.common.viewmodel
 
 import android.app.Application
 import androidx.core.content.edit
 import androidx.lifecycle.viewModelScope
-import com.ilieinc.donotdisturbsync.util.PermissionHelper
+import com.ilieinc.common.util.Logger
+import com.ilieinc.common.util.PermissionHelper
 import com.ilieinc.common.viewmodel.base.CardViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -55,6 +56,14 @@ class DoNotDisturbSyncCardViewModel(application: Application): CardViewModel(app
         com.ilieinc.common.util.SharedPreferenceManager.getInstance(getApplication()).edit(true) {
             putBoolean(tag, enabled)
             notificationUtils.changeDoNotDisturbStatus(enabled)
+        }
+    }
+
+    override fun requestPermission() {
+        try {
+            PermissionHelper.requestNotificationPolicyAccessPermission(getApplication())
+        } catch (ex: Exception) {
+            Logger.error(ex)
         }
     }
 }

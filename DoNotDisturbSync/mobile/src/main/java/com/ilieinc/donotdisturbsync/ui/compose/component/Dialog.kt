@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import com.ilieinc.donotdisturbsync.viewmodel.*
-import com.ilieinc.donotdisturbsync.viewmodel.base.CardViewModel
+import com.ilieinc.common.viewmodel.base.CardViewModel
 import com.ilieinc.donotdisturbsync.viewmodel.base.HelpDialogViewModel
 import com.ilieinc.donotdisturbsync.viewmodel.base.PermissionDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +40,7 @@ fun CardPermissionDialog(
     when (viewModel) {
         is DoNotDisturbSyncCardViewModel -> {
             PermissionDialog(
-                WakeLockPermissionDialogViewModel(
+                DoNotDisturbSyncPermissionDialogViewModel(
                     showPermissionDialog,
                     activity.application
                 )
