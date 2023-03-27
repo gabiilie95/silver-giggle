@@ -29,6 +29,7 @@ import com.ilieinc.dontsleep.util.StateHelper.showReviewSnackbar
 import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
 import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
 import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
+import com.ilieinc.dontsleep.viewmodel.MediaTimeoutCardViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
@@ -66,6 +67,7 @@ fun MainScreen(
             ) {
                 WakeLockTimerCard()
                 ScreenTimeoutTimerCard()
+                MediaTimeoutTimerCard()
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && activity is MainActivity
                     && !hasNotificationPermission
                 ) {
@@ -122,6 +124,12 @@ fun ScreenTimeoutTimerCard(viewModel: ScreenTimeoutCardViewModel = viewModel()) 
             else -> {}
         }
     }
+    ActionCard(model)
+}
+
+@Composable
+fun MediaTimeoutTimerCard(viewModel: MediaTimeoutCardViewModel = viewModel()) {
+    val model = remember { viewModel }
     ActionCard(model)
 }
 

@@ -20,22 +20,24 @@ fun CardHelpDialog(
 ) {
     val activity = LocalContext.current as Activity
     when (viewModel) {
-        is WakeLockCardViewModel -> {
-            HelpDialog(
-                WakeLockHelpDialogViewModel(
-                    showDialog,
-                    activity.application
-                )
+        is WakeLockCardViewModel -> HelpDialog(
+            WakeLockHelpDialogViewModel(
+                showDialog,
+                activity.application
             )
-        }
-        is ScreenTimeoutCardViewModel -> {
-            HelpDialog(
-                ScreenTimeoutCardHelpDialogViewModel(
-                    showDialog,
-                    activity.application
-                )
+        )
+        is ScreenTimeoutCardViewModel -> HelpDialog(
+            ScreenTimeoutCardHelpDialogViewModel(
+                showDialog,
+                activity.application
             )
-        }
+        )
+        is MediaTimeoutCardViewModel -> HelpDialog(
+            MediaTimeoutCardHelpDialogViewModel(
+                showDialog,
+                activity.application
+            )
+        )
     }
 }
 

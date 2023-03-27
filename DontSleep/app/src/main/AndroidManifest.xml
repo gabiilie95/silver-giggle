@@ -50,8 +50,21 @@
                 android:name="android.service.quicksettings.TOGGLEABLE_TILE"
                 android:value="true" />
         </service>
+        <service android:name="com.ilieinc.dontsleep.service.tile.MediaTimeoutTileService"
+            android:exported="true"
+            android:icon="@drawable/baseline_timer_off_24"
+            android:label="Media Timer Disabled"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+                android:value="true" />
+        </service>
         <service android:name=".service.WakeLockService" />
         <service android:name=".service.ScreenTimeoutService" />
+        <service android:name=".service.MediaTimeoutService" />
 
         <receiver
             android:name=".receiver.DeviceAdminReceiver"

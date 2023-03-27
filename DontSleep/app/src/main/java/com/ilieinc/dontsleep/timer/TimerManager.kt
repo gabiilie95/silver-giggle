@@ -12,7 +12,7 @@ class TimerManager {
         /**
          * Sets an alarm at the specified time.
          */
-        inline fun <reified T : Worker> setTimedTask(
+        inline fun <reified T : ListenableWorker> setTimedTask(
             context: Context,
             requestTime: Date,
             tag: String? = null,

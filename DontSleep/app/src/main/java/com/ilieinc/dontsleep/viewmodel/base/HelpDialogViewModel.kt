@@ -11,5 +11,5 @@ abstract class HelpDialogViewModel(
     val showRevokePermissionButton = MutableStateFlow(false)
     val revokeButtonText = MutableStateFlow("Revoke Permission")
 
-    abstract fun revokePermission()
+    open fun revokePermission() { }
 }

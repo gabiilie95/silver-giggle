@@ -19,6 +19,7 @@ class ScreenTimeoutService : BaseService(
     companion object {
         const val SLEEP_TAG = "DontSleep::ScreenTimeoutTag"
         const val SLEEP_SERVICE_STOP_TAG = "DontSleep::ScreenTimeoutServiceStopTag"
+
         fun isRunning(context: Context) =
             StateHelper.isServiceRunning(context, ScreenTimeoutService::class.java)
         val serviceRunning = MutableStateFlow(false)

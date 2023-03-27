@@ -12,6 +12,7 @@
     <string name="close">Close</string>
     <string name="timeout_notification_text">Keeping device awake until %s.</string>
     <string name="sleep_notification_text">"Turning screen off at %s.</string>
+    <string name="media_timeout_notification_text">"Pausing media playback at %s.</string>
     <string name="special_permission_grant_title">Special Permission Grant</string>
     <string name="special_permission_grant_body">In order to use this feature, you must grant a special permission to the application.\nThis permission allows the application to turn off your screen.\n\nDo you want to continue?</string>
     <string name="draw_over_permission_grant_title">Draw Over Permission Grant</string>

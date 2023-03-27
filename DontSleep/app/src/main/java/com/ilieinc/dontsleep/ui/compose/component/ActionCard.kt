@@ -4,7 +4,6 @@ import android.app.Application
 import android.view.LayoutInflater
 import android.widget.TimePicker
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.SwitchDefaults
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -90,6 +89,10 @@ fun ActionCard(
                         )
                         Text(text = "(Hours, Minutes)")
                     }
+//                    TimePicker(
+//                        state = TimePickerState(hours, minutes, true),
+//                        layoutType = TimePickerLayoutType.Horizontal
+//                    )
                     AndroidView(
                         factory = { context ->
                             val layout = LayoutInflater.from(context)
