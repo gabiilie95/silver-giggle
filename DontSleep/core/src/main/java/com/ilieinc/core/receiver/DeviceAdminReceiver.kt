@@ -1,4 +1,4 @@
-package com.ilieinc.dontsleep.receiver
+package com.ilieinc.core.receiver
 
 import android.app.admin.DeviceAdminReceiver
 import android.content.Context

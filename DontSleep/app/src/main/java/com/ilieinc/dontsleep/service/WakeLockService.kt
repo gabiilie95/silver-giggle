@@ -10,10 +10,11 @@ import android.view.View
 import android.view.WindowManager
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.model.NamedWakeLock
-import com.ilieinc.dontsleep.util.Logger
-import com.ilieinc.dontsleep.util.NotificationManager
-import com.ilieinc.dontsleep.util.SharedPreferenceManager
-import com.ilieinc.dontsleep.util.StateHelper
+import com.ilieinc.core.util.Logger
+import com.ilieinc.core.util.NotificationManager
+import com.ilieinc.core.util.SharedPreferenceManager
+import com.ilieinc.core.util.StateHelper
+import com.ilieinc.dontsleep.util.DontSleepNotificationManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
@@ -36,7 +37,7 @@ class WakeLockService : BaseService(
     private var overlay: View? = null
 
     override fun initFields() {
-        notification = NotificationManager.createTimeoutNotification<WakeLockService>(
+        notification = DontSleepNotificationManager.createTimeoutNotification<WakeLockService>(
             this,
             R.drawable.baseline_mobile_friendly_24,
             getString(R.string.app_name),

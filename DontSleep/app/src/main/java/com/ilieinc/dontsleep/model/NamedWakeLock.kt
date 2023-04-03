@@ -1,7 +1,7 @@
 package com.ilieinc.dontsleep.model
 
 import android.os.PowerManager
-import com.ilieinc.dontsleep.util.Logger
+import com.ilieinc.core.util.Logger
 
 data class NamedWakeLock(
     var name: String = "",

@@ -7,11 +7,12 @@ import android.content.pm.ServiceInfo
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import com.ilieinc.core.util.Logger
+import com.ilieinc.core.util.NotificationManager
+import com.ilieinc.core.util.SharedPreferenceManager
 import com.ilieinc.dontsleep.timer.StopServiceWorker
 import com.ilieinc.dontsleep.timer.TimerManager
-import com.ilieinc.dontsleep.util.Logger
-import com.ilieinc.dontsleep.util.NotificationManager
-import com.ilieinc.dontsleep.util.SharedPreferenceManager
+import com.ilieinc.dontsleep.util.DontSleepNotificationManager
 import java.util.*
 
 abstract class BaseService(
@@ -56,7 +57,7 @@ abstract class BaseService(
     abstract fun initFields()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.getBooleanExtra(NotificationManager.STOP_COMMAND, false) == true) {
+        if (intent?.getBooleanExtra(DontSleepNotificationManager.STOP_COMMAND, false) == true) {
             stopSelf()
         }
         return START_STICKY

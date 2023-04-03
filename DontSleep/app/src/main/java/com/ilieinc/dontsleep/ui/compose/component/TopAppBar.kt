@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.ilieinc.dontsleep.util.StateHelper
+import com.ilieinc.core.util.StateHelper
 import com.ilieinc.dontsleep.viewmodel.RatingDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 

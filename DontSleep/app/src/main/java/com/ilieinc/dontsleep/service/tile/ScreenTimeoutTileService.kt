@@ -7,10 +7,10 @@ import android.service.quicksettings.TileService
 import androidx.core.content.ContextCompat
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.service.ScreenTimeoutService
-import com.ilieinc.dontsleep.util.DeviceAdminHelper
-import com.ilieinc.dontsleep.util.StateHelper.TileStates
-import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
-import com.ilieinc.dontsleep.util.StateHelper.stopService
+import com.ilieinc.core.util.DeviceAdminHelper
+import com.ilieinc.core.util.StateHelper.TileStates
+import com.ilieinc.core.util.StateHelper.startForegroundService
+import com.ilieinc.core.util.StateHelper.stopService
 
 class ScreenTimeoutTileService : TileService() {
 

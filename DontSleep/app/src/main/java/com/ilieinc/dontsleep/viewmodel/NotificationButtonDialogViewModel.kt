@@ -3,7 +3,7 @@ package com.ilieinc.dontsleep.viewmodel
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.annotation.RequiresApi
 import com.ilieinc.dontsleep.MainActivity
-import com.ilieinc.dontsleep.util.PermissionHelper
+import com.ilieinc.core.util.PermissionHelper
 import com.ilieinc.dontsleep.viewmodel.base.PermissionDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 

@@ -1,4 +1,4 @@
-package com.ilieinc.dontsleep.util
+package com.ilieinc.core.util
 
 import android.app.Activity
 import android.app.admin.DevicePolicyManager
@@ -6,7 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
-import com.ilieinc.dontsleep.receiver.DeviceAdminReceiver
+import com.ilieinc.core.receiver.DeviceAdminReceiver
 
 object DeviceAdminHelper {
     lateinit var componentName: ComponentName

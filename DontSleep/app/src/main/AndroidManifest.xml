@@ -66,17 +66,6 @@
         <service android:name=".service.ScreenTimeoutService" />
         <service android:name=".service.MediaTimeoutService" />
 
-        <receiver
-            android:name=".receiver.DeviceAdminReceiver"
-            android:exported="true"
-            android:permission="android.permission.BIND_DEVICE_ADMIN">
-            <meta-data
-                android:name="android.app.device_admin"
-                android:resource="@xml/policies" />
-            <intent-filter>
-                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

@@ -2,7 +2,7 @@ package com.ilieinc.dontsleep.viewmodel
 
 import android.app.Activity
 import androidx.lifecycle.viewModelScope
-import com.ilieinc.dontsleep.util.DeviceAdminHelper
+import com.ilieinc.core.util.DeviceAdminHelper
 import com.ilieinc.dontsleep.viewmodel.base.PermissionDialogViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -2,9 +2,9 @@ package com.ilieinc.dontsleep.viewmodel
 
 import android.app.Application
 import com.ilieinc.dontsleep.service.WakeLockService
-import com.ilieinc.dontsleep.util.PermissionHelper
-import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
-import com.ilieinc.dontsleep.util.StateHelper.stopService
+import com.ilieinc.core.util.PermissionHelper
+import com.ilieinc.core.util.StateHelper.startForegroundService
+import com.ilieinc.core.util.StateHelper.stopService
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 
 class WakeLockCardViewModel(application: Application): CardViewModel(

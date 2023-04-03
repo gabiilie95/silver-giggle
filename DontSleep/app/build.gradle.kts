@@ -7,8 +7,9 @@ val composeCompilerVersion = "1.4.4"
 
 dependencies {
     implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation(project(mapOf("path" to ":core")))
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.2")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.20")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.activity:activity:1.7.0")

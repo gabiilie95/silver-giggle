@@ -8,7 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.ilieinc.dontsleep.util.Logger
+import com.ilieinc.core.util.Logger
 
 @RequiresApi(Build.VERSION_CODES.O)
 class MediaTimeoutWorker(

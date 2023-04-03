@@ -3,12 +3,12 @@ package com.ilieinc.dontsleep.service.tile
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import com.ilieinc.core.util.DeviceAdminHelper
+import com.ilieinc.core.util.StateHelper.TileStates
+import com.ilieinc.core.util.StateHelper.startForegroundService
+import com.ilieinc.core.util.StateHelper.stopService
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.service.MediaTimeoutService
-import com.ilieinc.dontsleep.util.DeviceAdminHelper
-import com.ilieinc.dontsleep.util.StateHelper.TileStates
-import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
-import com.ilieinc.dontsleep.util.StateHelper.stopService
 
 class MediaTimeoutTileService : TileService() {
 

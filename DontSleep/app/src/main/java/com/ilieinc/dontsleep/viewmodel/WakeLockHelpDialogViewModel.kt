@@ -1,7 +1,7 @@
 package com.ilieinc.dontsleep.viewmodel
 
 import android.app.Application
-import com.ilieinc.dontsleep.util.PermissionHelper
+import com.ilieinc.core.util.PermissionHelper
 import com.ilieinc.dontsleep.viewmodel.base.HelpDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 

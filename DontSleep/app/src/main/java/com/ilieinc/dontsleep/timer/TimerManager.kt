@@ -2,7 +2,7 @@ package com.ilieinc.dontsleep.timer
 
 import android.content.Context
 import androidx.work.*
-import com.ilieinc.dontsleep.util.Logger
+import com.ilieinc.core.util.Logger
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit

@@ -3,7 +3,7 @@ package com.ilieinc.dontsleep.viewmodel.base
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.ilieinc.dontsleep.util.SharedPreferenceManager
+import com.ilieinc.core.util.SharedPreferenceManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 

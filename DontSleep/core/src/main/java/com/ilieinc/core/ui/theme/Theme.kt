@@ -1,4 +1,4 @@
-package com.ilieinc.dontsleep.ui.theme
+package com.ilieinc.core.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

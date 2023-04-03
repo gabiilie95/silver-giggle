@@ -1,4 +1,4 @@
-package com.ilieinc.dontsleep.util
+package com.ilieinc.core.util
 
 import android.Manifest
 import android.content.Context

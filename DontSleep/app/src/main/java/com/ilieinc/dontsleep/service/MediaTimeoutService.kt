@@ -3,12 +3,12 @@ package com.ilieinc.dontsleep.service
 import android.content.Context
 import android.text.format.DateFormat
 import com.ilieinc.dontsleep.R
-import com.ilieinc.dontsleep.timer.LockScreenWorker
 import com.ilieinc.dontsleep.timer.MediaTimeoutWorker
 import com.ilieinc.dontsleep.timer.TimerManager
-import com.ilieinc.dontsleep.util.NotificationManager
-import com.ilieinc.dontsleep.util.SharedPreferenceManager
-import com.ilieinc.dontsleep.util.StateHelper
+import com.ilieinc.core.util.NotificationManager
+import com.ilieinc.core.util.SharedPreferenceManager
+import com.ilieinc.core.util.StateHelper
+import com.ilieinc.dontsleep.util.DontSleepNotificationManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
@@ -29,7 +29,7 @@ class MediaTimeoutService : BaseService(
     override val binder: ServiceBinder = ServiceBinder(this)
 
     override fun initFields() {
-        notification = NotificationManager.createTimeoutNotification<MediaTimeoutService>(
+        notification = DontSleepNotificationManager.createTimeoutNotification<MediaTimeoutService>(
             this,
             R.drawable.baseline_timer_24,
             getString(R.string.app_name),

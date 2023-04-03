@@ -8,7 +8,7 @@ import androidx.work.WorkerParameters
 import com.ilieinc.dontsleep.service.MediaTimeoutService
 import com.ilieinc.dontsleep.service.ScreenTimeoutService
 import com.ilieinc.dontsleep.service.WakeLockService
-import com.ilieinc.dontsleep.util.Logger
+import com.ilieinc.core.util.Logger
 
 class StopServiceWorker(
     context: Context,

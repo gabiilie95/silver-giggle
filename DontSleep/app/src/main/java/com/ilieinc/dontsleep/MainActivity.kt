@@ -14,11 +14,11 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.elevation.SurfaceColors
 import com.ilieinc.dontsleep.ui.compose.MainScreen
-import com.ilieinc.dontsleep.ui.theme.AppTheme
-import com.ilieinc.dontsleep.util.DeviceAdminHelper
-import com.ilieinc.dontsleep.util.PermissionHelper
-import com.ilieinc.dontsleep.util.SharedPreferenceManager
-import com.ilieinc.dontsleep.util.StateHelper
+import com.ilieinc.core.ui.theme.AppTheme
+import com.ilieinc.core.util.DeviceAdminHelper
+import com.ilieinc.core.util.PermissionHelper
+import com.ilieinc.core.util.SharedPreferenceManager
+import com.ilieinc.core.util.StateHelper
 
 class MainActivity : ComponentActivity() {
 

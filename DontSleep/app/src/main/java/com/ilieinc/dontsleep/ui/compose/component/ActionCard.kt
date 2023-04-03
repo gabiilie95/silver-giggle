@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilieinc.dontsleep.R
-import com.ilieinc.dontsleep.ui.theme.AppTypography
+import com.ilieinc.core.ui.theme.AppTypography
 import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 
@@ -49,7 +49,7 @@ fun ActionCard(
             ) {
                 Text(
                     text = title,
-                    style = AppTypography.titleLarge,
+                    style = com.ilieinc.core.ui.theme.AppTypography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Button(onClick = { viewModel.showHelpDialog.tryEmit(true) }) {

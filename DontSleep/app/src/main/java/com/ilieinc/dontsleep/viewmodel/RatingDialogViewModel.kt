@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.ContextCompat
-import com.ilieinc.dontsleep.util.Logger
+import com.ilieinc.core.util.Logger
 import com.ilieinc.dontsleep.viewmodel.base.DialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 

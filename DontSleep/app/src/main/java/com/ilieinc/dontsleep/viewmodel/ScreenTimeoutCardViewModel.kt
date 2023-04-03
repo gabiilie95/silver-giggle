@@ -2,9 +2,9 @@ package com.ilieinc.dontsleep.viewmodel
 
 import android.app.Application
 import com.ilieinc.dontsleep.service.ScreenTimeoutService
-import com.ilieinc.dontsleep.util.DeviceAdminHelper
-import com.ilieinc.dontsleep.util.StateHelper.startForegroundService
-import com.ilieinc.dontsleep.util.StateHelper.stopService
+import com.ilieinc.core.util.DeviceAdminHelper
+import com.ilieinc.core.util.StateHelper.startForegroundService
+import com.ilieinc.core.util.StateHelper.stopService
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 
 class ScreenTimeoutCardViewModel(application: Application) :

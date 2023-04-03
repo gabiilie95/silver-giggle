@@ -5,8 +5,8 @@ import android.content.Context
 import androidx.core.content.ContextCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.ilieinc.dontsleep.util.DeviceAdminHelper
-import com.ilieinc.dontsleep.util.Logger
+import com.ilieinc.core.util.DeviceAdminHelper
+import com.ilieinc.core.util.Logger
 
 class LockScreenWorker(
     context: Context,

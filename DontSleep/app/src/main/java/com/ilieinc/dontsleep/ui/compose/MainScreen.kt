@@ -21,11 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilieinc.dontsleep.MainActivity
-import com.ilieinc.dontsleep.receiver.DeviceAdminReceiver
+import com.ilieinc.core.receiver.DeviceAdminReceiver
 import com.ilieinc.dontsleep.ui.compose.component.*
-import com.ilieinc.dontsleep.ui.theme.AppTheme
-import com.ilieinc.dontsleep.util.StateHelper.needToShowReviewSnackbar
-import com.ilieinc.dontsleep.util.StateHelper.showReviewSnackbar
+import com.ilieinc.core.ui.theme.AppTheme
+import com.ilieinc.core.util.StateHelper.needToShowReviewSnackbar
+import com.ilieinc.core.util.StateHelper.showReviewSnackbar
 import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
 import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
 import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
@@ -116,7 +116,7 @@ fun WakeLockTimerCard(viewModel: WakeLockCardViewModel = viewModel()) {
 @Composable
 fun ScreenTimeoutTimerCard(viewModel: ScreenTimeoutCardViewModel = viewModel()) {
     val model = remember { viewModel }
-    val permissionGranted by DeviceAdminReceiver.permissionGranted.collectAsState()
+    val permissionGranted by com.ilieinc.core.receiver.DeviceAdminReceiver.permissionGranted.collectAsState()
     model.permissionRequired.tryEmit(!permissionGranted)
     OnLifecycleEvent { _, event ->
         when (event) {
@@ -136,7 +136,7 @@ fun MediaTimeoutTimerCard(viewModel: MediaTimeoutCardViewModel = viewModel()) {
 @Preview
 @Composable
 fun MainScreenPreview() {
-    AppTheme {
+    com.ilieinc.core.ui.theme.AppTheme {
         MainScreen(false, rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
             onResult = {}

@@ -8,3 +8,4 @@ pluginManagement {
 
 rootProject.name = "DontSleep"
 include(":app")
+include(":core")
