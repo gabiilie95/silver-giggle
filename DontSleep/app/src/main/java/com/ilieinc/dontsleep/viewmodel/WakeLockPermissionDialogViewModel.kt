@@ -2,7 +2,7 @@ package com.ilieinc.dontsleep.viewmodel
 
 import android.app.Application
 import com.ilieinc.core.util.PermissionHelper
-import com.ilieinc.dontsleep.viewmodel.base.PermissionDialogViewModel
+import com.ilieinc.core.viewmodel.PermissionDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class WakeLockPermissionDialogViewModel(

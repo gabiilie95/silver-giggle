@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ilieinc.core.ui.components.ThemedCard
 import com.ilieinc.dontsleep.R
 import com.ilieinc.core.ui.theme.AppTypography
 import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
@@ -32,16 +33,10 @@ fun ActionCard(
     val showPermissionDialog by viewModel.showPermissionDialog.collectAsState()
     val permissionRequired by viewModel.permissionRequired.collectAsState()
 
-    Card(
-        Modifier
-            .fillMaxWidth()
-            .padding(5.dp)
-    ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-        ) {
+    ThemedCard(
+        modifier = Modifier.padding(5.dp),
+        title = title,
+        titleBar = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -56,6 +51,13 @@ fun ActionCard(
                     Text(text = "Help")
                 }
             }
+        }
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
             if (permissionRequired) {
                 Button(
                     modifier = Modifier.align(Alignment.End),

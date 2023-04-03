@@ -4,7 +4,7 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.annotation.RequiresApi
 import com.ilieinc.dontsleep.MainActivity
 import com.ilieinc.core.util.PermissionHelper
-import com.ilieinc.dontsleep.viewmodel.base.PermissionDialogViewModel
+import com.ilieinc.core.viewmodel.PermissionDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @RequiresApi(33)
