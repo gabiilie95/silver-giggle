@@ -1,4 +1,4 @@
-package com.ilieinc.dontsleep.ui.compose.component
+package com.ilieinc.dontsleep.ui.component
 
 import android.app.Activity
 import androidx.compose.material3.AlertDialog
@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
+import com.ilieinc.core.viewmodel.RatingDialogViewModel
 import com.ilieinc.dontsleep.viewmodel.*
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 import com.ilieinc.dontsleep.viewmodel.base.HelpDialogViewModel

@@ -1,6 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
-package com.ilieinc.dontsleep.ui.compose
+package com.ilieinc.dontsleep.ui
 
 import android.app.Activity
 import android.os.Build
@@ -20,16 +18,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.ilieinc.dontsleep.MainActivity
 import com.ilieinc.core.receiver.DeviceAdminReceiver
-import com.ilieinc.dontsleep.ui.compose.component.*
 import com.ilieinc.core.ui.theme.AppTheme
 import com.ilieinc.core.util.StateHelper.needToShowReviewSnackbar
 import com.ilieinc.core.util.StateHelper.showReviewSnackbar
-import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
-import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
-import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
+import com.ilieinc.dontsleep.MainActivity
+import com.ilieinc.dontsleep.ui.component.ActionCard
+import com.ilieinc.core.ui.components.ApplicationTopAppBar
+import com.ilieinc.dontsleep.ui.component.OnLifecycleEvent
+import com.ilieinc.dontsleep.ui.component.RequestNotificationButton
 import com.ilieinc.dontsleep.viewmodel.MediaTimeoutCardViewModel
+import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
+import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
+import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
@@ -42,7 +43,7 @@ fun MainScreen(
     val scrollState = rememberScrollState()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { DontSleepTopAppBar() },
+        topBar = { ApplicationTopAppBar() },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             Button(
@@ -66,7 +67,7 @@ fun MainScreen(
                     .verticalScroll(scrollState)
             ) {
                 WakeLockTimerCard()
-                ScreenTimeoutTimerCard()
+//                ScreenTimeoutTimerCard()
                 MediaTimeoutTimerCard()
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && activity is MainActivity
                     && !hasNotificationPermission
@@ -116,7 +117,7 @@ fun WakeLockTimerCard(viewModel: WakeLockCardViewModel = viewModel()) {
 @Composable
 fun ScreenTimeoutTimerCard(viewModel: ScreenTimeoutCardViewModel = viewModel()) {
     val model = remember { viewModel }
-    val permissionGranted by com.ilieinc.core.receiver.DeviceAdminReceiver.permissionGranted.collectAsState()
+    val permissionGranted by DeviceAdminReceiver.permissionGranted.collectAsState()
     model.permissionRequired.tryEmit(!permissionGranted)
     OnLifecycleEvent { _, event ->
         when (event) {
@@ -136,7 +137,7 @@ fun MediaTimeoutTimerCard(viewModel: MediaTimeoutCardViewModel = viewModel()) {
 @Preview
 @Composable
 fun MainScreenPreview() {
-    com.ilieinc.core.ui.theme.AppTheme {
+    AppTheme {
         MainScreen(false, rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
             onResult = {}

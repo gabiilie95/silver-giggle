@@ -1,4 +1,4 @@
-package com.ilieinc.dontsleep.ui.compose.component
+package com.ilieinc.dontsleep.ui.component
 
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement

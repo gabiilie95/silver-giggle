@@ -1,4 +1,4 @@
-package com.ilieinc.dontsleep.ui.compose.component
+package com.ilieinc.dontsleep.ui.component
 
 import android.app.Application
 import android.view.LayoutInflater
@@ -49,7 +49,7 @@ fun ActionCard(
             ) {
                 Text(
                     text = title,
-                    style = com.ilieinc.core.ui.theme.AppTypography.titleLarge,
+                    style = AppTypography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Button(onClick = { viewModel.showHelpDialog.tryEmit(true) }) {

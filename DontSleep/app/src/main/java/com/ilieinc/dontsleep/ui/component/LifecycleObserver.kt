@@ -1,4 +1,4 @@
-package com.ilieinc.dontsleep.ui.compose.component
+package com.ilieinc.dontsleep.ui.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

@@ -1,11 +1,11 @@
-package com.ilieinc.dontsleep.viewmodel
+package com.ilieinc.core.viewmodel
 
 import android.app.Application
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.ContextCompat
 import com.ilieinc.core.util.Logger
-import com.ilieinc.dontsleep.viewmodel.base.DialogViewModel
+import com.ilieinc.core.viewmodel.base.DialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class RatingDialogViewModel(

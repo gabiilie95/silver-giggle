@@ -13,7 +13,7 @@ import androidx.core.content.edit
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.elevation.SurfaceColors
-import com.ilieinc.dontsleep.ui.compose.MainScreen
+import com.ilieinc.dontsleep.ui.MainScreen
 import com.ilieinc.core.ui.theme.AppTheme
 import com.ilieinc.core.util.DeviceAdminHelper
 import com.ilieinc.core.util.PermissionHelper

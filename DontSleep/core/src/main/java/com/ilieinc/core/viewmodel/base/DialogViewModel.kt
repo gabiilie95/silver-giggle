@@ -1,4 +1,4 @@
-package com.ilieinc.dontsleep.viewmodel.base
+package com.ilieinc.core.viewmodel.base
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
