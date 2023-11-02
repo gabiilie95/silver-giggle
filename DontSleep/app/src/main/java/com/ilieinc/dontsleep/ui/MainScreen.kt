@@ -95,7 +95,6 @@ fun AndroidTNotificationPermissionButton(
 ) {
     RequestNotificationButton(
         NotificationButtonDialogViewModel(
-            MutableStateFlow(false),
             activity,
             notificationPermissionResult
         )
@@ -118,7 +117,7 @@ fun WakeLockTimerCard(viewModel: WakeLockCardViewModel = viewModel()) {
 fun ScreenTimeoutTimerCard(viewModel: ScreenTimeoutCardViewModel = viewModel()) {
     val model = remember { viewModel }
     val permissionGranted by DeviceAdminReceiver.permissionGranted.collectAsState()
-    model.permissionRequired.tryEmit(!permissionGranted)
+    model.updatePermissionRequired(!permissionGranted)
     OnLifecycleEvent { _, event ->
         when (event) {
             Lifecycle.Event.ON_RESUME -> model.refreshPermissionState()

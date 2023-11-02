@@ -15,26 +15,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun CardHelpDialog(
-    showDialog: MutableStateFlow<Boolean>,
     viewModel: CardViewModel
 ) {
     val activity = LocalContext.current as Activity
     when (viewModel) {
         is WakeLockCardViewModel -> HelpDialog(
             WakeLockHelpDialogViewModel(
-                showDialog,
+                viewModel::onDismissHelpDialog,
                 activity.application
             )
         )
         is ScreenTimeoutCardViewModel -> HelpDialog(
             ScreenTimeoutCardHelpDialogViewModel(
-                showDialog,
+                viewModel::onDismissHelpDialog,
                 activity.application
             )
         )
         is MediaTimeoutCardViewModel -> HelpDialog(
             MediaTimeoutCardHelpDialogViewModel(
-                showDialog,
+                viewModel::onDismissHelpDialog,
                 activity.application
             )
         )
@@ -43,7 +42,6 @@ fun CardHelpDialog(
 
 @Composable
 fun CardPermissionDialog(
-    showPermissionDialog: MutableStateFlow<Boolean>,
     viewModel: CardViewModel
 ) {
     val activity = LocalContext.current as Activity
@@ -51,7 +49,7 @@ fun CardPermissionDialog(
         is WakeLockCardViewModel -> {
             PermissionDialog(
                 WakeLockPermissionDialogViewModel(
-                    showPermissionDialog,
+                    viewModel::onDismissPermissionDialog,
                     activity.application
                 )
             )
@@ -59,7 +57,7 @@ fun CardPermissionDialog(
         is ScreenTimeoutCardViewModel -> {
             PermissionDialog(
                 ScreenTimeoutPermissionDialogViewModel(
-                    showPermissionDialog,
+                    viewModel::onDismissPermissionDialog,
                     activity
                 )
             )
@@ -69,36 +67,41 @@ fun CardPermissionDialog(
 
 @Composable
 fun HelpDialog(viewModel: HelpDialogViewModel) {
-    AlertDialog(onDismissRequest = { viewModel.showDialog.tryEmit(false) },
-        title = { Text(viewModel.title.collectAsState().value) },
-        text = { Text(viewModel.description.collectAsState().value) },
-        confirmButton = { Button(onClick = { viewModel.showDialog.tryEmit(false) }) { Text("OK") } },
-        dismissButton = {
-            if (viewModel.showRevokePermissionButton.collectAsState().value) {
-                Button(onClick = { viewModel.revokePermission() }) {
-                    Text(text = viewModel.revokeButtonText.collectAsState().value)
+    with(viewModel) {
+        AlertDialog(
+            onDismissRequest = ::onDismissRequested,
+            title = { Text(title) },
+            text = { Text(description) },
+            confirmButton = { Button(onClick = ::onDismissRequested) { Text("OK") } },
+            dismissButton = {
+                if (showRevokePermissionButton) {
+                    Button(onClick = this::revokePermission) {
+                        Text(text = revokeButtonText)
+                    }
                 }
-            }
-        })
+            })
+    }
 }
 
 @Composable
 fun PermissionDialog(viewModel: PermissionDialogViewModel) {
-    AlertDialog(
-        onDismissRequest = { viewModel.showDialog.tryEmit(false) },
-        title = { Text(viewModel.title.collectAsState().value) },
-        text = { Text(viewModel.description.collectAsState().value) },
-        confirmButton = {
-            Button(
-                onClick = { viewModel.requestPermission() },
-                enabled = viewModel.confirmButtonEnabled.collectAsState().value
-            ) {
-                Text(viewModel.confirmButtonText.collectAsState().value)
-            }
-        },
-        dismissButton = {
-            Button(onClick = { viewModel.showDialog.tryEmit(false) }) {
-                Text("No")
-            }
-        })
+    with(viewModel) {
+        AlertDialog(
+            onDismissRequest = ::onDismissRequested,
+            title = { Text(title) },
+            text = { Text(description) },
+            confirmButton = {
+                Button(
+                    onClick = ::requestPermission,
+                    enabled = confirmButtonEnabled
+                ) {
+                    Text(confirmButtonText)
+                }
+            },
+            dismissButton = {
+                Button(onClick = ::onDismissRequested) {
+                    Text("No")
+                }
+            })
+    }
 }

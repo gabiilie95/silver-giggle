@@ -6,21 +6,20 @@ import com.ilieinc.core.viewmodel.PermissionDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class WakeLockPermissionDialogViewModel(
-    showDialog: MutableStateFlow<Boolean>,
+    onDismissRequestedCallback: () -> Unit,
     application: Application
-) : PermissionDialogViewModel(showDialog, application) {
+) : PermissionDialogViewModel(onDismissRequestedCallback, application) {
 
     init {
-        title.tryEmit("Draw Over Permission Grant")
-        description.tryEmit(
+        title = "Draw Over Permission Grant"
+        description = 
             "Due to limitations from the manufacturer of your device, in order to use this feature, you must grant draw over other apps permission to the application.\n" +
                     "This permission will only be used to keep the screen awake.\n\n" +
                     "Do you want to continue?"
-        )
     }
 
     override fun requestPermission() {
         PermissionHelper.requestDrawOverPermission(getApplication())
-        showDialog.tryEmit(false)
+        onDismissRequested()
     }
 }

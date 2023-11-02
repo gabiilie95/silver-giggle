@@ -20,6 +20,7 @@ class MediaTimeoutService : BaseService(
     companion object {
         const val MEDIA_TIMEOUT_TAG = "DontSleep::MediaTimeoutTag"
         const val MEDIA_TIMEOUT_SERVICE_STOP_TAG = "DontSleep::MediaTimeoutServiceStopTag"
+        const val TIMEOUT_ENABLED_TAG = "${MEDIA_TIMEOUT_TAG}_TimeoutEnabled"
 
         fun isRunning(context: Context) =
             StateHelper.isServiceRunning(context, MediaTimeoutService::class.java)

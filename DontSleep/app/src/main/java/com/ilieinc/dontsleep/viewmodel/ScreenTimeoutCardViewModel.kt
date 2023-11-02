@@ -10,15 +10,18 @@ import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 class ScreenTimeoutCardViewModel(application: Application) :
     CardViewModel(application, ScreenTimeoutService.serviceRunning) {
     override val tag: String = ScreenTimeoutService.SLEEP_TAG
+    override val showTimeoutSectionToggle = true
+    override val timeoutEnabledTag = ScreenTimeoutService.TIMEOUT_ENABLED_TAG
 
     init {
-        title.tryEmit("Sleep!")
-        refreshPermissionState()
+        title = "Sleep!"
         setSavedTime()
+        setSavedTimeoutStatus()
+        refreshPermissionState()
     }
 
     override fun refreshPermissionState() {
-        permissionRequired.tryEmit(!DeviceAdminHelper.adminPermissionGranted())
+        permissionRequired = !DeviceAdminHelper.adminPermissionGranted()
     }
 
     override fun startService() {
@@ -27,5 +30,9 @@ class ScreenTimeoutCardViewModel(application: Application) :
 
     override fun stopService() {
         getApplication<Application>().stopService<ScreenTimeoutService>()
+    }
+
+    fun updatePermissionRequired(permissionRequired: Boolean) {
+        this.permissionRequired = permissionRequired
     }
 }

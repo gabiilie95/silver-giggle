@@ -3,6 +3,7 @@ package com.ilieinc.dontsleep.ui.component
 import android.app.Application
 import android.view.LayoutInflater
 import android.widget.TimePicker
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -25,105 +26,122 @@ import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 fun ActionCard(
     viewModel: CardViewModel = viewModel()
 ) {
-    val title by viewModel.title.collectAsState()
-    val enabled by viewModel.enabled.collectAsState()
-    val hours by viewModel.hours.collectAsState()
-    val minutes by viewModel.minutes.collectAsState()
-    val showHelp by viewModel.showHelpDialog.collectAsState()
-    val showPermissionDialog by viewModel.showPermissionDialog.collectAsState()
-    val permissionRequired by viewModel.permissionRequired.collectAsState()
-
-    ThemedCard(
-        modifier = Modifier.padding(5.dp),
-        title = title,
-        titleBar = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = title,
-                    style = AppTypography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Button(onClick = { viewModel.showHelpDialog.tryEmit(true) }) {
-                    Text(text = "Help")
-                }
-            }
-        }
-    ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-        ) {
-            if (permissionRequired) {
-                Button(
-                    modifier = Modifier.align(Alignment.End),
-                    onClick = { viewModel.showPermissionDialog.tryEmit(true) }) {
-                    Text(text = "Get Started")
-                }
-            } else {
+    with(viewModel) {
+        val enabled by this.enabled.collectAsState()
+        ThemedCard(
+            modifier = Modifier.padding(5.dp).animateContentSize(),
+            title = title,
+            titleBar = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Status",
+                        text = title,
+                        style = AppTypography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
-                    Switch(
-                        checked = enabled,
-                        onCheckedChange = { viewModel.enabled.tryEmit(!enabled) }
-                    )
+                    Button(onClick = viewModel::onShowHelpDialog) {
+                        Text(text = "Help")
+                    }
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
+            }
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
+                if (permissionRequired) {
+                    Button(
+                        modifier = Modifier.align(Alignment.End),
+                        onClick = viewModel::onShowPermissionDialog) {
+                        Text(text = "Get Started")
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
-                            text = "Timeout",
+                            text = "Status",
                             fontWeight = FontWeight.Bold
                         )
-                        Text(text = "(Hours, Minutes)")
+                        Switch(
+                            checked = enabled,
+                            onCheckedChange = { viewModel.enabled.tryEmit(!enabled) }
+                        )
                     }
-//                    TimePicker(
-//                        state = TimePickerState(hours, minutes, true),
-//                        layoutType = TimePickerLayoutType.Horizontal
-//                    )
-                    AndroidView(
-                        factory = { context ->
-                            val layout = LayoutInflater.from(context)
-                                .inflate(R.layout.layout_time_picker, null)
-                            val timePicker =
-                                layout.findViewById<TimePicker>(R.id.time_picker).apply {
-                                    isEnabled = !enabled
-                                    setIs24HourView(true)
-                                    this.hour = hours
-                                    this.minute = minutes
-                                    this.setOnTimeChangedListener { _, hours, minutes ->
-                                        viewModel.updateTime(hours, minutes)
-                                    }
-                                }
-                            return@AndroidView timePicker
-                        },
-                        update = { timePicker ->
-                            timePicker.isEnabled = !enabled
+                    if (showTimeoutSectionToggle) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Enable Auto-Off",
+                                fontWeight = FontWeight.Bold
+                            )
+                            Switch(
+                                checked = timeoutEnabled,
+                                onCheckedChange = viewModel::timeoutChanged
+                            )
                         }
-                    )
+                    }
+                    if (timeoutEnabled) {
+                        TimeoutSection(viewModel)
+                    }
                 }
             }
         }
+        if (showHelpDialog) {
+            CardHelpDialog(viewModel)
+        }
+        if (showPermissionDialog) {
+            CardPermissionDialog(viewModel)
+        }
     }
-    if (showHelp) {
-        CardHelpDialog(viewModel.showHelpDialog, viewModel)
-    }
-    if (showPermissionDialog) {
-        CardPermissionDialog(viewModel.showPermissionDialog, viewModel)
+}
+
+@Composable
+fun TimeoutSection(viewModel: CardViewModel) {
+    with(viewModel) {
+        val enabled by this.enabled.collectAsState()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = "Timeout",
+                    fontWeight = FontWeight.Bold
+                )
+                Text(text = "(Hours, Minutes)")
+            }
+            AndroidView(
+                factory = { context ->
+                    val layout = LayoutInflater.from(context)
+                        .inflate(R.layout.layout_time_picker, null)
+                    val timePicker =
+                        layout.findViewById<TimePicker>(R.id.time_picker).apply {
+                            isEnabled = !enabled
+                            setIs24HourView(true)
+                            this.hour = hours
+                            this.minute = minutes
+                            this.setOnTimeChangedListener { _, hours, minutes ->
+                                viewModel.updateTime(hours, minutes)
+                            }
+                        }
+                    return@AndroidView timePicker
+                },
+                update = { timePicker ->
+                    timePicker.isEnabled = !enabled
+                }
+            )
+        }
     }
 }
 

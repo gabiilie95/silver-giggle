@@ -21,22 +21,23 @@ import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
 @RequiresApi(33)
 @Composable
 fun RequestNotificationButton(viewModel: NotificationButtonDialogViewModel) {
-    val showDialog by viewModel.showDialog.collectAsState()
-    Button(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = { viewModel.requestPermission() }) {
-        Row(
+    with(viewModel) {
+        Button(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "Allow Notifications")
-            IconButton(onClick = { viewModel.showDialog.tryEmit(true) }) {
-                Icon(imageVector = Icons.Default.Info, contentDescription = null)
+            onClick = { requestPermission() }) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = "Allow Notifications")
+                IconButton(onClick = ::onShowRequested) {
+                    Icon(imageVector = Icons.Default.Info, contentDescription = null)
+                }
             }
         }
-    }
-    if (showDialog) {
-        NotificationInfoDialog(viewModel)
+        if (showDialog) {
+            NotificationInfoDialog(viewModel)
+        }
     }
 }

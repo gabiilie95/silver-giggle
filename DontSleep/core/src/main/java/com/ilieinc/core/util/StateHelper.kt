@@ -9,6 +9,9 @@ import android.os.Build
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,14 +24,15 @@ object StateHelper {
         Disabled
     }
 
-    const val APP_START_COUNT = "AppStartCount"
-    const val RATING_SHOWN = "RatingShown"
-    const val SHOULD_USE_DYNAMIC_COLORS = "ShouldUseDynamicColors"
+    private const val APP_START_COUNT = "AppStartCount"
+    private const val RATING_SHOWN = "RatingShown"
+    private const val SHOULD_USE_DYNAMIC_COLORS = "ShouldUseDynamicColors"
 
     private val overlayDevices = arrayOf(
         "samsung"
     )
-    val useDynamicColors = MutableStateFlow(true)
+    var useDynamicColors by mutableStateOf(true)
+        private set
 
     fun deviceRequiresOverlay(): Boolean {
         return overlayDevices.contains(Build.MANUFACTURER.lowercase(Locale.getDefault()))
@@ -44,9 +48,10 @@ object StateHelper {
         return false
     }
 
-    inline fun <reified T> Context.startForegroundService() where T : Service {
-        ContextCompat.startForegroundService(this, Intent(this, T::class.java))
-    }
+    inline fun <reified T> Context.startForegroundService(extraActions: (intent: Intent) -> Unit = {}) where T : Service =
+        ContextCompat.startForegroundService(this, Intent(this, T::class.java).apply {
+            extraActions(this)
+        })
 
     inline fun <reified T> Context.stopService() where T : Service {
         stopService(Intent(this, T::class.java))
@@ -64,14 +69,14 @@ object StateHelper {
 
     fun initDynamicColorsEnabledProperty(context: Context) {
         with(SharedPreferenceManager.getInstance(context)) {
-            useDynamicColors.tryEmit(getBoolean(SHOULD_USE_DYNAMIC_COLORS, true))
+            useDynamicColors = getBoolean(SHOULD_USE_DYNAMIC_COLORS, true)
         }
     }
 
     fun setDynamicColorsEnabled(context: Context, enabled: Boolean) {
         with(SharedPreferenceManager.getInstance(context)) {
-            edit(true){ putBoolean(SHOULD_USE_DYNAMIC_COLORS, enabled) }
-            useDynamicColors.tryEmit(enabled)
+            edit(true) { putBoolean(SHOULD_USE_DYNAMIC_COLORS, enabled) }
+            useDynamicColors = enabled
         }
     }
 
@@ -98,7 +103,7 @@ object StateHelper {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
             )
-            with(SharedPreferenceManager.getInstance(context)){
+            with(SharedPreferenceManager.getInstance(context)) {
                 edit(true) { putBoolean(RATING_SHOWN, true) }
             }
         }

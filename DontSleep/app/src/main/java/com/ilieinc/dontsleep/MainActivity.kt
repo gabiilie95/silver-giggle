@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
         window.statusBarColor = SurfaceColors.SURFACE_0.getColor(this)
         window.navigationBarColor = SurfaceColors.SURFACE_2.getColor(this)
         setContent {
-            val useDynamicColors by StateHelper.useDynamicColors.collectAsState()
+            val useDynamicColors = StateHelper.useDynamicColors
             var hasNotificationPermission by remember {
                 mutableStateOf(
                     PermissionHelper.hasNotificationPermission(

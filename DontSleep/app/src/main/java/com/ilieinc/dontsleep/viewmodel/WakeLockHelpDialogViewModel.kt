@@ -6,28 +6,27 @@ import com.ilieinc.dontsleep.viewmodel.base.HelpDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class WakeLockHelpDialogViewModel(
-    showDialog: MutableStateFlow<Boolean>,
+    onDismissRequestedCallback: () -> Unit,
     application: Application
-) :
-    HelpDialogViewModel(showDialog, application) {
+) : HelpDialogViewModel(onDismissRequestedCallback, application) {
     init {
-        title.tryEmit("Don't Sleep! Help")
+        title = "Don't Sleep! Help"
         setDetails()
-        revokeButtonText.tryEmit("Revoke Draw Over Permission")
+        revokeButtonText = "Revoke Draw Over Permission"
     }
 
     private fun setDetails() {
-        description.tryEmit(buildString {
+        description = buildString {
             append("This feature enables you to turn off your screen timeout with the click of a button.")
             if (PermissionHelper.hasDrawOverPermission(getApplication())) {
                 append("\nYou can revoke the draw over permission from this dialog.")
-                showRevokePermissionButton.tryEmit(true)
+                showRevokePermissionButton = true
             }
-        })
+        }
     }
 
     override fun revokePermission() {
         PermissionHelper.requestDrawOverPermission(getApplication())
-        showDialog.tryEmit(false)
+        onDismissRequested()
     }
 }

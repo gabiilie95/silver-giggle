@@ -11,6 +11,7 @@
     <string name="sleep_timer_label">Sleep Timer</string>
     <string name="close">Close</string>
     <string name="timeout_notification_text">Keeping device awake until %s.</string>
+    <string name="timeout_notification_indefinite_text">Keeping device awake.</string>
     <string name="sleep_notification_text">"Turning screen off at %s.</string>
     <string name="media_timeout_notification_text">"Pausing media playback at %s.</string>
     <string name="special_permission_grant_title">Special Permission Grant</string>
@@ -25,4 +26,5 @@
     <string name="warning">WARNING</string>
     <string name="special_permission_grant_warning_body">You will not be able to uninstall the application until you revoke the administrator permission.\nYou can revoke the permission by clicking the \'Help\' button from the \'Sleep! Timer\' section of the app.\n\nDo you want to continue?</string>
     <string name="stop">Stop</string>
+    <string name="media_timeout_description">This feature allows you to set a timer which will pause any media playing on the device, such as music or video playback.</string>
 </resources>

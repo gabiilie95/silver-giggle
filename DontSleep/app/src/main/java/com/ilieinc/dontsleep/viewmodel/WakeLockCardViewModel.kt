@@ -12,15 +12,18 @@ class WakeLockCardViewModel(application: Application): CardViewModel(
     WakeLockService.serviceRunning
 ) {
     override val tag: String = WakeLockService.TIMEOUT_TAG
+    override val showTimeoutSectionToggle = true
+    override val timeoutEnabledTag = WakeLockService.TIMEOUT_ENABLED_TAG
 
     init {
-        title.tryEmit("Don't Sleep!")
-        refreshPermissionState()
+        title = "Don't Sleep!"
         setSavedTime()
+        setSavedTimeoutStatus()
+        refreshPermissionState()
     }
 
     override fun refreshPermissionState() {
-        permissionRequired.tryEmit(PermissionHelper.shouldRequestDrawOverPermission(getApplication()))
+        permissionRequired = PermissionHelper.shouldRequestDrawOverPermission(getApplication())
     }
 
     override fun startService() {

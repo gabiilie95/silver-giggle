@@ -18,7 +18,7 @@ import java.util.*
 abstract class BaseService(
     private val serviceClass: Class<*>,
     private val serviceTag: String,
-    private val id: Int
+    private val id: Int,
 ) : Service() {
 
     class ServiceBinder(private val boundService: Service) : Binder() {
@@ -28,6 +28,7 @@ abstract class BaseService(
     protected abstract val binder: ServiceBinder
 
     protected lateinit var notification: Notification
+    protected var timeoutEnabled: Boolean = true
     protected lateinit var timeoutDateTime: Calendar
     protected var timeout: Long = 500000
 
@@ -42,16 +43,22 @@ abstract class BaseService(
         } else {
             startForeground(id, notification)
         }
-        timeout = SharedPreferenceManager.getInstance(this)
-            .getLong(serviceTag, 500000)
+        timeout = if (timeoutEnabled) {
+            SharedPreferenceManager.getInstance(this)
+                .getLong(serviceTag, 500000L)
+        } else {
+            Int.MAX_VALUE.toLong()
+        }
         timeoutDateTime = Calendar.getInstance()
         timeoutDateTime.add(Calendar.MILLISECOND, timeout.toInt())
-        TimerManager.setTimedTask<StopServiceWorker>(
-            this,
-            timeoutDateTime.time,
-            serviceTag,
-            mutableMapOf(StopServiceWorker.SERVICE_NAME_EXTRA to serviceClass.name)
-        )
+        if (timeoutEnabled) {
+            TimerManager.setTimedTask<StopServiceWorker>(
+                this,
+                timeoutDateTime.time,
+                serviceTag,
+                mutableMapOf(StopServiceWorker.SERVICE_NAME_EXTRA to serviceClass.name)
+            )
+        }
     }
 
     abstract fun initFields()
@@ -66,5 +73,9 @@ abstract class BaseService(
     override fun onDestroy() {
         TimerManager.cancelTask(this, serviceTag)
         super.onDestroy()
+    }
+
+    companion object {
+        const val TIMEOUT_ENABLED_EXTRA = "TimeoutEnabled"
     }
 }

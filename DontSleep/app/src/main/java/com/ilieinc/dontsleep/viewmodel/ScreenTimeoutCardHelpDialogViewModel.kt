@@ -6,28 +6,27 @@ import com.ilieinc.dontsleep.viewmodel.base.HelpDialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class ScreenTimeoutCardHelpDialogViewModel(
-    showDialog: MutableStateFlow<Boolean>,
+    onDismissRequestedCallback: () -> Unit,
     application: Application,
-) :
-    HelpDialogViewModel(showDialog, application) {
+) : HelpDialogViewModel(onDismissRequestedCallback, application) {
     init {
-        title.tryEmit("Sleep! Help")
+        title = "Sleep! Help"
         setDetails()
-        revokeButtonText.tryEmit("Revoke Admin Permission")
+        revokeButtonText = "Revoke Admin Permission"
     }
 
     private fun setDetails() {
-        description.tryEmit(buildString {
+        description = buildString {
             append("When this feature is enabled you will not be able to uninstall the application before first revoking the administrator permission.")
             if (DeviceAdminHelper.adminPermissionGranted()) {
                 append("\nYou can revoke the draw over permission from this dialog.")
-                showRevokePermissionButton.tryEmit(true)
+                showRevokePermissionButton = true
             }
-        })
+        }
     }
 
     override fun revokePermission() {
         DeviceAdminHelper.removeActiveAdmin()
-        showDialog.tryEmit(false)
+        onDismissRequested()
     }
 }

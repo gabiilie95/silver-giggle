@@ -11,7 +11,6 @@ import android.view.WindowManager
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.model.NamedWakeLock
 import com.ilieinc.core.util.Logger
-import com.ilieinc.core.util.NotificationManager
 import com.ilieinc.core.util.SharedPreferenceManager
 import com.ilieinc.core.util.StateHelper
 import com.ilieinc.dontsleep.util.DontSleepNotificationManager
@@ -26,6 +25,8 @@ class WakeLockService : BaseService(
     companion object {
         const val TIMEOUT_TAG = "DontSleep::WakeLockTag"
         const val TIMEOUT_WAKELOCK_TAG = "DontSleep::WakeLockServiceStopTag"
+        const val TIMEOUT_ENABLED_TAG = "${TIMEOUT_TAG}_TimeoutEnabled"
+
         private val wakeLock = NamedWakeLock()
         fun isRunning(context: Context) =
             StateHelper.isServiceRunning(context, WakeLockService::class.java)
@@ -37,21 +38,27 @@ class WakeLockService : BaseService(
     private var overlay: View? = null
 
     override fun initFields() {
+        timeoutEnabled =
+            SharedPreferenceManager.getInstance(this).getBoolean(TIMEOUT_ENABLED_TAG, true)
         notification = DontSleepNotificationManager.createTimeoutNotification<WakeLockService>(
             this,
             R.drawable.baseline_mobile_friendly_24,
             getString(R.string.app_name),
-            getString(
-                R.string.timeout_notification_text,
-                DateFormat.getTimeFormat(this).format(Calendar.getInstance().apply {
-                    add(
-                        Calendar.MILLISECOND,
-                        SharedPreferenceManager.getInstance(this@WakeLockService)
-                            .getLong(TIMEOUT_TAG, 900000)
-                            .toInt()
-                    )
-                }.time)
-            )
+            if (timeoutEnabled) {
+                getString(
+                    R.string.timeout_notification_text,
+                    DateFormat.getTimeFormat(this).format(Calendar.getInstance().apply {
+                        add(
+                            Calendar.MILLISECOND,
+                            SharedPreferenceManager.getInstance(this@WakeLockService)
+                                .getLong(TIMEOUT_TAG, 900000)
+                                .toInt()
+                        )
+                    }.time)
+                )
+            } else {
+                getString(R.string.timeout_notification_indefinite_text)
+            }
         )
     }
 

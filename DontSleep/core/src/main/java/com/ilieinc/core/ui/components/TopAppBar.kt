@@ -13,7 +13,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,8 +32,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 fun ApplicationTopAppBar() {
     val context = LocalContext.current
     val activity = (context as Activity)
-    val useDynamicColors by StateHelper.useDynamicColors.collectAsState()
-    val showRateDialog = remember { MutableStateFlow(false) }
+    val useDynamicColors = StateHelper.useDynamicColors
+    var showRateDialog by remember { mutableStateOf(false) }
 
     TopAppBar(title = {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -61,11 +63,16 @@ fun ApplicationTopAppBar() {
                 )
             }
         }
-        IconButton(onClick = { showRateDialog.tryEmit(true) }) {
+        IconButton(onClick = { showRateDialog = true }) {
             Icon(Icons.Outlined.StarRate, "Rating Image")
         }
     })
-    if (showRateDialog.collectAsState().value) {
-        RatingDialog(RatingDialogViewModel(showRateDialog, activity.application))
+    if (showRateDialog) {
+        RatingDialog(
+            RatingDialogViewModel(
+                onDismissRequestedCallback = { showRateDialog = false },
+                activity.application
+            )
+        )
     }
 }

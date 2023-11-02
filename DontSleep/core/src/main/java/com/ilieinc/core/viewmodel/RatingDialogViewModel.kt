@@ -9,9 +9,9 @@ import com.ilieinc.core.viewmodel.base.DialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class RatingDialogViewModel(
-    showDialog: MutableStateFlow<Boolean>,
+    onDismissRequestedCallback: () -> Unit,
     application: Application
-) : DialogViewModel(showDialog, application) {
+) : DialogViewModel(onDismissRequestedCallback, application) {
     fun requestReview() {
         with(Uri.parse("market://details?id=${getApplication<Application>().packageName}")) {
             with(Intent(Intent.ACTION_VIEW, this)) {
@@ -23,6 +23,6 @@ class RatingDialogViewModel(
                 }
             }
         }
-        showDialog.tryEmit(false)
+        onDismissRequested()
     }
 }

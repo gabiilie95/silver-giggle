@@ -5,7 +5,6 @@ import android.text.format.DateFormat
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.timer.LockScreenWorker
 import com.ilieinc.dontsleep.timer.TimerManager
-import com.ilieinc.core.util.NotificationManager
 import com.ilieinc.core.util.SharedPreferenceManager
 import com.ilieinc.core.util.StateHelper
 import com.ilieinc.dontsleep.util.DontSleepNotificationManager
@@ -20,6 +19,7 @@ class ScreenTimeoutService : BaseService(
     companion object {
         const val SLEEP_TAG = "DontSleep::ScreenTimeoutTag"
         const val SLEEP_SERVICE_STOP_TAG = "DontSleep::ScreenTimeoutServiceStopTag"
+        const val TIMEOUT_ENABLED_TAG = "${SLEEP_TAG}_TimeoutEnabled"
 
         fun isRunning(context: Context) =
             StateHelper.isServiceRunning(context, ScreenTimeoutService::class.java)
@@ -45,6 +45,8 @@ class ScreenTimeoutService : BaseService(
                 }.time)
             )
         )
+        timeoutEnabled =
+            SharedPreferenceManager.getInstance(this).getBoolean(TIMEOUT_ENABLED_TAG, true)
     }
 
     override fun onCreate() {

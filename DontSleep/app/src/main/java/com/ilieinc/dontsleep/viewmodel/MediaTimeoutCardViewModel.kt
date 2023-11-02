@@ -11,10 +11,13 @@ import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 class MediaTimeoutCardViewModel(application: Application) :
     CardViewModel(application, MediaTimeoutService.serviceRunning) {
     override val tag: String = MediaTimeoutService.MEDIA_TIMEOUT_TAG
+    override val showTimeoutSectionToggle = false
+    override val timeoutEnabledTag = MediaTimeoutService.TIMEOUT_ENABLED_TAG
 
     init {
-        title.tryEmit("Media Timeout")
+        title = "Media Timeout"
         setSavedTime()
+        setSavedTimeoutStatus()
     }
 
     override fun refreshPermissionState() {
