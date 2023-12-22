@@ -2,11 +2,10 @@ package com.ilieinc.dontsleep.viewmodel
 
 import android.app.Application
 import com.ilieinc.dontsleep.service.MediaTimeoutService
-import com.ilieinc.dontsleep.service.ScreenTimeoutService
-import com.ilieinc.core.util.DeviceAdminHelper
 import com.ilieinc.core.util.StateHelper.startForegroundService
 import com.ilieinc.core.util.StateHelper.stopService
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
+import kotlinx.coroutines.flow.update
 
 class MediaTimeoutCardViewModel(application: Application) :
     CardViewModel(application, MediaTimeoutService.serviceRunning) {
@@ -15,9 +14,14 @@ class MediaTimeoutCardViewModel(application: Application) :
     override val timeoutEnabledTag = MediaTimeoutService.TIMEOUT_ENABLED_TAG
 
     init {
-        title = "Media Timeout"
+        updateTitle("Media Timeout")
+        setAutoOffToggleDisabled()
         setSavedTime()
         setSavedTimeoutStatus()
+    }
+
+    private fun setAutoOffToggleDisabled() {
+        uiModel.update { it.copy(showTimeoutSectionToggle = false) }
     }
 
     override fun refreshPermissionState() {

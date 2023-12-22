@@ -1,19 +1,15 @@
 package com.ilieinc.dontsleep.viewmodel.base
 
 import android.app.Application
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.ilieinc.core.viewmodel.base.DialogViewModel
+import com.ilieinc.dontsleep.ui.model.HelpDialogUiModel
+import kotlinx.coroutines.flow.MutableStateFlow
 
 abstract class HelpDialogViewModel(
     onDismissRequestedCallback: () -> Unit,
     application: Application
 ) : DialogViewModel(onDismissRequestedCallback, application) {
-    var showRevokePermissionButton by mutableStateOf(false)
-        protected set
-    var revokeButtonText by mutableStateOf("Revoke Permission")
-        protected set
+    val uiModel = MutableStateFlow(HelpDialogUiModel())
 
     open fun revokePermission() {}
 }

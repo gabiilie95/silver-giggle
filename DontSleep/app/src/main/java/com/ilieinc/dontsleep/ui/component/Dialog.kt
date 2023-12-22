@@ -6,76 +6,85 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import com.ilieinc.core.ui.model.PermissionDialogUiModel
 import com.ilieinc.dontsleep.viewmodel.*
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
-import com.ilieinc.dontsleep.viewmodel.base.HelpDialogViewModel
 import com.ilieinc.core.viewmodel.PermissionDialogViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.ilieinc.dontsleep.ui.model.HelpDialogUiModel
 
 @Composable
 fun CardHelpDialog(
-    viewModel: CardViewModel
+    viewModel: CardViewModel,
+    onDismissHelpDialog: () -> Unit
 ) {
     val activity = LocalContext.current as Activity
-    when (viewModel) {
-        is WakeLockCardViewModel -> HelpDialog(
-            WakeLockHelpDialogViewModel(
-                viewModel::onDismissHelpDialog,
-                activity.application
-            )
+    val dialogViewModel = when (viewModel) {
+        is WakeLockCardViewModel -> WakeLockHelpDialogViewModel(
+            onDismissHelpDialog,
+            activity.application
         )
-        is ScreenTimeoutCardViewModel -> HelpDialog(
-            ScreenTimeoutCardHelpDialogViewModel(
-                viewModel::onDismissHelpDialog,
-                activity.application
-            )
+
+        is MediaTimeoutCardViewModel -> MediaTimeoutCardHelpDialogViewModel(
+            onDismissHelpDialog,
+            activity.application
         )
-        is MediaTimeoutCardViewModel -> HelpDialog(
-            MediaTimeoutCardHelpDialogViewModel(
-                viewModel::onDismissHelpDialog,
-                activity.application
-            )
+
+        else -> null
+    }
+    dialogViewModel?.let {
+        val uiModel by it.uiModel.collectAsState()
+        HelpDialog(
+            uiModel,
+            onDismissRequested = onDismissHelpDialog,
+            onRevokePermissionClick = it::revokePermission
         )
     }
 }
 
 @Composable
 fun CardPermissionDialog(
-    viewModel: CardViewModel
+    viewModel: CardViewModel,
+    onDismissRequested: () -> Unit,
+    onRevokePermissionClick: () -> Unit
 ) {
     val activity = LocalContext.current as Activity
-    when (viewModel) {
+    val dialogViewModel = when (viewModel) {
         is WakeLockCardViewModel -> {
-            PermissionDialog(
-                WakeLockPermissionDialogViewModel(
-                    viewModel::onDismissPermissionDialog,
-                    activity.application
-                )
+            WakeLockPermissionDialogViewModel(
+                onDismissRequested,
+                activity.application
             )
         }
-        is ScreenTimeoutCardViewModel -> {
-            PermissionDialog(
-                ScreenTimeoutPermissionDialogViewModel(
-                    viewModel::onDismissPermissionDialog,
-                    activity
-                )
-            )
-        }
+
+        else -> null
+    }
+    dialogViewModel?.let {
+        val uiModel by it.uiModel.collectAsState()
+        PermissionDialog(
+            uiModel,
+            onRequestPermission = it::requestPermission,
+            onDismissRequested = onDismissRequested
+        )
     }
 }
 
 @Composable
-fun HelpDialog(viewModel: HelpDialogViewModel) {
-    with(viewModel) {
+fun HelpDialog(
+    uiModel: HelpDialogUiModel,
+    onDismissRequested: () -> Unit,
+    onRevokePermissionClick: () -> Unit
+) {
+    with(uiModel) {
         AlertDialog(
-            onDismissRequest = ::onDismissRequested,
+            onDismissRequest = onDismissRequested,
             title = { Text(title) },
             text = { Text(description) },
-            confirmButton = { Button(onClick = ::onDismissRequested) { Text("OK") } },
+            confirmButton = { Button(onClick = onDismissRequested) { Text("OK") } },
             dismissButton = {
                 if (showRevokePermissionButton) {
-                    Button(onClick = this::revokePermission) {
+                    Button(onClick = onRevokePermissionClick) {
                         Text(text = revokeButtonText)
                     }
                 }
@@ -84,22 +93,26 @@ fun HelpDialog(viewModel: HelpDialogViewModel) {
 }
 
 @Composable
-fun PermissionDialog(viewModel: PermissionDialogViewModel) {
-    with(viewModel) {
+fun PermissionDialog(
+    uiModel: PermissionDialogUiModel,
+    onRequestPermission: () -> Unit,
+    onDismissRequested: () -> Unit
+) {
+    with(uiModel) {
         AlertDialog(
-            onDismissRequest = ::onDismissRequested,
+            onDismissRequest = onDismissRequested,
             title = { Text(title) },
             text = { Text(description) },
             confirmButton = {
                 Button(
-                    onClick = ::requestPermission,
+                    onClick = onRequestPermission,
                     enabled = confirmButtonEnabled
                 ) {
                     Text(confirmButtonText)
                 }
             },
             dismissButton = {
-                Button(onClick = ::onDismissRequested) {
+                Button(onClick = onDismissRequested) {
                     Text("No")
                 }
             })

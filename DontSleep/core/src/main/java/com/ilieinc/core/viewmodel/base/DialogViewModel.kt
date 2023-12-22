@@ -11,10 +11,6 @@ abstract class DialogViewModel(
     private val onDismissRequestedCallback: () -> Unit,
     application: Application
 ) : AndroidViewModel(application) {
-    var title by mutableStateOf("")
-        protected set
-    var description by mutableStateOf("")
-        protected set
 
     open fun onDismissRequested() {
         onDismissRequestedCallback()

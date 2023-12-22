@@ -6,24 +6,29 @@ import com.ilieinc.core.util.PermissionHelper
 import com.ilieinc.core.util.StateHelper.startForegroundService
 import com.ilieinc.core.util.StateHelper.stopService
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
+import kotlinx.coroutines.flow.update
 
-class WakeLockCardViewModel(application: Application): CardViewModel(
-    application,
-    WakeLockService.serviceRunning
-) {
+class WakeLockCardViewModel(application: Application) :
+    CardViewModel(application, WakeLockService.serviceRunning) {
     override val tag: String = WakeLockService.TIMEOUT_TAG
     override val showTimeoutSectionToggle = true
     override val timeoutEnabledTag = WakeLockService.TIMEOUT_ENABLED_TAG
 
     init {
-        title = "Don't Sleep!"
+        updateTitle("Don't Sleep!")
         setSavedTime()
         setSavedTimeoutStatus()
         refreshPermissionState()
     }
 
     override fun refreshPermissionState() {
-        permissionRequired = PermissionHelper.shouldRequestDrawOverPermission(getApplication())
+        uiModel.update {
+            it.copy(
+                permissionRequired = PermissionHelper.shouldRequestDrawOverPermission(
+                    getApplication()
+                )
+            )
+        }
     }
 
     override fun startService() {

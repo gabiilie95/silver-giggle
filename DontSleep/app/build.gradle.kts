@@ -17,6 +17,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("com.google.android.play:core-ktx:1.8.1")
     implementation("androidx.work:work-runtime:2.8.1")
     implementation("androidx.cardview:cardview:1.0.0")

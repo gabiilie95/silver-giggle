@@ -1,35 +1,36 @@
 package com.ilieinc.dontsleep.ui.component
 
-import android.app.Application
 import android.view.LayoutInflater
 import android.widget.TimePicker
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilieinc.core.ui.components.ThemedCard
 import com.ilieinc.dontsleep.R
 import com.ilieinc.core.ui.theme.AppTypography
-import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
-import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
+import com.ilieinc.dontsleep.ui.model.CardUiModel
 
 @Composable
 fun ActionCard(
-    viewModel: CardViewModel = viewModel()
+    uiModel: CardUiModel,
+    onShowHelp: () -> Unit = {},
+    onShowPermissionDialog: () -> Unit = {},
+    autoOffChanged: (Boolean) -> Unit = {},
+    onCheckedChanged: (Boolean) -> Unit = {},
+    onUpdateTime: (hour: Int, minute: Int) -> Unit
 ) {
-    with(viewModel) {
-        val enabled by this.enabled.collectAsState()
+    with(uiModel) {
         ThemedCard(
-            modifier = Modifier.padding(5.dp).animateContentSize(),
+            modifier = Modifier
+                .padding(5.dp)
+                .animateContentSize(),
             title = title,
             titleBar = {
                 Row(
@@ -42,7 +43,7 @@ fun ActionCard(
                         style = AppTypography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
-                    Button(onClick = viewModel::onShowHelpDialog) {
+                    Button(onClick = onShowHelp) {
                         Text(text = "Help")
                     }
                 }
@@ -56,7 +57,8 @@ fun ActionCard(
                 if (permissionRequired) {
                     Button(
                         modifier = Modifier.align(Alignment.End),
-                        onClick = viewModel::onShowPermissionDialog) {
+                        onClick = onShowPermissionDialog
+                    ) {
                         Text(text = "Get Started")
                     }
                 } else {
@@ -71,7 +73,7 @@ fun ActionCard(
                         )
                         Switch(
                             checked = enabled,
-                            onCheckedChange = { viewModel.enabled.tryEmit(!enabled) }
+                            onCheckedChange = onCheckedChanged
                         )
                     }
                     if (showTimeoutSectionToggle) {
@@ -86,29 +88,28 @@ fun ActionCard(
                             )
                             Switch(
                                 checked = timeoutEnabled,
-                                onCheckedChange = viewModel::timeoutChanged
+                                onCheckedChange = autoOffChanged
                             )
                         }
                     }
                     if (timeoutEnabled) {
-                        TimeoutSection(viewModel)
+                        TimeoutSection(
+                            uiModel = uiModel,
+                            onUpdateTime = onUpdateTime
+                        )
                     }
                 }
             }
-        }
-        if (showHelpDialog) {
-            CardHelpDialog(viewModel)
-        }
-        if (showPermissionDialog) {
-            CardPermissionDialog(viewModel)
         }
     }
 }
 
 @Composable
-fun TimeoutSection(viewModel: CardViewModel) {
-    with(viewModel) {
-        val enabled by this.enabled.collectAsState()
+fun TimeoutSection(
+    uiModel: CardUiModel,
+    onUpdateTime: (hour: Int, minute: Int) -> Unit
+) {
+    with(uiModel) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -132,7 +133,7 @@ fun TimeoutSection(viewModel: CardViewModel) {
                             this.hour = hours
                             this.minute = minutes
                             this.setOnTimeChangedListener { _, hours, minutes ->
-                                viewModel.updateTime(hours, minutes)
+                                onUpdateTime(hours, minutes)
                             }
                         }
                     return@AndroidView timePicker
@@ -148,5 +149,5 @@ fun TimeoutSection(viewModel: CardViewModel) {
 @Preview
 @Composable
 fun ActionCardPreview() {
-    ActionCard(ScreenTimeoutCardViewModel(Application()))
+    ActionCard(CardUiModel()) { _, _ -> }
 }

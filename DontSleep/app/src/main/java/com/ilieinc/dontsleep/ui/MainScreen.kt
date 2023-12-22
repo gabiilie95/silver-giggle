@@ -18,20 +18,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.ilieinc.core.receiver.DeviceAdminReceiver
 import com.ilieinc.core.ui.theme.AppTheme
 import com.ilieinc.core.util.StateHelper.needToShowReviewSnackbar
 import com.ilieinc.core.util.StateHelper.showReviewSnackbar
 import com.ilieinc.dontsleep.MainActivity
 import com.ilieinc.dontsleep.ui.component.ActionCard
 import com.ilieinc.core.ui.components.ApplicationTopAppBar
+import com.ilieinc.dontsleep.ui.component.CardHelpDialog
+import com.ilieinc.dontsleep.ui.component.CardPermissionDialog
 import com.ilieinc.dontsleep.ui.component.OnLifecycleEvent
 import com.ilieinc.dontsleep.ui.component.RequestNotificationButton
 import com.ilieinc.dontsleep.viewmodel.MediaTimeoutCardViewModel
 import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
-import com.ilieinc.dontsleep.viewmodel.ScreenTimeoutCardViewModel
 import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun MainScreen(
@@ -39,12 +38,12 @@ fun MainScreen(
     notificationPermissionResult: ManagedActivityResultLauncher<String, Boolean>
 ) {
     val activity = (LocalContext.current as? Activity)
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
     val scrollState = rememberScrollState()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { ApplicationTopAppBar() },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(snackBarHostState) },
         bottomBar = {
             Button(
                 modifier = Modifier
@@ -67,7 +66,6 @@ fun MainScreen(
                     .verticalScroll(scrollState)
             ) {
                 WakeLockTimerCard()
-//                ScreenTimeoutTimerCard()
                 MediaTimeoutTimerCard()
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && activity is MainActivity
                     && !hasNotificationPermission
@@ -77,10 +75,10 @@ fun MainScreen(
             }
         }
         if (activity != null && needToShowReviewSnackbar(activity.applicationContext)) {
-            LaunchedEffect(snackbarHostState) {
+            LaunchedEffect(snackBarHostState) {
                 showReviewSnackbar(
                     activity.applicationContext,
-                    snackbarHostState
+                    snackBarHostState
                 )
             }
         }
@@ -103,34 +101,50 @@ fun AndroidTNotificationPermissionButton(
 
 @Composable
 fun WakeLockTimerCard(viewModel: WakeLockCardViewModel = viewModel()) {
-    val model = remember { viewModel }
     OnLifecycleEvent { _, event ->
         when (event) {
-            Lifecycle.Event.ON_RESUME -> model.refreshPermissionState()
+            Lifecycle.Event.ON_RESUME -> viewModel.refreshPermissionState()
             else -> {}
         }
     }
-    ActionCard(model)
-}
-
-@Composable
-fun ScreenTimeoutTimerCard(viewModel: ScreenTimeoutCardViewModel = viewModel()) {
-    val model = remember { viewModel }
-    val permissionGranted by DeviceAdminReceiver.permissionGranted.collectAsState()
-    model.updatePermissionRequired(!permissionGranted)
-    OnLifecycleEvent { _, event ->
-        when (event) {
-            Lifecycle.Event.ON_RESUME -> model.refreshPermissionState()
-            else -> {}
+    with(viewModel) {
+        val uiModel by uiModel.collectAsState()
+        ActionCard(
+            uiModel,
+            ::onShowHelpDialog,
+            ::onShowPermissionDialog,
+            ::timeoutChanged,
+            ::setEnabled,
+            ::updateTime
+        )
+        if (uiModel.showHelpDialog) {
+            CardHelpDialog(this, ::onDismissHelpDialog)
+        }
+        if (uiModel.showPermissionDialog) {
+            CardPermissionDialog(this, ::onDismissPermissionDialog, {})
         }
     }
-    ActionCard(model)
 }
 
 @Composable
 fun MediaTimeoutTimerCard(viewModel: MediaTimeoutCardViewModel = viewModel()) {
-    val model = remember { viewModel }
-    ActionCard(model)
+    with(viewModel) {
+        val uiModel by uiModel.collectAsState()
+        ActionCard(
+            uiModel,
+            ::onShowHelpDialog,
+            ::onShowPermissionDialog,
+            ::timeoutChanged,
+            ::setEnabled,
+            ::updateTime
+        )
+        if (uiModel.showHelpDialog) {
+            CardHelpDialog(this, ::onDismissHelpDialog)
+        }
+        if (uiModel.showPermissionDialog) {
+            CardPermissionDialog(this, ::onDismissHelpDialog, {})
+        }
+    }
 }
 
 @Preview

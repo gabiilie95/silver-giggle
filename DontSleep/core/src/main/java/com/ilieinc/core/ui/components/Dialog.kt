@@ -8,7 +8,7 @@ import com.ilieinc.core.viewmodel.PermissionDialogViewModel
 import com.ilieinc.core.viewmodel.RatingDialogViewModel
 
 @Composable
-fun RatingDialog(viewModel: RatingDialogViewModel){
+fun RatingDialog(viewModel: RatingDialogViewModel) {
     with(viewModel) {
         AlertDialog(onDismissRequest = this::onDismissRequested,
             title = { Text(text = "Rate this app") },

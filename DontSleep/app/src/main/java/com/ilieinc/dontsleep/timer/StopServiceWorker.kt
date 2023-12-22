@@ -2,11 +2,9 @@ package com.ilieinc.dontsleep.timer
 
 import android.content.Context
 import android.content.Intent
-import androidx.core.content.ContextCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.ilieinc.dontsleep.service.MediaTimeoutService
-import com.ilieinc.dontsleep.service.ScreenTimeoutService
 import com.ilieinc.dontsleep.service.WakeLockService
 import com.ilieinc.core.util.Logger
 
@@ -27,9 +25,6 @@ class StopServiceWorker(
             when (service) {
                 WakeLockService::class.java.name -> {
                     serviceIntent = Intent(applicationContext, WakeLockService::class.java)
-                }
-                ScreenTimeoutService::class.java.name -> {
-                    serviceIntent = Intent(applicationContext, ScreenTimeoutService::class.java)
                 }
                 MediaTimeoutService::class.java.name -> {
                     serviceIntent = Intent(applicationContext, MediaTimeoutService::class.java)
