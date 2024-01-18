@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">App Name</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="notifications_info">Notifications Info</string>
+    <string name="notification_info_description">This permission is needed if you want to be shown useful notifications when using the application.\n\nNotifications include Time Remaining, and an option to quickly stop the application.</string>
+    <string name="rate_title">Rate this app</string>
+    <string name="rate_description">If you enjoy this app please feel free to rate it on the Google Play Store, it would help me out a lot :)\nFor any feedback or suggestions either leave a review, or contact me directly at gabiilie95@gmail.com</string>
+    <string name="rate_app">Rate App</string>
 </resources>

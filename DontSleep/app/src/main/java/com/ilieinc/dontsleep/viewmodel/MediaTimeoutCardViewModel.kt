@@ -4,6 +4,7 @@ import android.app.Application
 import com.ilieinc.dontsleep.service.MediaTimeoutService
 import com.ilieinc.core.util.StateHelper.startForegroundService
 import com.ilieinc.core.util.StateHelper.stopService
+import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 import kotlinx.coroutines.flow.update
 
@@ -14,7 +15,7 @@ class MediaTimeoutCardViewModel(application: Application) :
     override val timeoutEnabledTag = MediaTimeoutService.TIMEOUT_ENABLED_TAG
 
     init {
-        updateTitle("Media Timeout")
+        updateTitle(context.getString(R.string.media_timeout_title))
         setAutoOffToggleDisabled()
         setSavedTime()
         setSavedTimeoutStatus()

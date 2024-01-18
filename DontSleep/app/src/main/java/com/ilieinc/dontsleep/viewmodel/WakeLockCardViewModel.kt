@@ -1,10 +1,13 @@
 package com.ilieinc.dontsleep.viewmodel
 
 import android.app.Application
+import android.content.Intent
+import androidx.core.content.ContextCompat
 import com.ilieinc.dontsleep.service.WakeLockService
 import com.ilieinc.core.util.PermissionHelper
 import com.ilieinc.core.util.StateHelper.startForegroundService
 import com.ilieinc.core.util.StateHelper.stopService
+import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 import kotlinx.coroutines.flow.update
 
@@ -15,7 +18,7 @@ class WakeLockCardViewModel(application: Application) :
     override val timeoutEnabledTag = WakeLockService.TIMEOUT_ENABLED_TAG
 
     init {
-        updateTitle("Don't Sleep!")
+        updateTitle(context.getString(R.string.don_t_sleep))
         setSavedTime()
         setSavedTimeoutStatus()
         refreshPermissionState()
@@ -24,18 +27,16 @@ class WakeLockCardViewModel(application: Application) :
     override fun refreshPermissionState() {
         uiModel.update {
             it.copy(
-                permissionRequired = PermissionHelper.shouldRequestDrawOverPermission(
-                    getApplication()
-                )
+                permissionRequired = PermissionHelper.shouldRequestDrawOverPermission(context)
             )
         }
     }
 
     override fun startService() {
-        getApplication<Application>().startForegroundService<WakeLockService>()
+        context.startForegroundService<WakeLockService>()
     }
 
     override fun stopService() {
-        getApplication<Application>().stopService<WakeLockService>()
+        context.stopService<WakeLockService>()
     }
 }

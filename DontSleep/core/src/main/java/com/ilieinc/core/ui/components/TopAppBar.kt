@@ -44,7 +44,7 @@ fun ApplicationTopAppBar() {
             )
             Text(
                 modifier = Modifier.padding(start = 5.dp),
-                text = stringResource(id = R.string.app_name),
+                text = stringResource(R.string.app_name),
                 fontWeight = FontWeight.Bold
             )
         }

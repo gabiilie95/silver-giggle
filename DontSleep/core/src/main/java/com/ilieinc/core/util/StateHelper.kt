@@ -14,8 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
-import kotlinx.coroutines.flow.MutableStateFlow
-import java.util.*
+import java.util.Locale
 
 object StateHelper {
     enum class TileStates {

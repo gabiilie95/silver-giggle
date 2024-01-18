@@ -4,6 +4,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.ilieinc.core.R
 import com.ilieinc.core.viewmodel.PermissionDialogViewModel
 import com.ilieinc.core.viewmodel.RatingDialogViewModel
 
@@ -11,25 +13,22 @@ import com.ilieinc.core.viewmodel.RatingDialogViewModel
 fun RatingDialog(viewModel: RatingDialogViewModel) {
     with(viewModel) {
         AlertDialog(onDismissRequest = this::onDismissRequested,
-            title = { Text(text = "Rate this app") },
+            title = { Text(text = stringResource(R.string.rate_title)) },
             text = {
                 Text(
-                    text = "If you enjoy this app please feel free to rate it on the Google Play " +
-                            "Store, it would help me out a lot :)\n" +
-                            "For any feedback or suggestions either leave a review, " +
-                            "or contact me directly at gabiilie95@gmail.com"
+                    text = stringResource(R.string.rate_description)
                 )
             },
             confirmButton = {
                 Button(onClick = {
                     requestReview()
                 }) {
-                    Text("Rate App")
+                    Text(stringResource(R.string.rate_app))
                 }
             },
             dismissButton = {
                 Button(onClick = this::onDismissRequested) {
-                    Text(text = "Dismiss")
+                    Text(text = stringResource(R.string.dismiss))
                 }
             }
         )
@@ -42,10 +41,10 @@ fun NotificationInfoDialog(viewModel: PermissionDialogViewModel) {
         AlertDialog(onDismissRequest = this::onDismissRequested,
             confirmButton = {
                 Button(onClick = this::onDismissRequested) {
-                    Text(text = "Dismiss")
+                    Text(text = stringResource(R.string.dismiss))
                 }
             },
-            title = { Text(text = "Notifications Info") },
-            text = { Text(text = "This permission is needed if you want to be shown useful notifications when using the application.\n\nNotifications include Time Remaining, and an option to quickly stop the application.") })
+            title = { Text(text = stringResource(R.string.notifications_info)) },
+            text = { Text(text = stringResource(R.string.notification_info_description)) })
     }
 }

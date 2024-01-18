@@ -16,8 +16,6 @@
     <string name="media_timeout_notification_text">"Pausing media playback at %s.</string>
     <string name="special_permission_grant_title">Special Permission Grant</string>
     <string name="special_permission_grant_body">In order to use this feature, you must grant a special permission to the application.\nThis permission allows the application to turn off your screen.\n\nDo you want to continue?</string>
-    <string name="draw_over_permission_grant_title">Draw Over Permission Grant</string>
-    <string name="draw_over_permission_grant_body">Due to limitations from the manufacturer of your device, in order to use this feature, you must grant draw over other apps permission to the application.\nThis permission will only be used to keep the screen awake.\n\nDo you want to continue?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="ok">OK</string>
@@ -26,5 +24,16 @@
     <string name="warning">WARNING</string>
     <string name="special_permission_grant_warning_body">You will not be able to uninstall the application until you revoke the administrator permission.\nYou can revoke the permission by clicking the \'Help\' button from the \'Sleep! Timer\' section of the app.\n\nDo you want to continue?</string>
     <string name="stop">Stop</string>
-    <string name="media_timeout_description">This feature allows you to set a timer which will pause any media playing on the device, such as music or video playback.</string>
+    <string name="media_timeout_help_description">This feature allows you to set a timer which will pause any media playing on the device, such as music or video playback.</string>
+    <string name="wakelock_help_title">Don\'t Sleep! Help</string>
+    <string name="wakelock_help_description">This feature enables you to turn off your screen timeout with the click of a button.</string>
+    <string name="revoke_permission_description">\nYou can revoke the draw over permission from this dialog.</string>
+    <string name="revoke_draw_over_permission">Revoke Draw Over Permission</string>
+    <string name="don_t_sleep">Don\'t Sleep!</string>
+    <string name="draw_over_permission_title">Draw Over Permission Grant</string>
+    <string name="draw_over_permission_description">Due to limitations from the manufacturer of your device, in order to use this feature, you must grant draw over other apps permission to the application.\nThis permission will only be used to keep the screen awake.\n\nDo you want to continue?</string>
+    <string name="media_timeout_title">Media Timeout</string>
+    <string name="media_timeout_help_title">Media Timeout Help</string>
+    <string name="allow_notifications">Allow Notifications</string>
+    <string name="enable_auto_off">Enable Auto-Off</string>
 </resources>

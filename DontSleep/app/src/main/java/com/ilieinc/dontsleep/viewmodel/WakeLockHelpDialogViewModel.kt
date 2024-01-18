@@ -2,8 +2,8 @@ package com.ilieinc.dontsleep.viewmodel
 
 import android.app.Application
 import com.ilieinc.core.util.PermissionHelper
+import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.viewmodel.base.HelpDialogViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
 class WakeLockHelpDialogViewModel(
@@ -17,14 +17,14 @@ class WakeLockHelpDialogViewModel(
     private fun setDetails() {
         uiModel.update {
             it.copy(
-                title = "Don't Sleep! Help",
+                title = context.getString(R.string.wakelock_help_title),
                 description = buildString {
-                    append("This feature enables you to turn off your screen timeout with the click of a button.")
+                    append(context.getString(R.string.wakelock_help_description))
                     if (PermissionHelper.hasDrawOverPermission(getApplication())) {
-                        append("\nYou can revoke the draw over permission from this dialog.")
+                        append(context.getString(R.string.revoke_permission_description))
                     }
                 },
-                revokeButtonText = "Revoke Draw Over Permission",
+                revokeButtonText = context.getString(R.string.revoke_draw_over_permission),
                 showRevokePermissionButton = PermissionHelper.hasDrawOverPermission(getApplication())
             )
         }

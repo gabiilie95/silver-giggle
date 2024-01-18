@@ -1,6 +1,7 @@
 package com.ilieinc.dontsleep.viewmodel.base
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ilieinc.core.util.SharedPreferenceManager
@@ -15,7 +16,7 @@ abstract class CardViewModel(application: Application, serviceRunning: MutableSt
     abstract val showTimeoutSectionToggle: Boolean
     abstract val timeoutEnabledTag: String
 
-    private var enabled = false
+    protected val context: Context get() = getApplication<Application>().applicationContext
 
     var uiModel = MutableStateFlow(CardUiModel())
 
@@ -23,7 +24,10 @@ abstract class CardViewModel(application: Application, serviceRunning: MutableSt
         viewModelScope.launch {
             serviceRunning.collect { serviceRunning ->
                 uiModel.update {
-                    it.copy(enabled = serviceRunning)
+                    it.copy(
+                        enabled = serviceRunning,
+                        timeoutSectionToggleEnabled = !serviceRunning
+                    )
                 }
             }
         }
@@ -65,7 +69,12 @@ abstract class CardViewModel(application: Application, serviceRunning: MutableSt
         } else {
             stopService()
         }
-        uiModel.update { it.copy(enabled = enabled) }
+        uiModel.update {
+            it.copy(
+                enabled = enabled,
+                timeoutSectionToggleEnabled = !enabled
+            )
+        }
     }
 
     fun updateTime(hours: Int, minutes: Int) =
@@ -91,7 +100,7 @@ abstract class CardViewModel(application: Application, serviceRunning: MutableSt
     }
 
     fun onDismissPermissionDialog() {
-        uiModel.update { it.copy(showPermissionDialog = true) }
+        uiModel.update { it.copy(showPermissionDialog = false) }
     }
 
     fun timeoutChanged(enabled: Boolean) {

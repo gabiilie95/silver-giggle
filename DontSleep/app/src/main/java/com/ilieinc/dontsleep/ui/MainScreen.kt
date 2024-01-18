@@ -121,7 +121,7 @@ fun WakeLockTimerCard(viewModel: WakeLockCardViewModel = viewModel()) {
             CardHelpDialog(this, ::onDismissHelpDialog)
         }
         if (uiModel.showPermissionDialog) {
-            CardPermissionDialog(this, ::onDismissPermissionDialog, {})
+            CardPermissionDialog(this, ::onDismissPermissionDialog)
         }
     }
 }
@@ -142,7 +142,7 @@ fun MediaTimeoutTimerCard(viewModel: MediaTimeoutCardViewModel = viewModel()) {
             CardHelpDialog(this, ::onDismissHelpDialog)
         }
         if (uiModel.showPermissionDialog) {
-            CardPermissionDialog(this, ::onDismissHelpDialog, {})
+            CardPermissionDialog(this, ::onDismissHelpDialog)
         }
     }
 }

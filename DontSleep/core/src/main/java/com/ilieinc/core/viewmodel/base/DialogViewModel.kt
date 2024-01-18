@@ -11,6 +11,7 @@ abstract class DialogViewModel(
     private val onDismissRequestedCallback: () -> Unit,
     application: Application
 ) : AndroidViewModel(application) {
+    protected val context get() = getApplication<Application>()
 
     open fun onDismissRequested() {
         onDismissRequestedCallback()

@@ -15,7 +15,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.ilieinc.core.ui.components.NotificationInfoDialog
+import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
 
 @RequiresApi(33)
@@ -30,7 +32,7 @@ fun RequestNotificationButton(viewModel: NotificationButtonDialogViewModel) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "Allow Notifications")
+                Text(text = stringResource(R.string.allow_notifications))
                 IconButton(onClick = ::onShowRequested) {
                     Icon(imageVector = Icons.Default.Info, contentDescription = null)
                 }

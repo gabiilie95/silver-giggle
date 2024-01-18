@@ -8,10 +8,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.ilieinc.core.ui.model.PermissionDialogUiModel
 import com.ilieinc.dontsleep.viewmodel.*
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 import com.ilieinc.core.viewmodel.PermissionDialogViewModel
+import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.ui.model.HelpDialogUiModel
 
 @Composable
@@ -46,8 +48,7 @@ fun CardHelpDialog(
 @Composable
 fun CardPermissionDialog(
     viewModel: CardViewModel,
-    onDismissRequested: () -> Unit,
-    onRevokePermissionClick: () -> Unit
+    onDismissRequested: () -> Unit
 ) {
     val activity = LocalContext.current as Activity
     val dialogViewModel = when (viewModel) {
@@ -81,7 +82,11 @@ fun HelpDialog(
             onDismissRequest = onDismissRequested,
             title = { Text(title) },
             text = { Text(description) },
-            confirmButton = { Button(onClick = onDismissRequested) { Text("OK") } },
+            confirmButton = {
+                Button(onClick = onDismissRequested) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
             dismissButton = {
                 if (showRevokePermissionButton) {
                     Button(onClick = onRevokePermissionClick) {
@@ -113,7 +118,7 @@ fun PermissionDialog(
             },
             dismissButton = {
                 Button(onClick = onDismissRequested) {
-                    Text("No")
+                    Text(stringResource(R.string.no))
                 }
             })
     }

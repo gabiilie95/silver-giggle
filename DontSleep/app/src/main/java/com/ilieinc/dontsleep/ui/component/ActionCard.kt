@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,7 +45,7 @@ fun ActionCard(
                         fontWeight = FontWeight.Bold
                     )
                     Button(onClick = onShowHelp) {
-                        Text(text = "Help")
+                        Text(text = stringResource(R.string.help))
                     }
                 }
             }
@@ -59,7 +60,7 @@ fun ActionCard(
                         modifier = Modifier.align(Alignment.End),
                         onClick = onShowPermissionDialog
                     ) {
-                        Text(text = "Get Started")
+                        Text(text = stringResource(R.string.get_started))
                     }
                 } else {
                     Row(
@@ -68,7 +69,7 @@ fun ActionCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Status",
+                            text = stringResource(R.string.status),
                             fontWeight = FontWeight.Bold
                         )
                         Switch(
@@ -83,11 +84,12 @@ fun ActionCard(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Enable Auto-Off",
+                                text = stringResource(R.string.enable_auto_off),
                                 fontWeight = FontWeight.Bold
                             )
                             Switch(
                                 checked = timeoutEnabled,
+                                enabled = timeoutSectionToggleEnabled,
                                 onCheckedChange = autoOffChanged
                             )
                         }
@@ -117,10 +119,10 @@ fun TimeoutSection(
         ) {
             Column {
                 Text(
-                    text = "Timeout",
+                    text = stringResource(R.string.timeout),
                     fontWeight = FontWeight.Bold
                 )
-                Text(text = "(Hours, Minutes)")
+                Text(text = stringResource(R.string.hours_minutes))
             }
             AndroidView(
                 factory = { context ->
