@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.ilieinc.core"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -34,7 +34,6 @@ android {
 
 dependencies {
     implementation(platform(libs.compose.bom))
-    implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.compose.ui)
@@ -49,7 +48,6 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     // Test
     testImplementation(libs.junit)
-//    androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.espresso.core)
 }
 

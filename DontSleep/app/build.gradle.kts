@@ -35,12 +35,12 @@ dependencies {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         applicationId = "com.ilieinc.dontsleep"
         minSdk = 24
         targetSdk = 35
-        versionCode = 29
+        versionCode = 30
         versionName = "2.$versionCode"
         multiDexEnabled = true
     }
