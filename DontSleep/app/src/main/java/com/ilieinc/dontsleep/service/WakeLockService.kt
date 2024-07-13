@@ -1,6 +1,7 @@
 package com.ilieinc.dontsleep.service
 
 import android.content.Context
+import android.content.pm.ServiceInfo
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.PowerManager
@@ -18,9 +19,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
 class WakeLockService : BaseService(
-    WakeLockService::class.java,
-    TIMEOUT_TAG,
-    1
+    serviceClass = WakeLockService::class.java,
+    serviceTag = TIMEOUT_TAG,
+    id = 1,
+    foregroundServiceTypeFlag = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+        }
+
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
+        }
+
+        else -> null
+    }
 ) {
     companion object {
         const val TIMEOUT_TAG = "DontSleep::WakeLockTag"
@@ -30,6 +42,7 @@ class WakeLockService : BaseService(
         private val wakeLock = NamedWakeLock()
         fun isRunning(context: Context) =
             StateHelper.isServiceRunning(context, WakeLockService::class.java)
+
         val serviceRunning = MutableStateFlow(false)
     }
 

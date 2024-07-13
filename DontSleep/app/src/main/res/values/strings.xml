@@ -36,4 +36,5 @@
     <string name="media_timeout_help_title">Media Timeout Help</string>
     <string name="allow_notifications">Allow Notifications</string>
     <string name="enable_auto_off">Enable Auto-Off</string>
+    <string name="special_use_explanation">This service is required for the application to work properly.</string>
 </resources>

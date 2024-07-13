@@ -48,6 +48,7 @@ fun MainScreen(
             Button(
                 modifier = Modifier
                     .padding(5.dp)
+                    .systemBarsPadding()
                     .fillMaxWidth(),
                 onClick = { activity?.finish() }) {
                 Text("Close")

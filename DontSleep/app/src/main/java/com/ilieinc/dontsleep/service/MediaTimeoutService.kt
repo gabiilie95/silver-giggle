@@ -1,21 +1,33 @@
 package com.ilieinc.dontsleep.service
 
 import android.content.Context
+import android.content.pm.ServiceInfo
+import android.os.Build
 import android.text.format.DateFormat
+import com.ilieinc.core.util.SharedPreferenceManager
+import com.ilieinc.core.util.StateHelper
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.timer.MediaTimeoutWorker
 import com.ilieinc.dontsleep.timer.TimerManager
-import com.ilieinc.core.util.NotificationManager
-import com.ilieinc.core.util.SharedPreferenceManager
-import com.ilieinc.core.util.StateHelper
 import com.ilieinc.dontsleep.util.DontSleepNotificationManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
 class MediaTimeoutService : BaseService(
-    MediaTimeoutService::class.java,
-    MEDIA_TIMEOUT_TAG,
-    3
+    serviceClass = MediaTimeoutService::class.java,
+    serviceTag = MEDIA_TIMEOUT_TAG,
+    id = 3,
+    foregroundServiceTypeFlag = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+        }
+
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
+        }
+
+        else -> null
+    }
 ) {
     companion object {
         const val MEDIA_TIMEOUT_TAG = "DontSleep::MediaTimeoutTag"
@@ -24,6 +36,7 @@ class MediaTimeoutService : BaseService(
 
         fun isRunning(context: Context) =
             StateHelper.isServiceRunning(context, MediaTimeoutService::class.java)
+
         val serviceRunning = MutableStateFlow(false)
     }
 

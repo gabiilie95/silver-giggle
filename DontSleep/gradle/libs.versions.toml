@@ -1,0 +1,71 @@
+[versions]
+agp = "8.6.0-beta01"
+kotlin = "1.9.24"
+
+activity = "1.9.0"
+activity-compose = "1.9.0"
+appcompat = "1.7.0"
+cardview = "1.0.0"
+compose-bom = "2024.06.00"
+compose-ui = "1.6.8"
+composeCompilerVersion = "1.5.14"
+constraintlayout = "2.1.4"
+core-ktx = "1.13.1"
+core-ktx-play = "1.10.3"
+espresso-core = "3.6.1"
+gradle = "8.1.4"
+jsoup = "1.18.1"
+junit = "4.13.2"
+kotlin-stdlib-jdk7 = "2.0.0"
+kotlinGradlePlugin = "1.9.10"
+kotlinx-coroutines-core = "1.8.1"
+lifecycle-extensions = "2.2.0"
+lifecycle-viewmodel-ktx = "2.8.3"
+lifecycle-viewmodel-compose = "2.8.3"
+material = "1.12.0"
+material3 = "1.2.1"
+materialIconsCore = "1.6.8"
+materialIconsExtended = "1.6.8"
+navigation-compose = "2.7.7"
+work-runtime-ktx = "2.9.0"
+
+[libraries]
+activity = { module = "androidx.activity:activity", version.ref = "activity" }
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
+androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
+compiler = { module = "androidx.compose.compiler:compiler", version.ref = "composeCompilerVersion" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose-ui" }
+compose-material = { module = "androidx.compose.material:material" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
+compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-ui" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-ui" }
+constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+#core = { module = "project:path::core", version.ref = "" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+core-ktx-play = { module = "com.google.android.play:core-ktx", version.ref = "core-ktx-play" }
+espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso-core" }
+gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePlugin" }
+kotlin-stdlib-jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin-stdlib-jdk7" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
+lifecycle-extensions = { module = "androidx.lifecycle:lifecycle-extensions", version.ref = "lifecycle-extensions" }
+lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle-viewmodel-ktx" }
+lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle-viewmodel-compose" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
+work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work-runtime-ktx" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }

@@ -2,9 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.ACTION_MANAGE_OVERLAY_PERMISSION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -37,7 +40,8 @@
                 android:name="android.service.quicksettings.TOGGLEABLE_TILE"
                 android:value="true" />
         </service>
-        <service android:name="com.ilieinc.dontsleep.service.tile.MediaTimeoutTileService"
+        <service
+            android:name="com.ilieinc.dontsleep.service.tile.MediaTimeoutTileService"
             android:exported="true"
             android:icon="@drawable/baseline_timer_off_24"
             android:label="Media Timer Disabled"
@@ -49,8 +53,20 @@
                 android:name="android.service.quicksettings.TOGGLEABLE_TILE"
                 android:value="true" />
         </service>
-        <service android:name=".service.WakeLockService" />
-        <service android:name=".service.MediaTimeoutService" />
+        <service
+            android:name=".service.WakeLockService"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="@string/special_use_explanation" />
+        </service>
+        <service
+            android:name=".service.MediaTimeoutService"
+            android:foregroundServiceType="mediaPlayback">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="@string/special_use_explanation" />
+        </service>
 
     </application>
 

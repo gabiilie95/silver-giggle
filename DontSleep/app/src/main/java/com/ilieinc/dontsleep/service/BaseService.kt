@@ -19,6 +19,7 @@ abstract class BaseService(
     private val serviceClass: Class<*>,
     private val serviceTag: String,
     private val id: Int,
+    private val foregroundServiceTypeFlag: Int?
 ) : Service() {
 
     class ServiceBinder(private val boundService: Service) : Binder() {
@@ -38,10 +39,13 @@ abstract class BaseService(
         Logger.info("Starting service $serviceClass")
         initFields()
         super.onCreate()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(id, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE)
-        } else {
-            startForeground(id, notification)
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && foregroundServiceTypeFlag != null -> {
+                startForeground(id, notification, foregroundServiceTypeFlag)
+            }
+            else -> {
+                startForeground(id, notification)
+            }
         }
         timeout = if (timeoutEnabled) {
             SharedPreferenceManager.getInstance(this)

@@ -8,17 +8,21 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.content.edit
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.elevation.SurfaceColors
-import com.ilieinc.dontsleep.ui.MainScreen
 import com.ilieinc.core.ui.theme.AppTheme
 import com.ilieinc.core.util.DeviceAdminHelper
 import com.ilieinc.core.util.PermissionHelper
 import com.ilieinc.core.util.SharedPreferenceManager
 import com.ilieinc.core.util.StateHelper
+import com.ilieinc.dontsleep.ui.MainScreen
 
 class MainActivity : ComponentActivity() {
 
