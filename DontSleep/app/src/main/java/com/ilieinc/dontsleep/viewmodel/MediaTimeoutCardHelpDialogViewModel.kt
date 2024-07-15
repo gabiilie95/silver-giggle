@@ -14,7 +14,7 @@ class MediaTimeoutCardHelpDialogViewModel(
     }
 
     private fun setDetails() {
-        uiModel.update {
+        state.update {
             it.copy(
                 title = context.getString(R.string.media_timeout_help_title),
                 description = buildString {

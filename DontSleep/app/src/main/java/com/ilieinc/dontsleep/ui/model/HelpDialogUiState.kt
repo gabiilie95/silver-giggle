@@ -1,6 +1,6 @@
 package com.ilieinc.dontsleep.ui.model
 
-data class HelpDialogUiModel(
+data class HelpDialogUiState(
     val title: String = "",
     val description: String = "",
     val showRevokePermissionButton: Boolean = false,

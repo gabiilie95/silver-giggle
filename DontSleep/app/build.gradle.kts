@@ -3,43 +3,12 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
-dependencies {
-    implementation(libs.work.runtime.ktx)
-    implementation(project(":core"))
-    implementation(libs.kotlin.stdlib.jdk7)
-    implementation(platform(libs.compose.bom))
-    implementation(libs.appcompat)
-    implementation(libs.activity)
-    implementation(libs.activity.compose)
-    implementation(libs.constraintlayout)
-    implementation(libs.lifecycle.extensions)
-    implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.navigation.compose)
-    implementation(libs.work.runtime.ktx)
-    implementation(libs.cardview)
-    implementation(libs.material)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.tooling)
-    implementation(libs.compiler)
-    implementation(libs.compose.foundation)
-    implementation(libs.compose.material)
-    implementation(libs.compose.material3)
-    implementation(libs.compose.material.icons.core)
-    implementation(libs.compose.material.icons.extended)
-    implementation(libs.lifecycle.viewmodel.compose)
-    implementation(libs.jsoup)
-    //Test
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.espresso.core)
-}
-
 android {
     compileSdk = 35
     defaultConfig {
         applicationId = "com.ilieinc.dontsleep"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 33
         versionCode = 30
         versionName = "2.$versionCode"
         multiDexEnabled = true
@@ -67,4 +36,36 @@ android {
         }
     }
     namespace = "com.ilieinc.dontsleep"
+}
+
+dependencies {
+    implementation(libs.work.runtime.ktx)
+    implementation(project(":core"))
+    implementation(libs.kotlin.stdlib.jdk7)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.appcompat)
+    implementation(libs.activity)
+    implementation(libs.activity.compose)
+    implementation(libs.constraintlayout)
+    implementation(libs.lifecycle.extensions)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.navigation.compose)
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.cardview)
+    implementation(libs.material)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling)
+    implementation(libs.compiler)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.material)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.core)
+    implementation(libs.compose.material.icons.extended)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.jsoup)
+    //Test
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.espresso.core)
 }

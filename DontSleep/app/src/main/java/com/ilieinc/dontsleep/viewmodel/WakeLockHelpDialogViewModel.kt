@@ -15,7 +15,7 @@ class WakeLockHelpDialogViewModel(
     }
 
     private fun setDetails() {
-        uiModel.update {
+        state.update {
             it.copy(
                 title = context.getString(R.string.wakelock_help_title),
                 description = buildString {

@@ -1,9 +1,9 @@
 package com.ilieinc.dontsleep.ui.model
 
-data class CardUiModel(
+data class CardUiState(
     val title: String = "",
-    val hours: Int = 0,
-    val minutes: Int = 0,
+    val hours: Int? = null,
+    val minutes: Int? = null,
     val timeoutEnabled: Boolean = true,
     val enabled: Boolean = false,
     val showTimeoutSectionToggle: Boolean = true,

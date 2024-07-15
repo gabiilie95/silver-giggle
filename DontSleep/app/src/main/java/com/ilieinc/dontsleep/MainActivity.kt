@@ -8,31 +8,40 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.core.content.edit
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.elevation.SurfaceColors
+import com.ilieinc.core.data.CoreDataStore.PERMISSION_NOTIFICATION_SHOWN_PREF_KEY
+import com.ilieinc.core.data.dataStore
+import com.ilieinc.core.data.setValue
 import com.ilieinc.core.ui.theme.AppTheme
 import com.ilieinc.core.util.DeviceAdminHelper
 import com.ilieinc.core.util.PermissionHelper
-import com.ilieinc.core.util.SharedPreferenceManager
 import com.ilieinc.core.util.StateHelper
 import com.ilieinc.dontsleep.ui.MainScreen
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        StateHelper.initDynamicColorsEnabledProperty(this)
         window.statusBarColor = SurfaceColors.SURFACE_0.getColor(this)
         window.navigationBarColor = SurfaceColors.SURFACE_2.getColor(this)
         setContent {
-            val useDynamicColors = StateHelper.useDynamicColors
+            val context = LocalContext.current
+            val scope = rememberCoroutineScope()
+            val useDynamicColors by StateHelper.useDynamicColors.collectAsState()
             var hasNotificationPermission by remember {
                 mutableStateOf(
                     PermissionHelper.hasNotificationPermission(
@@ -43,26 +52,33 @@ class MainActivity : ComponentActivity() {
             val notificationPermissionResult = rememberLauncherForActivityResult(
                 ActivityResultContracts.RequestPermission()
             ) {
-                SharedPreferenceManager.getInstance(this).edit(true) {
-                    putBoolean(PermissionHelper.PERMISSION_NOTIFICATION_SHOWN, true)
+                scope.launch {
+                    context.dataStore.setValue(PERMISSION_NOTIFICATION_SHOWN_PREF_KEY, true)
+                    hasNotificationPermission = it
                 }
-                hasNotificationPermission = it
+            }
+            LaunchedEffect(Unit) {
+                scope.launch {
+                    StateHelper.initDynamicColorsEnabledProperty(context)
+                    StateHelper.updateRatingCountIfNeeded(context)
+                }
             }
             setWindowInsetAppearance(window, useDynamicColors, isSystemInDarkTheme())
             AppTheme(useDynamicColors = useDynamicColors) {
                 MainScreen(hasNotificationPermission, notificationPermissionResult)
             }
             SideEffect {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                    && !hasNotificationPermission
-                    && !PermissionHelper.appRequestedNotificationPermissionOnStartup(this)
-                ) {
-                    PermissionHelper.requestNotificationPermission(notificationPermissionResult)
+                scope.launch {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                        && !hasNotificationPermission
+                        && !PermissionHelper.appRequestedNotificationPermissionOnStartup(context)
+                    ) {
+                        PermissionHelper.requestNotificationPermission(notificationPermissionResult)
+                    }
                 }
             }
         }
         DeviceAdminHelper.init(applicationContext)
-        StateHelper.updateRatingCountIfNeeded(this)
     }
 
     private fun setWindowInsetAppearance(

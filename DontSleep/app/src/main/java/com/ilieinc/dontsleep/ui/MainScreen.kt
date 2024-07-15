@@ -6,6 +6,7 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -14,9 +15,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilieinc.core.ui.theme.AppTheme
 import com.ilieinc.core.util.StateHelper.needToShowReviewSnackbar
@@ -28,9 +32,11 @@ import com.ilieinc.dontsleep.ui.component.CardHelpDialog
 import com.ilieinc.dontsleep.ui.component.CardPermissionDialog
 import com.ilieinc.dontsleep.ui.component.OnLifecycleEvent
 import com.ilieinc.dontsleep.ui.component.RequestNotificationButton
+import com.ilieinc.dontsleep.ui.model.CardUiEvent
 import com.ilieinc.dontsleep.viewmodel.MediaTimeoutCardViewModel
 import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
 import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
+import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 
 @Composable
 fun MainScreen(
@@ -75,12 +81,14 @@ fun MainScreen(
                 }
             }
         }
-        if (activity != null && needToShowReviewSnackbar(activity.applicationContext)) {
+        if (activity != null) {
             LaunchedEffect(snackBarHostState) {
-                showReviewSnackbar(
-                    activity.applicationContext,
-                    snackBarHostState
-                )
+                if (needToShowReviewSnackbar(activity.applicationContext)) {
+                    showReviewSnackbar(
+                        activity.applicationContext,
+                        snackBarHostState
+                    )
+                }
             }
         }
     }
@@ -101,56 +109,44 @@ fun AndroidTNotificationPermissionButton(
 }
 
 @Composable
-fun WakeLockTimerCard(viewModel: WakeLockCardViewModel = viewModel()) {
-    OnLifecycleEvent { _, event ->
-        when (event) {
-            Lifecycle.Event.ON_RESUME -> viewModel.refreshPermissionState()
-            else -> {}
-        }
-    }
-    with(viewModel) {
-        val uiModel by uiModel.collectAsState()
-        ActionCard(
-            uiModel,
-            ::onShowHelpDialog,
-            ::onShowPermissionDialog,
-            ::timeoutChanged,
-            ::setEnabled,
-            ::updateTime
-        )
-        if (uiModel.showHelpDialog) {
-            CardHelpDialog(this, ::onDismissHelpDialog)
-        }
-        if (uiModel.showPermissionDialog) {
-            CardPermissionDialog(this, ::onDismissPermissionDialog)
+private fun WakeLockTimerCard(viewModel: WakeLockCardViewModel = viewModel()) {
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    UiCard(viewModel)
+    LaunchedEffect(Unit) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewModel.refreshPermissionState()
         }
     }
 }
 
 @Composable
-fun MediaTimeoutTimerCard(viewModel: MediaTimeoutCardViewModel = viewModel()) {
+private fun MediaTimeoutTimerCard(viewModel: MediaTimeoutCardViewModel = viewModel()) {
+    UiCard(viewModel)
+}
+
+@Composable
+private fun UiCard(viewModel: CardViewModel) {
     with(viewModel) {
-        val uiModel by uiModel.collectAsState()
+        val state by state.collectAsState()
         ActionCard(
-            uiModel,
-            ::onShowHelpDialog,
-            ::onShowPermissionDialog,
-            ::timeoutChanged,
-            ::setEnabled,
-            ::updateTime
+            modifier = Modifier
+                .padding(5.dp)
+                .animateContentSize(),
+            state = state,
+            onEvent = ::onEvent
         )
-        if (uiModel.showHelpDialog) {
-            CardHelpDialog(this, ::onDismissHelpDialog)
+        if (state.showHelpDialog) {
+            CardHelpDialog(viewModel = this)
         }
-        if (uiModel.showPermissionDialog) {
-            CardPermissionDialog(this, ::onDismissHelpDialog)
+        if (state.showPermissionDialog) {
+            CardPermissionDialog(viewModel = this)
         }
     }
 }
 
 @Preview
 @Composable
-fun MainScreenPreview() {
+private fun MainScreenPreview() {
     AppTheme {
         MainScreen(false, rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),

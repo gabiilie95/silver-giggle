@@ -12,32 +12,24 @@ import android.view.WindowManager
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.model.NamedWakeLock
 import com.ilieinc.core.util.Logger
-import com.ilieinc.core.util.SharedPreferenceManager
 import com.ilieinc.core.util.StateHelper
+import com.ilieinc.dontsleep.manager.MediaTimeoutServiceManager
+import com.ilieinc.dontsleep.manager.WakeLockServiceManager
+import com.ilieinc.dontsleep.service.MediaTimeoutService.Companion.MEDIA_TIMEOUT_TAG
 import com.ilieinc.dontsleep.util.DontSleepNotificationManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
 class WakeLockService : BaseService(
-    serviceClass = WakeLockService::class.java,
-    serviceTag = TIMEOUT_TAG,
-    id = 1,
-    foregroundServiceTypeFlag = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-        }
-
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
-        }
-
-        else -> null
-    }
+    serviceManager = WakeLockServiceManager(
+        serviceClass = WakeLockService::class.java,
+        serviceTag = TIMEOUT_TAG,
+        serviceId = 1
+    )
 ) {
     companion object {
         const val TIMEOUT_TAG = "DontSleep::WakeLockTag"
         const val TIMEOUT_WAKELOCK_TAG = "DontSleep::WakeLockServiceStopTag"
-        const val TIMEOUT_ENABLED_TAG = "${TIMEOUT_TAG}_TimeoutEnabled"
 
         private val wakeLock = NamedWakeLock()
         fun isRunning(context: Context) =
@@ -49,31 +41,6 @@ class WakeLockService : BaseService(
     override val binder: ServiceBinder = ServiceBinder(this)
 
     private var overlay: View? = null
-
-    override fun initFields() {
-        timeoutEnabled =
-            SharedPreferenceManager.getInstance(this).getBoolean(TIMEOUT_ENABLED_TAG, true)
-        notification = DontSleepNotificationManager.createTimeoutNotification<WakeLockService>(
-            this,
-            R.drawable.baseline_mobile_friendly_24,
-            getString(R.string.app_name),
-            if (timeoutEnabled) {
-                getString(
-                    R.string.timeout_notification_text,
-                    DateFormat.getTimeFormat(this).format(Calendar.getInstance().apply {
-                        add(
-                            Calendar.MILLISECOND,
-                            SharedPreferenceManager.getInstance(this@WakeLockService)
-                                .getLong(TIMEOUT_TAG, 900000)
-                                .toInt()
-                        )
-                    }.time)
-                )
-            } else {
-                getString(R.string.timeout_notification_indefinite_text)
-            }
-        )
-    }
 
     override fun onCreate() {
         super.onCreate()
@@ -126,7 +93,7 @@ class WakeLockService : BaseService(
                     TIMEOUT_WAKELOCK_TAG
                 )
             }
-        currentWakeLock.acquire(timeout)
+        currentWakeLock.acquire(serviceManager.timeout)
         wakeLock.name = TIMEOUT_WAKELOCK_TAG
         wakeLock.lock = currentWakeLock
     }

@@ -9,11 +9,16 @@ import android.os.Build
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
+import com.ilieinc.core.data.CoreDataStore
+import com.ilieinc.core.data.CoreDataStore.APP_START_COUNT_PREF_KEY
+import com.ilieinc.core.data.CoreDataStore.RATING_SHOWN_PREF_KEY
+import com.ilieinc.core.data.dataStore
+import com.ilieinc.core.data.getValue
+import com.ilieinc.core.data.setValue
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.util.Locale
 
 object StateHelper {
@@ -23,15 +28,12 @@ object StateHelper {
         Disabled
     }
 
-    private const val APP_START_COUNT = "AppStartCount"
-    private const val RATING_SHOWN = "RatingShown"
-    private const val SHOULD_USE_DYNAMIC_COLORS = "ShouldUseDynamicColors"
-
     private val overlayDevices = arrayOf(
         "samsung"
     )
-    var useDynamicColors by mutableStateOf(true)
-        private set
+
+    private val _useDynamicColors = MutableStateFlow(true)
+    val useDynamicColors = _useDynamicColors.asStateFlow()
 
     fun deviceRequiresOverlay(): Boolean {
         return overlayDevices.contains(Build.MANUFACTURER.lowercase(Locale.getDefault()))
@@ -47,42 +49,56 @@ object StateHelper {
         return false
     }
 
+    inline fun Context.startForegroundService(
+        serviceClass: Class<*>,
+        extraActions: (intent: Intent) -> Unit = {}
+    ) = ContextCompat.startForegroundService(this, Intent(this, serviceClass).apply {
+        extraActions(this)
+    })
+
     inline fun <reified T> Context.startForegroundService(extraActions: (intent: Intent) -> Unit = {}) where T : Service =
-        ContextCompat.startForegroundService(this, Intent(this, T::class.java).apply {
-            extraActions(this)
-        })
+        this.startForegroundService(T::class.java, extraActions)
+
+    fun Context.stopService(serviceClass: Class<*>) {
+        stopService(Intent(this, serviceClass))
+    }
 
     inline fun <reified T> Context.stopService() where T : Service {
         stopService(Intent(this, T::class.java))
     }
 
-    fun updateRatingCountIfNeeded(context: Context) {
-        with(SharedPreferenceManager.getInstance(context)) {
-            val ratingWasShown = getBoolean(RATING_SHOWN, false)
+    suspend fun updateRatingCountIfNeeded(context: Context) {
+        with(context.dataStore) {
+            val ratingWasShown = getValue(RATING_SHOWN_PREF_KEY, false)
             if (!ratingWasShown) {
-                val startNum = getInt(APP_START_COUNT, 0)
-                edit(true) { putInt(APP_START_COUNT, startNum + 1) }
+                val startNum = getValue(APP_START_COUNT_PREF_KEY, 0)
+                setValue(APP_START_COUNT_PREF_KEY, startNum + 1)
             }
         }
     }
 
-    fun initDynamicColorsEnabledProperty(context: Context) {
-        with(SharedPreferenceManager.getInstance(context)) {
-            useDynamicColors = getBoolean(SHOULD_USE_DYNAMIC_COLORS, true)
+    suspend fun initDynamicColorsEnabledProperty(context: Context) {
+        with(context.dataStore) {
+            _useDynamicColors.update {
+                getValue(
+                    CoreDataStore.SHOULD_USE_DYNAMIC_COLORS_PREF_KEY,
+                    true
+                )
+            }
         }
     }
 
-    fun setDynamicColorsEnabled(context: Context, enabled: Boolean) {
-        with(SharedPreferenceManager.getInstance(context)) {
-            edit(true) { putBoolean(SHOULD_USE_DYNAMIC_COLORS, enabled) }
-            useDynamicColors = enabled
+    suspend fun setDynamicColorsEnabled(context: Context, enabled: Boolean) {
+        with(context.dataStore) {
+            setValue(CoreDataStore.SHOULD_USE_DYNAMIC_COLORS_PREF_KEY, enabled)
+            _useDynamicColors.update { enabled }
         }
     }
 
-    fun needToShowReviewSnackbar(context: Context): Boolean {
-        with(SharedPreferenceManager.getInstance(context)) {
-            val snackbarWasShown = getBoolean(RATING_SHOWN, false)
-            val startNum = getInt(APP_START_COUNT, 0)
+    suspend fun needToShowReviewSnackbar(context: Context): Boolean {
+        with(context.dataStore) {
+            val snackbarWasShown = getValue(RATING_SHOWN_PREF_KEY, false)
+            val startNum = getValue(APP_START_COUNT_PREF_KEY, 0)
             return !snackbarWasShown && startNum != 0 && startNum % 5 == 0
         }
     }
@@ -102,9 +118,7 @@ object StateHelper {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
             )
-            with(SharedPreferenceManager.getInstance(context)) {
-                edit(true) { putBoolean(RATING_SHOWN, true) }
-            }
+            context.dataStore.setValue(RATING_SHOWN_PREF_KEY, true)
         }
     }
 }

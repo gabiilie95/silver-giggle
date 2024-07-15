@@ -9,7 +9,7 @@ abstract class PermissionDialogViewModel(
     onDismissRequestedCallback: () -> Unit,
     application: Application
 ) : DialogViewModel(onDismissRequestedCallback, application) {
-    val uiModel = MutableStateFlow(PermissionDialogUiModel())
+    val state = MutableStateFlow(PermissionDialogUiModel())
 
     abstract fun requestPermission()
 }

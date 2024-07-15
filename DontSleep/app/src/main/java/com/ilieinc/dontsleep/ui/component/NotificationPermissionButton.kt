@@ -38,6 +38,7 @@ fun RequestNotificationButton(viewModel: NotificationButtonDialogViewModel) {
                 }
             }
         }
+        val showDialog by showDialog.collectAsState()
         if (showDialog) {
             NotificationInfoDialog(viewModel)
         }

@@ -12,34 +12,33 @@ import androidx.compose.ui.res.stringResource
 import com.ilieinc.core.ui.model.PermissionDialogUiModel
 import com.ilieinc.dontsleep.viewmodel.*
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
-import com.ilieinc.core.viewmodel.PermissionDialogViewModel
 import com.ilieinc.dontsleep.R
-import com.ilieinc.dontsleep.ui.model.HelpDialogUiModel
+import com.ilieinc.dontsleep.ui.model.CardUiEvent
+import com.ilieinc.dontsleep.ui.model.HelpDialogUiState
 
 @Composable
 fun CardHelpDialog(
-    viewModel: CardViewModel,
-    onDismissHelpDialog: () -> Unit
+    viewModel: CardViewModel
 ) {
     val activity = LocalContext.current as Activity
     val dialogViewModel = when (viewModel) {
         is WakeLockCardViewModel -> WakeLockHelpDialogViewModel(
-            onDismissHelpDialog,
+            {viewModel.onEvent(CardUiEvent.ChangeHelpDialogVisibility(false))},
             activity.application
         )
 
         is MediaTimeoutCardViewModel -> MediaTimeoutCardHelpDialogViewModel(
-            onDismissHelpDialog,
+            {viewModel.onEvent(CardUiEvent.ChangeHelpDialogVisibility(false))},
             activity.application
         )
 
         else -> null
     }
     dialogViewModel?.let {
-        val uiModel by it.uiModel.collectAsState()
+        val state by it.state.collectAsState()
         HelpDialog(
-            uiModel,
-            onDismissRequested = onDismissHelpDialog,
+            state,
+            onDismissRequested = it::onDismissRequested,
             onRevokePermissionClick = it::revokePermission
         )
     }
@@ -47,33 +46,34 @@ fun CardHelpDialog(
 
 @Composable
 fun CardPermissionDialog(
-    viewModel: CardViewModel,
-    onDismissRequested: () -> Unit
+    viewModel: CardViewModel
 ) {
     val activity = LocalContext.current as Activity
     val dialogViewModel = when (viewModel) {
         is WakeLockCardViewModel -> {
             WakeLockPermissionDialogViewModel(
-                onDismissRequested,
-                activity.application
+                application = activity.application,
+                onDismissRequestedCallback = {
+                    viewModel.onEvent(CardUiEvent.ChangePermissionDialogVisibility(false))
+                }
             )
         }
 
         else -> null
     }
     dialogViewModel?.let {
-        val uiModel by it.uiModel.collectAsState()
+        val state by it.state.collectAsState()
         PermissionDialog(
-            uiModel,
+            state,
             onRequestPermission = it::requestPermission,
-            onDismissRequested = onDismissRequested
+            onDismissRequested = it::onDismissRequested
         )
     }
 }
 
 @Composable
 fun HelpDialog(
-    uiModel: HelpDialogUiModel,
+    uiModel: HelpDialogUiState,
     onDismissRequested: () -> Unit,
     onRevokePermissionClick: () -> Unit
 ) {

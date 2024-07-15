@@ -2,28 +2,44 @@ package com.ilieinc.dontsleep.viewmodel.base
 
 import android.app.Application
 import android.content.Context
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.ilieinc.core.util.SharedPreferenceManager
-import com.ilieinc.dontsleep.ui.model.CardUiModel
+import com.ilieinc.core.data.dataStore
+import com.ilieinc.core.data.getValue
+import com.ilieinc.core.data.setValue
+import com.ilieinc.core.util.StateHelper.startForegroundService
+import com.ilieinc.core.util.StateHelper.stopService
+import com.ilieinc.dontsleep.ui.model.CardUiEvent
+import com.ilieinc.dontsleep.ui.model.CardUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-abstract class CardViewModel(application: Application, serviceRunning: MutableStateFlow<Boolean>) : AndroidViewModel(application) {
+abstract class CardViewModel(
+    application: Application,
+    private val serviceClass: Class<*>,
+    serviceRunning: StateFlow<Boolean>
+) : AndroidViewModel(application) {
 
     abstract val tag: String
+    abstract val timeoutPreferenceKey: Preferences.Key<Long>
+    abstract val timeoutEnabledPreferenceKey: Preferences.Key<Boolean>
     abstract val showTimeoutSectionToggle: Boolean
-    abstract val timeoutEnabledTag: String
 
     protected val context: Context get() = getApplication<Application>().applicationContext
 
-    var uiModel = MutableStateFlow(CardUiModel())
+    protected val _state = MutableStateFlow(CardUiState())
+    val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
             serviceRunning.collect { serviceRunning ->
-                uiModel.update {
+                _state.update {
                     it.copy(
                         enabled = serviceRunning,
                         timeoutSectionToggleEnabled = !serviceRunning
@@ -33,20 +49,24 @@ abstract class CardViewModel(application: Application, serviceRunning: MutableSt
         }
     }
 
-    abstract fun refreshPermissionState()
+    open fun refreshPermissionState() {}
 
-    protected fun setSavedTime() {
-        val timeout =
-            SharedPreferenceManager.getInstance(getApplication()).getLong(tag, 900000) / 1000 / 60
-        updateTime(timeout)
+    open fun <T> onEvent(event: T) where T : CardUiEvent = viewModelScope.launch {
+        when (event) {
+            is CardUiEvent.StatusToggleChanged -> setEnabled(event.enabled)
+            is CardUiEvent.AutoOffToggleChanged -> timeoutChanged(event.enabled)
+            is CardUiEvent.ChangeHelpDialogVisibility -> onChangeHelpDialogVisibility(event.visible)
+            is CardUiEvent.ChangePermissionDialogVisibility -> onChangePermissionDialogVisibility(
+                event.visible
+            )
+
+            is CardUiEvent.TimeoutTimeChanged -> updateTime(event.hours, event.minutes)
+        }
     }
 
-    protected fun updateTitle(title: String) {
-        uiModel.update { it.copy(title = title) }
-    }
-
-    private fun updateTime(timeout: Long){
-        uiModel.update {
+    protected suspend fun setSavedTime() {
+        val timeout = context.dataStore.getValue(timeoutPreferenceKey, 900000) / 1000 / 60
+        _state.update {
             it.copy(
                 hours = (timeout / 60).toInt(),
                 minutes = (timeout % 60).toInt()
@@ -54,22 +74,38 @@ abstract class CardViewModel(application: Application, serviceRunning: MutableSt
         }
     }
 
-    protected fun setSavedTimeoutStatus() {
-        uiModel.update {
+    protected fun updateTitle(title: String) {
+        _state.update { it.copy(title = title) }
+    }
+
+    private suspend fun updateTime(hours: Int, minutes: Int) {
+        _state.update {
             it.copy(
-                timeoutEnabled = SharedPreferenceManager.getInstance(getApplication())
-                    .getBoolean(timeoutEnabledTag, true)
+                hours = hours,
+                minutes = minutes
+            )
+        }
+        context.dataStore.setValue(
+            timeoutPreferenceKey,
+            ((hours * 60 + minutes) * 60 * 1000).toLong()
+        )
+    }
+
+    protected suspend fun setSavedTimeoutStatus() {
+        _state.update {
+            it.copy(
+                timeoutEnabled = context.dataStore.getValue(timeoutEnabledPreferenceKey, true)
             )
         }
     }
 
-    fun setEnabled(enabled: Boolean) {
+    private fun setEnabled(enabled: Boolean) {
         if (enabled) {
             startService()
         } else {
             stopService()
         }
-        uiModel.update {
+        _state.update {
             it.copy(
                 enabled = enabled,
                 timeoutSectionToggleEnabled = !enabled
@@ -77,40 +113,29 @@ abstract class CardViewModel(application: Application, serviceRunning: MutableSt
         }
     }
 
-    fun updateTime(hours: Int, minutes: Int) =
-        with(SharedPreferenceManager.getInstance(getApplication()).edit()) {
-            putLong(tag, ((hours * 60 + minutes) * 60 * 1000).toLong())
-            apply()
-        }
-
-    abstract fun startService()
-
-    abstract fun stopService()
-
-    fun onShowHelpDialog() {
-        uiModel.update { it.copy(showHelpDialog = true) }
+    open fun startService() {
+        context.startForegroundService(serviceClass)
     }
 
-    fun onShowPermissionDialog() {
-        uiModel.update { it.copy(showPermissionDialog = true) }
+    open fun stopService() {
+        context.stopService(serviceClass)
     }
 
-    fun onDismissHelpDialog() {
-        uiModel.update { it.copy(showHelpDialog = false) }
+    private fun onChangeHelpDialogVisibility(visible: Boolean) {
+        _state.update { it.copy(showHelpDialog = visible) }
     }
 
-    fun onDismissPermissionDialog() {
-        uiModel.update { it.copy(showPermissionDialog = false) }
+    private fun onChangePermissionDialogVisibility(visible: Boolean) {
+        _state.update { it.copy(showPermissionDialog = visible) }
     }
 
-    fun timeoutChanged(enabled: Boolean) {
-        with(SharedPreferenceManager.getInstance(getApplication()).edit()) {
-            putBoolean(timeoutEnabledTag, enabled)
-            apply()
+    private suspend fun timeoutChanged(enabled: Boolean) {
+        withContext(Dispatchers.IO) {
+            context.dataStore.setValue(timeoutEnabledPreferenceKey, enabled)
         }
         if (!enabled) {
             stopService()
         }
-        uiModel.update { it.copy(timeoutEnabled = enabled) }
+        _state.update { it.copy(timeoutEnabled = enabled) }
     }
 }
