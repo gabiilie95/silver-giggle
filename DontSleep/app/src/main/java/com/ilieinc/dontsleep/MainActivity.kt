@@ -32,8 +32,6 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.statusBarColor = SurfaceColors.SURFACE_0.getColor(this)

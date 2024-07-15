@@ -2,11 +2,9 @@ package com.ilieinc.dontsleep.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope
-import com.ilieinc.dontsleep.service.MediaTimeoutService
-import com.ilieinc.core.util.StateHelper.startForegroundService
-import com.ilieinc.core.util.StateHelper.stopService
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.data.DontSleepDataStore
+import com.ilieinc.dontsleep.service.MediaTimeoutService
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
