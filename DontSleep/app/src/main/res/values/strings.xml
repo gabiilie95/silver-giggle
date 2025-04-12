@@ -37,4 +37,10 @@
     <string name="allow_notifications">Allow Notifications</string>
     <string name="enable_auto_off">Enable Auto-Off</string>
     <string name="special_use_explanation">This service is required for the application to work properly.</string>
+    <string name="no_saved_times">No Saved Times</string>
+    <string name="delete">Delete</string>
+    <string name="select_time">Select Time</string>
+    <string name="switch_to_clock">Switch to Clock</string>
+    <string name="switch_to_timeout">Switch to Timer</string>
+    <string name="cancel">Cancel</string>
 </resources>

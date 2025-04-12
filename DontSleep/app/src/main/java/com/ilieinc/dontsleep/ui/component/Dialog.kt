@@ -23,12 +23,12 @@ fun CardHelpDialog(
     val activity = LocalContext.current as Activity
     val dialogViewModel = when (viewModel) {
         is WakeLockCardViewModel -> WakeLockHelpDialogViewModel(
-            {viewModel.onEvent(CardUiEvent.ChangeHelpDialogVisibility(false))},
+            {viewModel.onEvent(CardUiEvent.OnChangeHelpDialogVisibility(false))},
             activity.application
         )
 
         is MediaTimeoutCardViewModel -> MediaTimeoutCardHelpDialogViewModel(
-            {viewModel.onEvent(CardUiEvent.ChangeHelpDialogVisibility(false))},
+            {viewModel.onEvent(CardUiEvent.OnChangeHelpDialogVisibility(false))},
             activity.application
         )
 
@@ -54,7 +54,7 @@ fun CardPermissionDialog(
             WakeLockPermissionDialogViewModel(
                 application = activity.application,
                 onDismissRequestedCallback = {
-                    viewModel.onEvent(CardUiEvent.ChangePermissionDialogVisibility(false))
+                    viewModel.onEvent(CardUiEvent.OnChangePermissionDialogVisibility(false))
                 }
             )
         }

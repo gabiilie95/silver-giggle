@@ -1,23 +1,33 @@
 package com.ilieinc.dontsleep.ui.component
 
-import android.view.LayoutInflater
-import android.widget.TimePicker
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import com.ilieinc.core.ui.components.ThemedCard
-import com.ilieinc.dontsleep.R
 import com.ilieinc.core.ui.theme.AppTypography
+import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.ui.model.CardUiEvent
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnAutoOffToggleChange
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnChangeHelpDialogVisibility
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnChangePermissionDialogVisibility
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnStatusToggleChange
 import com.ilieinc.dontsleep.ui.model.CardUiState
+import com.ilieinc.dontsleep.util.previewprovider.ClockPreviewProvider
+import com.ilieinc.dontsleep.util.previewprovider.SavedTimePreviewProvider
+import com.ilieinc.dontsleep.util.previewprovider.TimeoutPreviewProvider
 
 @Composable
 fun ActionCard(
@@ -40,7 +50,7 @@ fun ActionCard(
                         style = AppTypography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
-                    Button(onClick = { onEvent(CardUiEvent.ChangeHelpDialogVisibility(true)) }) {
+                    Button(onClick = { onEvent(OnChangeHelpDialogVisibility(true)) }) {
                         Text(text = stringResource(R.string.help))
                     }
                 }
@@ -54,7 +64,7 @@ fun ActionCard(
                 if (permissionRequired) {
                     Button(
                         modifier = Modifier.align(Alignment.End),
-                        onClick = { onEvent(CardUiEvent.ChangePermissionDialogVisibility(true)) }
+                        onClick = { onEvent(OnChangePermissionDialogVisibility(true)) }
                     ) {
                         Text(text = stringResource(R.string.get_started))
                     }
@@ -70,7 +80,7 @@ fun ActionCard(
                         )
                         Switch(
                             checked = enabled,
-                            onCheckedChange = { onEvent(CardUiEvent.StatusToggleChanged(it)) }
+                            onCheckedChange = { onEvent(OnStatusToggleChange(it)) }
                         )
                     }
                     if (showTimeoutSectionToggle) {
@@ -85,18 +95,16 @@ fun ActionCard(
                             )
                             Switch(
                                 checked = timeoutEnabled,
-                                enabled = timeoutSectionToggleEnabled,
-                                onCheckedChange = { onEvent(CardUiEvent.AutoOffToggleChanged(it)) }
+                                enabled = editControlsEnabled,
+                                onCheckedChange = { onEvent(OnAutoOffToggleChange(it)) }
                             )
                         }
                     }
                     if (timeoutEnabled) {
-                        TimeoutSection(
+                        TimeSection(
                             modifier = Modifier.fillMaxWidth(),
                             state = state,
-                            onUpdateTime = { hour, minute ->
-                                onEvent(CardUiEvent.TimeoutTimeChanged(hour, minute))
-                            }
+                            onEvent = onEvent
                         )
                     }
                 }
@@ -106,66 +114,57 @@ fun ActionCard(
 }
 
 @Composable
-fun TimeoutSection(
+fun TimeSection(
     state: CardUiState,
-    onUpdateTime: (hour: Int, minute: Int) -> Unit,
+    onEvent: (CardUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     with(state) {
-        Row(
-            modifier = modifier,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = stringResource(R.string.timeout),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(text = stringResource(R.string.hours_minutes))
-            }
-            if (hours != null && minutes != null) {
-                AndroidView(
-                    factory = { context ->
-                        val layout = LayoutInflater.from(context)
-                            .inflate(R.layout.layout_time_picker, null)
-                        val timePicker =
-                            layout.findViewById<TimePicker>(R.id.time_picker).apply {
-                                isEnabled = !enabled
-                                setIs24HourView(true)
-                                this.hour = hours
-                                this.minute = minutes
-                                this.setOnTimeChangedListener { _, hours, minutes ->
-                                    onUpdateTime(hours, minutes)
-                                }
-                            }
-                        return@AndroidView timePicker
-                    },
-                    update = { timePicker ->
-                        timePicker.isEnabled = !enabled
-                    }
-                )
-            }
+        when (state.timeoutMode) {
+            CardUiState.TimeoutMode.TIMEOUT -> TimeoutSection(
+                modifier = modifier,
+                state = state,
+                onEvent = onEvent
+            )
+
+            CardUiState.TimeoutMode.CLOCK -> ClockSection(
+                modifier = modifier,
+                state = state,
+                onEvent = onEvent
+            )
         }
     }
 }
 
 @Preview
 @Composable
-fun ActionCardPreview() {
+fun ActionCardPreview(
+    @PreviewParameter(ClockPreviewProvider::class) state: CardUiState
+) {
     ActionCard(
-        state = CardUiState(
-            title = "Action Card",
-            hours = 1,
-            minutes = 30,
-            timeoutEnabled = true,
-            enabled = false,
-            showTimeoutSectionToggle = true,
-            timeoutSectionToggleEnabled = true,
-            showPermissionDialog = false,
-            showHelpDialog = false,
-            permissionRequired = false
-        ),
+        state = state,
+        onEvent = {}
+    )
+}
+
+@Preview
+@Composable
+fun ActionCardClockPreview(
+    @PreviewParameter(SavedTimePreviewProvider::class) state: CardUiState
+) {
+    ActionCard(
+        state = state,
+        onEvent = {}
+    )
+}
+
+@Preview
+@Composable
+fun ActionCardClockTimePickerPreview(
+    @PreviewParameter(TimeoutPreviewProvider::class) state: CardUiState
+) {
+    ActionCard(
+        state = state,
         onEvent = {}
     )
 }

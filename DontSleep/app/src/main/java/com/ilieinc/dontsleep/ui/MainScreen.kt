@@ -1,7 +1,7 @@
 package com.ilieinc.dontsleep.ui
 
-import android.app.Activity
 import android.os.Build
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,25 +14,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ilieinc.core.ui.components.ApplicationTopAppBar
 import com.ilieinc.core.ui.theme.AppTheme
 import com.ilieinc.core.util.StateHelper.needToShowReviewSnackbar
 import com.ilieinc.core.util.StateHelper.showReviewSnackbar
 import com.ilieinc.dontsleep.MainActivity
 import com.ilieinc.dontsleep.ui.component.ActionCard
-import com.ilieinc.core.ui.components.ApplicationTopAppBar
 import com.ilieinc.dontsleep.ui.component.CardHelpDialog
 import com.ilieinc.dontsleep.ui.component.CardPermissionDialog
-import com.ilieinc.dontsleep.ui.component.OnLifecycleEvent
 import com.ilieinc.dontsleep.ui.component.RequestNotificationButton
-import com.ilieinc.dontsleep.ui.model.CardUiEvent
 import com.ilieinc.dontsleep.viewmodel.MediaTimeoutCardViewModel
 import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
 import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
@@ -43,7 +39,7 @@ fun MainScreen(
     hasNotificationPermission: Boolean,
     notificationPermissionResult: ManagedActivityResultLauncher<String, Boolean>
 ) {
-    val activity = (LocalContext.current as? Activity)
+    val activity = LocalActivity.current
     val snackBarHostState = remember { SnackbarHostState() }
     val scrollState = rememberScrollState()
     Scaffold(
@@ -54,7 +50,7 @@ fun MainScreen(
             Button(
                 modifier = Modifier
                     .padding(5.dp)
-                    .systemBarsPadding()
+                    .navigationBarsPadding()
                     .fillMaxWidth(),
                 onClick = { activity?.finish() }) {
                 Text("Close")

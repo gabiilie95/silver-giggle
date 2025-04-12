@@ -1,14 +1,33 @@
 package com.ilieinc.dontsleep.ui.model
 
+import com.ilieinc.dontsleep.ui.model.common.ClockState
+import com.ilieinc.dontsleep.ui.model.common.TimeoutState
+
 data class CardUiState(
     val title: String = "",
-    val hours: Int? = null,
-    val minutes: Int? = null,
+    val timeoutState: TimeoutState = TimeoutState(),
+    val clockState: ClockState = ClockState(),
+    val timeoutMode: TimeoutMode = TimeoutMode.TIMEOUT,
     val timeoutEnabled: Boolean = true,
+    @Transient
     val enabled: Boolean = false,
+    @Transient
     val showTimeoutSectionToggle: Boolean = true,
-    val timeoutSectionToggleEnabled: Boolean = true,
+    @Transient
     val showPermissionDialog: Boolean = false,
+    @Transient
     val showHelpDialog: Boolean = false,
-    val permissionRequired: Boolean = false
-)
+    @Transient
+    val permissionRequired: Boolean = false,
+) {
+    val editControlsEnabled get() = !enabled
+    val selectedTime get() = when(timeoutMode) {
+        TimeoutMode.TIMEOUT -> timeoutState.selectedTime
+        TimeoutMode.CLOCK -> clockState.selectedTime
+    }
+
+    enum class TimeoutMode {
+        TIMEOUT,
+        CLOCK
+    }
+}

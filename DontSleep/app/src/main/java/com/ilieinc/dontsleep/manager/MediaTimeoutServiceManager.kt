@@ -5,8 +5,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.text.format.DateFormat
 import com.ilieinc.dontsleep.R
-import com.ilieinc.dontsleep.data.DontSleepDataStore.MEDIA_TIMEOUT_ENABLED_PREF_KEY
-import com.ilieinc.dontsleep.data.DontSleepDataStore.MEDIA_TIMEOUT_PREF_KEY
+import com.ilieinc.dontsleep.data.DontSleepDataStore.MEDIA_STATE_PREF_KEY
 import com.ilieinc.dontsleep.service.MediaTimeoutService
 import com.ilieinc.dontsleep.util.DontSleepNotificationManager
 
@@ -17,8 +16,7 @@ class MediaTimeoutServiceManager(
 ) : BaseServiceManager(
     serviceClass = serviceClass,
     serviceTaskTag = serviceTag,
-    serviceTimeoutPreferenceKey = MEDIA_TIMEOUT_PREF_KEY,
-    serviceEnabledPreferenceKey = MEDIA_TIMEOUT_ENABLED_PREF_KEY,
+    serviceStatePreferenceKey = MEDIA_STATE_PREF_KEY,
     serviceId = serviceId
 ) {
     override val foregroundServiceTypeFlag by lazy {

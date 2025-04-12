@@ -21,15 +21,13 @@ class WakeLockCardViewModel(application: Application) : CardViewModel(
 ) {
     override val tag: String = WakeLockService.TIMEOUT_TAG
     override val showTimeoutSectionToggle = true
-    override val timeoutPreferenceKey = DontSleepDataStore.WAKE_LOCK_TIMEOUT_PREF_KEY
-    override val timeoutEnabledPreferenceKey = DontSleepDataStore.WAKE_LOCK_TIMEOUT_ENABLED_PREF_KEY
+    override val statePreferenceKey = DontSleepDataStore.WAKE_LOCK_STATE_PREF_KEY
 
     init {
         updateTitle(context.getString(R.string.don_t_sleep))
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                setSavedTime()
-                setSavedTimeoutStatus()
+                setSavedState()
             }
             refreshPermissionState()
         }
@@ -41,13 +39,5 @@ class WakeLockCardViewModel(application: Application) : CardViewModel(
                 permissionRequired = PermissionHelper.shouldRequestDrawOverPermission(context)
             )
         }
-    }
-
-    override fun startService() {
-        context.startForegroundService<WakeLockService>()
-    }
-
-    override fun stopService() {
-        context.stopService<WakeLockService>()
     }
 }

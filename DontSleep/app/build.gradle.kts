@@ -1,71 +1,83 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
 android {
-    compileSdk = 35
+    namespace = "com.ilieinc.dontsleep"
+    compileSdk = 36
+
     defaultConfig {
         applicationId = "com.ilieinc.dontsleep"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 31
         versionName = "2.$versionCode"
         multiDexEnabled = true
     }
-    buildFeatures {
-        compose = true
-    }
-    compileOptions {
-        // Sets Java compatibility to Java 11
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlin {
-        jvmToolchain(11)
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompilerVersion.get()
-    }
+
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = false
         }
-        getByName("debug") {
+        debug {
             applicationIdSuffix = ".test"
         }
     }
-    namespace = "com.ilieinc.dontsleep"
+
+    buildFeatures {
+        compose = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    kotlin {
+        jvmToolchain(21)
+    }
 }
 
 dependencies {
-    implementation(libs.work.runtime.ktx)
     implementation(project(":core"))
-    implementation(libs.kotlin.stdlib.jdk7)
-    implementation(platform(libs.compose.bom))
+
+    // Compose (via BOM)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
+
+    // AndroidX Core
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.cardview)
     implementation(libs.androidx.datastore.preferences)
-    implementation(libs.appcompat)
-    implementation(libs.activity)
-    implementation(libs.activity.compose)
-    implementation(libs.constraintlayout)
-    implementation(libs.lifecycle.extensions)
-    implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.navigation.compose)
-    implementation(libs.work.runtime.ktx)
-    implementation(libs.cardview)
-    implementation(libs.material)
+    implementation(libs.androidx.lifecycle.extensions)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Google Material
+    implementation(libs.google.material)
+
+    // Kotlin + Coroutines
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.tooling)
-    implementation(libs.compiler)
-    implementation(libs.compose.foundation)
-    implementation(libs.compose.material)
-    implementation(libs.compose.material3)
-    implementation(libs.compose.material.icons.core)
-    implementation(libs.compose.material.icons.extended)
-    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.kotlin.stdlib.jdk7)
+
+    // Misc
+    implementation(libs.gson)
     implementation(libs.jsoup)
-    //Test
+
+    // Testing
     testImplementation(libs.junit)
-    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.androidx.espresso.core)
 }

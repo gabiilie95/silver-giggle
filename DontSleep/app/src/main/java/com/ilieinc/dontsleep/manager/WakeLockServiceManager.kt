@@ -5,8 +5,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.text.format.DateFormat
 import com.ilieinc.dontsleep.R
-import com.ilieinc.dontsleep.data.DontSleepDataStore.WAKE_LOCK_TIMEOUT_ENABLED_PREF_KEY
-import com.ilieinc.dontsleep.data.DontSleepDataStore.WAKE_LOCK_TIMEOUT_PREF_KEY
+import com.ilieinc.dontsleep.data.DontSleepDataStore.WAKE_LOCK_STATE_PREF_KEY
 import com.ilieinc.dontsleep.service.WakeLockService
 import com.ilieinc.dontsleep.util.DontSleepNotificationManager
 
@@ -17,8 +16,7 @@ class WakeLockServiceManager(
 ) : BaseServiceManager(
     serviceClass = serviceClass,
     serviceTaskTag = serviceTag,
-    serviceTimeoutPreferenceKey = WAKE_LOCK_TIMEOUT_PREF_KEY,
-    serviceEnabledPreferenceKey = WAKE_LOCK_TIMEOUT_ENABLED_PREF_KEY,
+    serviceStatePreferenceKey = WAKE_LOCK_STATE_PREF_KEY,
     serviceId = serviceId
 ) {
     override val foregroundServiceTypeFlag by lazy {
@@ -40,7 +38,7 @@ class WakeLockServiceManager(
             context,
             R.drawable.baseline_mobile_friendly_24,
             context.getString(R.string.app_name),
-            if (timeoutEnabled) {
+            if (state.timeoutEnabled) {
                 context.getString(
                     R.string.timeout_notification_text,
                     DateFormat.getTimeFormat(context).format(timeoutDateTime.time)

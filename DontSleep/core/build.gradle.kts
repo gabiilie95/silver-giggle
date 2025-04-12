@@ -1,15 +1,16 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
+
 android {
     namespace = "com.ilieinc.core"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -23,40 +24,44 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+
+    buildFeatures {
+        compose = true
     }
-    kotlin{
-        jvmToolchain(11)
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    kotlin {
+        jvmToolchain(21)
     }
 }
 
 dependencies {
-    implementation(platform(libs.compose.bom))
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.tooling)
-    implementation(libs.activity.compose)
-    implementation(libs.compiler)
-    implementation(libs.compose.foundation)
-    implementation(libs.compose.material)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.material.icons.core)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.lifecycle.viewmodel.compose)
-    // Test
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.espresso.core)
-}
+    // Compose BOM
+    implementation(platform(libs.androidx.compose.bom))
 
-android {
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompilerVersion.get()
-    }
+    // Compose
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
+
+    // AndroidX
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Google Material
+    implementation(libs.google.material)
+
+    // Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }

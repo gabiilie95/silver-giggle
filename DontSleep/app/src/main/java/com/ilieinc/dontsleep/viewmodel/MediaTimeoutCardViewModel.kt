@@ -18,16 +18,14 @@ class MediaTimeoutCardViewModel(application: Application) : CardViewModel(
 ) {
     override val tag: String = MediaTimeoutService.MEDIA_TIMEOUT_TAG
     override val showTimeoutSectionToggle = false
-    override val timeoutPreferenceKey = DontSleepDataStore.MEDIA_TIMEOUT_PREF_KEY
-    override val timeoutEnabledPreferenceKey = DontSleepDataStore.MEDIA_TIMEOUT_ENABLED_PREF_KEY
+    override val statePreferenceKey = DontSleepDataStore.MEDIA_STATE_PREF_KEY
 
     init {
         updateTitle(context.getString(R.string.media_timeout_title))
         setAutoOffToggleDisabled()
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                setSavedTime()
-                setSavedTimeoutStatus()
+                setSavedState()
             }
         }
     }
