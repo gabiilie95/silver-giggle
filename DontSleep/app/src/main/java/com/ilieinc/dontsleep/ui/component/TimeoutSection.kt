@@ -62,7 +62,11 @@ fun TimeoutSection(
                     return@AndroidView timePicker
                 },
                 update = { timePicker ->
-                    timePicker.isEnabled = !state.enabled
+                    with(timePicker) {
+                        isEnabled = !state.enabled
+                        hour = selectedTime.hour
+                        minute = selectedTime.minute
+                    }
                 }
             )
         }

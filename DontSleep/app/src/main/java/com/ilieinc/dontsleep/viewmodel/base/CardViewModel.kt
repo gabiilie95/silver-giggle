@@ -13,20 +13,11 @@ import com.ilieinc.core.util.Logger
 import com.ilieinc.core.util.StateHelper.startForegroundService
 import com.ilieinc.core.util.StateHelper.stopService
 import com.ilieinc.dontsleep.ui.model.CardUiEvent
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnAddButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnAutoOffToggleChange
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnCancelButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnChangeHelpDialogVisibility
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnChangePermissionDialogVisibility
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnDeleteButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnExpandedDropdownChanged
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnSaveButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnSavedTimeSelectionChange
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnStatusToggleChange
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnTimeoutModeButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnTimeoutTimeChange
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.*
 import com.ilieinc.dontsleep.ui.model.CardUiState
-import com.ilieinc.dontsleep.ui.model.common.SelectedTime
+import com.ilieinc.dontsleep.ui.model.common.ClockState.EditMode
+import com.ilieinc.dontsleep.ui.model.common.ClockState.TimepickerMode
+import com.ilieinc.dontsleep.ui.model.common.SavedTime
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,15 +45,47 @@ abstract class CardViewModel(
 
     private val ioScope = Dispatchers.IO + exceptionHandler
 
-    protected val _state = MutableStateFlow(CardUiState())
+    protected val _state = MutableStateFlow(
+        CardUiState(
+            isLoading = true
+        )
+    )
     val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch(ioScope) {
+            context.dataStore.getValue(statePreferenceKey, "").let { stateJson ->
+                if (stateJson.isNotEmpty()) {
+                    runCatching {
+                        _state.update { it.copy(isLoading = true) }
+                        val timeoutState = Gson().fromJson(stateJson, CardUiState::class.java).let {
+                            it.copy(
+                                clockState = it.clockState.copy(
+                                    savedTimes = it.clockState.savedTimes.toSortedSet(SavedTime.Comparator)
+                                )
+                            )
+                        }
+                        withContext(Dispatchers.Main) {
+                            _state.update { timeoutState }
+                        }
+                    }.onFailure {
+                        Logger.error("Failed to parse saved state", it)
+                        _state.update {
+                            CardUiState(isLoading = false)
+                        }
+                    }.onSuccess {
+                        _state.update { it.copy(isLoading = false) }
+                    }
+                }
+            }
             serviceRunning.collect { serviceRunning ->
                 _state.update {
                     it.copy(enabled = serviceRunning)
                 }
+            }
+        }.invokeOnCompletion { exception ->
+            if (exception != null) {
+                Logger.error("Failed to initialize CardViewModel", exception)
             }
         }
     }
@@ -79,28 +102,12 @@ abstract class CardViewModel(
             is OnTimeoutModeButtonClick -> onTimeoutModeButtonClick(event.state)
             OnAddButtonClick -> onAddButtonClick()
             OnCancelButtonClick -> onCancelButtonClick()
-            is OnSaveButtonClick -> onSaveButtonClick(event.hour, event.minute, event.isAfternoon)
+            is OnConfirmEditClick -> onConfirmEditClick(event.hour, event.minute, event.editMode)
+            is OnEditSavedTimeClick -> onEditSavedTimeClick()
             OnDeleteButtonClick -> onDeleteButtonClick()
             is OnExpandedDropdownChanged -> onExpandedDropdownChanged(event.expanded)
             is OnSavedTimeSelectionChange -> onSelectionChange(event.savedTime)
-        }
-    }
-
-    protected suspend fun setSavedState() {
-        context.dataStore.getValue(statePreferenceKey, "").let { stateJson ->
-            if (stateJson.isNotEmpty()) {
-                runCatching {
-                    val timeoutState = Gson().fromJson(stateJson, CardUiState::class.java)
-                    withContext(Dispatchers.Main) {
-                        _state.update { timeoutState }
-                    }
-                }.onFailure {
-                    Logger.error("Failed to parse saved state", it)
-                    _state.update {
-                        CardUiState()
-                    }
-                }
-            }
+            is OnSwitchTimePickerModeButtonClick -> onSwitchTimePickerModeButtonClick(event.timepickerMode)
         }
     }
 
@@ -112,7 +119,7 @@ abstract class CardViewModel(
         _state.update {
             it.copy(
                 timeoutState = it.timeoutState.copy(
-                    selectedTime = SelectedTime(hours, minutes)
+                    selectedTime = SavedTime(hours, minutes)
                 )
             ).also(::updateState)
         }
@@ -136,7 +143,10 @@ abstract class CardViewModel(
                     CardUiState.TimeoutMode.CLOCK
                 } else {
                     CardUiState.TimeoutMode.TIMEOUT
-                }
+                },
+                clockState = state.clockState.copy(
+                    editMode = null
+                ),
             ).also(::updateState)
         }
     }
@@ -145,7 +155,7 @@ abstract class CardViewModel(
         _state.update {
             it.copy(
                 clockState = it.clockState.copy(
-                    isAddingNewTime = true
+                    editMode = EditMode.ADD
                 )
             )
         }
@@ -155,40 +165,49 @@ abstract class CardViewModel(
         _state.update {
             it.copy(
                 clockState = it.clockState.copy(
-                    isAddingNewTime = false
+                    editMode = null
                 )
             )
         }
     }
 
-    private fun onSaveButtonClick(hour: Int, minute: Int, isAfternoon: Boolean) {
-        val newSavedTime = SelectedTime(hour, minute)
+    private fun onEditSavedTimeClick() {
         _state.update {
             it.copy(
-                clockState = with(it.clockState) {
-                    copy(
-                        selectedTime = newSavedTime,
-                        isAddingNewTime = false,
-                        savedTimes = savedTimes.toMutableList().apply {
-                            if (!contains(newSavedTime)) {
-                                add(newSavedTime)
-                            }
+                clockState = it.clockState.copy(
+                    editMode = EditMode.EDIT
+                )
+            )
+        }
+    }
+
+    private fun onConfirmEditClick(hours: Int, minutes: Int, editMode: EditMode) {
+        val newTime = SavedTime(hours, minutes)
+        _state.update {
+            it.copy(
+                clockState = it.clockState.copy(
+                    editMode = null,
+                    selectedTime = newTime,
+                    savedTimes = it.clockState.savedTimes.toMutableSet().apply {
+                        if (editMode == EditMode.EDIT) {
+                            remove(it.clockState.selectedTime)
                         }
-                    )
-                }
+                        add(newTime)
+                    }.toSortedSet(SavedTime.Comparator)
+                )
             ).also(::updateState)
         }
     }
 
     private fun onDeleteButtonClick() {
         _state.update {
-            val updatedItems = it.clockState.savedTimes.toMutableList().apply {
+            val updatedItems = it.clockState.savedTimes.toMutableSet().apply {
                 remove(state.value.clockState.selectedTime)
-            }
+            }.toSortedSet(SavedTime.Comparator)
             it.copy(
                 clockState = it.clockState.copy(
                     selectedTime = updatedItems.firstOrNull(),
-                    isAddingNewTime = false,
+                    editMode = null,
                     savedTimes = updatedItems
                 )
             ).also(::updateState)
@@ -206,12 +225,25 @@ abstract class CardViewModel(
         }
     }
 
-    private fun onSelectionChange(savedTime: SelectedTime) {
+    private fun onSelectionChange(savedTime: SavedTime) {
         _state.update {
             it.copy(
                 clockState = it.clockState.copy(
                     selectedTime = savedTime,
                     isDropdownExpanded = false
+                )
+            ).also(::updateState)
+        }
+    }
+
+    private fun onSwitchTimePickerModeButtonClick(timepickerMode: TimepickerMode) {
+        _state.update {
+            it.copy(
+                clockState = it.clockState.copy(
+                    timepickerMode = when (timepickerMode) {
+                        TimepickerMode.DIGITAL_INPUT -> TimepickerMode.CLOCK_PICKER
+                        TimepickerMode.CLOCK_PICKER -> TimepickerMode.DIGITAL_INPUT
+                    }
                 )
             ).also(::updateState)
         }

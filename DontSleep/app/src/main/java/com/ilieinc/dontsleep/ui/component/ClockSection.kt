@@ -1,7 +1,7 @@
 package com.ilieinc.dontsleep.ui.component
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -10,15 +10,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.ArrowDropDown
-import androidx.compose.material.icons.rounded.AddCircleOutline
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -27,10 +26,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.MenuItemColors
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimeInput
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerState
+import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,17 +44,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.ui.model.CardUiEvent
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnAddButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnCancelButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnDeleteButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnExpandedDropdownChanged
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnSaveButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnSavedTimeSelectionChange
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.*
 import com.ilieinc.dontsleep.ui.model.CardUiState
 import com.ilieinc.dontsleep.ui.model.common.ClockState
+import com.ilieinc.dontsleep.ui.model.common.ClockState.EditMode
+import com.ilieinc.dontsleep.util.previewprovider.ClockSectionPreviewProvider
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,23 +63,72 @@ fun ClockSection(
     onEvent: (CardUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val calendar = remember { Calendar.getInstance() }
     Column(modifier = modifier) {
-        val timePickerState = rememberTimePickerState(
-            initialHour = calendar[Calendar.HOUR_OF_DAY],
-            initialMinute = calendar[Calendar.MINUTE],
-            is24Hour = false
-        )
-        SwitchModesButton(
-            state = state,
-            onEvent = onEvent
-        )
-        if (state.clockState.isAddingNewTime) {
-            TimeInput(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 16.dp),
-                state = timePickerState
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            SwitchModesButton(
+                state = state,
+                onEvent = onEvent
+            )
+            if (state.clockState.editMode != null) {
+                SwitchTimePickerMode(
+                    state = state.clockState,
+                    onEvent = onEvent
+                )
+            }
+        }
+        val editMode = state.clockState.editMode
+        if (editMode != null) {
+            val (initialHour, initialMinutes) = when (editMode) {
+                EditMode.ADD -> {
+                    with(Calendar.getInstance()) {
+                        val hour = get(Calendar.HOUR_OF_DAY)
+                        val minutes = get(Calendar.MINUTE)
+                        hour to minutes
+                    }
+                }
+
+                EditMode.EDIT -> {
+                    with(state.selectedTime) {
+                        val hour = this?.hour ?: 0
+                        val minutes = this?.minute ?: 0
+                        hour to minutes
+                    }
+                }
+            }
+            val timePickerState = rememberTimePickerState(
+                initialHour = initialHour,
+                initialMinute = initialMinutes
+            )
+            when (state.clockState.timepickerMode) {
+                ClockState.TimepickerMode.DIGITAL_INPUT -> {
+                    timePickerState.is24hour = false
+                    TimeInput(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(vertical = 16.dp),
+                        state = timePickerState
+                    )
+                }
+
+                ClockState.TimepickerMode.CLOCK_PICKER -> {
+                    timePickerState.is24hour = true
+                    TimePicker(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        state = timePickerState
+                    )
+                }
+            }
+            ManageSavedTimesButton(
+                modifier = Modifier.fillMaxWidth(),
+                editMode = editMode,
+                enabled = state.editControlsEnabled,
+                timePickerState = timePickerState,
+                onEvent = onEvent
             )
         } else {
             SavedTimesSection(
@@ -88,14 +140,27 @@ fun ClockSection(
                 onEvent = onEvent
             )
         }
-        if (state.clockState.isAddingNewTime) {
-            ManageSavedTimesButton(
-                modifier = Modifier.fillMaxWidth(),
-                enabled = state.editControlsEnabled,
-                timePickerState = timePickerState,
-                onEvent = onEvent
+    }
+}
+
+@Composable
+private fun SwitchTimePickerMode(
+    state: ClockState,
+    onEvent: (CardUiEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    OutlinedButton(
+        modifier = modifier,
+        onClick = { onEvent(OnSwitchTimePickerModeButtonClick(state.timepickerMode)) }
+    ) {
+        Text(
+            stringResource(
+                R.string.switch_timepicker_mode, when (state.timepickerMode) {
+                    ClockState.TimepickerMode.DIGITAL_INPUT -> stringResource(R.string.clock_input)
+                    ClockState.TimepickerMode.CLOCK_PICKER -> stringResource(R.string.digital_input)
+                }
             )
-        }
+        )
     }
 }
 
@@ -103,6 +168,7 @@ fun ClockSection(
 @Composable
 private fun ManageSavedTimesButton(
     timePickerState: TimePickerState,
+    editMode: EditMode,
     enabled: Boolean,
     onEvent: (CardUiEvent) -> Unit,
     modifier: Modifier = Modifier
@@ -113,23 +179,36 @@ private fun ManageSavedTimesButton(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(
+            onClick = { onEvent(OnCancelButtonClick) }
+        ) {
+            Text(text = stringResource(R.string.cancel))
+        }
+
+        Button(
             enabled = enabled,
             onClick = {
                 onEvent(
-                    OnSaveButtonClick(
+                    OnConfirmEditClick(
                         hour = timePickerState.hour,
                         minute = timePickerState.minute,
-                        isAfternoon = timePickerState.isAfternoon
+                        editMode = editMode
                     )
                 )
             }
         ) {
-            Text("Save")
-        }
-        Button(
-            onClick = { onEvent(OnCancelButtonClick) }
-        ) {
-            Text(text = stringResource(R.string.cancel))
+            Text(
+                stringResource(
+                    when (editMode) {
+                        EditMode.ADD -> {
+                            R.string.save
+                        }
+
+                        EditMode.EDIT -> {
+                            R.string.update
+                        }
+                    }
+                )
+            )
         }
     }
 }
@@ -140,6 +219,7 @@ private fun SavedTimesSection(
     enabled: Boolean,
     onEvent: (CardUiEvent) -> Unit,
     modifier: Modifier = Modifier
+
 ) {
     Row(
         modifier = modifier then Modifier.animateContentSize(),
@@ -161,19 +241,39 @@ private fun SavedTimesSection(
         SavedTimesDropdown(
             modifier = Modifier
                 .weight(1f)
+                .padding(horizontal = 8.dp)
                 .wrapContentSize(Alignment.TopStart),
             state = state,
             enabled = enabled,
             onEvent = onEvent
         )
+        if (state.selectedTime != null) {
+            IconButton(
+                enabled = enabled,
+                colors = IconButtonDefaults.iconButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary
+                ),
+                onClick = { onEvent(OnEditSavedTimeClick) }
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = null
+                )
+            }
+        }
         if (savedTimes.isNotEmpty()) {
             if (state.selectedTime != null) {
-                Button(
-                    modifier = Modifier.padding(start = 8.dp),
+                IconButton(
                     enabled = enabled,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary
+                    ),
                     onClick = { onEvent(OnDeleteButtonClick) }
                 ) {
-                    Text(text = stringResource(R.string.delete))
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = null
+                    )
                 }
             }
         }
@@ -230,11 +330,29 @@ private fun SavedTimesDropdown(
             onDismissRequest = { onEvent(OnExpandedDropdownChanged(false)) },
         ) {
             state.savedTimes.forEach { item ->
+                val itemBackground = if (item == state.selectedTime) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    Color.Unspecified
+                }
                 DropdownMenuItem(
+                    modifier = Modifier.widthIn(min = 180.dp).background(itemBackground),
                     text = { Text(item.formattedTime) },
-                    onClick = { onEvent(OnSavedTimeSelectionChange(item)) }
+                    onClick = { onEvent(OnSavedTimeSelectionChange(item)) },
+                    colors = MenuDefaults.itemColors(
+                        textColor = MaterialTheme.colorScheme.contentColorFor(itemBackground)
+                    )
                 )
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun ClockSectionPreview(@PreviewParameter(ClockSectionPreviewProvider::class) state: CardUiState) {
+    ClockSection(
+        state = state,
+        onEvent = {}
+    )
 }

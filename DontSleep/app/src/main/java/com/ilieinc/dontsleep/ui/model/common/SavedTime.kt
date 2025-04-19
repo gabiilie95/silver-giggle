@@ -1,6 +1,6 @@
 package com.ilieinc.dontsleep.ui.model.common
 
-data class SelectedTime(
+data class SavedTime(
     val hour: Int,
     val minute: Int
 ) {
@@ -20,4 +20,16 @@ data class SelectedTime(
                 "AM"
             }
         )
+
+    object Comparator : kotlin.Comparator<SavedTime> {
+        override fun compare(o1: SavedTime?, o2: SavedTime?): Int {
+            if (o1 == null && o2 == null) return 0
+            if (o1 == null) return -1
+            if (o2 == null) return 1
+
+            val o1Minutes = o1.hour * 60 + o1.minute
+            val o2Minutes = o2.hour * 60 + o2.minute
+            return o1Minutes.compareTo(o2Minutes)
+        }
+    }
 }

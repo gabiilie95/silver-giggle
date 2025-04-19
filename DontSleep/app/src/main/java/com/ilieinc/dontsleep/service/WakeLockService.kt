@@ -18,6 +18,8 @@ import com.ilieinc.dontsleep.manager.WakeLockServiceManager
 import com.ilieinc.dontsleep.service.MediaTimeoutService.Companion.MEDIA_TIMEOUT_TAG
 import com.ilieinc.dontsleep.util.DontSleepNotificationManager
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.util.*
 
 class WakeLockService : BaseService(
@@ -35,7 +37,8 @@ class WakeLockService : BaseService(
         fun isRunning(context: Context) =
             StateHelper.isServiceRunning(context, WakeLockService::class.java)
 
-        val serviceRunning = MutableStateFlow(false)
+        private val _serviceRunning = MutableStateFlow(false)
+        val serviceRunning = _serviceRunning.asStateFlow()
     }
 
     override val binder: ServiceBinder = ServiceBinder(this)
@@ -44,7 +47,7 @@ class WakeLockService : BaseService(
 
     override fun onCreate() {
         super.onCreate()
-        serviceRunning.tryEmit(true)
+        _serviceRunning.update { true }
         if (StateHelper.deviceRequiresOverlay()) {
             showOverlay()
         } else {
@@ -58,13 +61,13 @@ class WakeLockService : BaseService(
         } else {
             wakeLock.release()
         }
-        serviceRunning.tryEmit(false)
+        _serviceRunning.update { false }
         super.onDestroy()
     }
 
     private fun showOverlay() {
         val windowManager =
-            getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            getSystemService(WINDOW_SERVICE) as WindowManager
         removeOverlay(windowManager)
         overlay = View(this)
         val params =

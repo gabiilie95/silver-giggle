@@ -27,7 +27,6 @@ fun SwitchModesButton(
                 enabled = state.editControlsEnabled,
                 onClick = { onEvent(OnTimeoutModeButtonClick(state)) }
             ) {
-//                Text(stringResource(R.string.switch_to_clock))
                 Icon(imageVector = Icons.Outlined.AccessTime, contentDescription = null)
             }
         }
@@ -39,7 +38,6 @@ fun SwitchModesButton(
                 enabled = state.editControlsEnabled,
                 onClick = { onEvent(OnTimeoutModeButtonClick(state)) }
             ) {
-//                Text(stringResource(R.string.switch_to_timeout))
                 Icon(imageVector = Icons.Outlined.Timer, contentDescription = null)
             }
         }

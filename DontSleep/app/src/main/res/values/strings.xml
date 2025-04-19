@@ -43,4 +43,9 @@
     <string name="switch_to_clock">Switch to Clock</string>
     <string name="switch_to_timeout">Switch to Timer</string>
     <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="update">Update</string>
+    <string name="switch_timepicker_mode">Switch to %1$s</string>
+    <string name="clock_input">Clock Picker</string>
+    <string name="digital_input">Digital Input</string>
 </resources>

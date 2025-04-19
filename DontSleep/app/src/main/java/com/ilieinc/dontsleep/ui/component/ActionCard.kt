@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,8 +27,6 @@ import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnChangePermissionDialogVisibi
 import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnStatusToggleChange
 import com.ilieinc.dontsleep.ui.model.CardUiState
 import com.ilieinc.dontsleep.util.previewprovider.ClockPreviewProvider
-import com.ilieinc.dontsleep.util.previewprovider.SavedTimePreviewProvider
-import com.ilieinc.dontsleep.util.previewprovider.TimeoutPreviewProvider
 
 @Composable
 fun ActionCard(
@@ -61,55 +60,76 @@ fun ActionCard(
                     .fillMaxWidth()
                     .padding(10.dp)
             ) {
-                if (permissionRequired) {
-                    Button(
-                        modifier = Modifier.align(Alignment.End),
-                        onClick = { onEvent(OnChangePermissionDialogVisibility(true)) }
-                    ) {
-                        Text(text = stringResource(R.string.get_started))
-                    }
-                } else {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.status),
-                            fontWeight = FontWeight.Bold
+                when {
+                    isLoading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(vertical = 24.dp)
+                                .align(Alignment.CenterHorizontally)
                         )
-                        Switch(
+                    }
+
+                    permissionRequired -> {
+                        Button(
+                            modifier = Modifier.align(Alignment.End),
+                            onClick = { onEvent(OnChangePermissionDialogVisibility(true)) }
+                        ) {
+                            Text(text = stringResource(R.string.get_started))
+                        }
+                    }
+
+                    else -> {
+                        SwitchRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(R.string.status),
                             checked = enabled,
                             onCheckedChange = { onEvent(OnStatusToggleChange(it)) }
                         )
-                    }
-                    if (showTimeoutSectionToggle) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
+                        if (showTimeoutSectionToggle) {
+                            SwitchRow(
+                                modifier = Modifier.fillMaxWidth(),
                                 text = stringResource(R.string.enable_auto_off),
-                                fontWeight = FontWeight.Bold
-                            )
-                            Switch(
                                 checked = timeoutEnabled,
-                                enabled = editControlsEnabled,
-                                onCheckedChange = { onEvent(OnAutoOffToggleChange(it)) }
+                                onCheckedChange = { onEvent(OnAutoOffToggleChange(it)) },
+                                enabled = editControlsEnabled
                             )
                         }
-                    }
-                    if (timeoutEnabled) {
-                        TimeSection(
-                            modifier = Modifier.fillMaxWidth(),
-                            state = state,
-                            onEvent = onEvent
-                        )
+                        if (timeoutEnabled) {
+                            TimeSection(
+                                modifier = Modifier.fillMaxWidth(),
+                                state = state,
+                                onEvent = onEvent
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun SwitchRow(
+    text: String,
+    onCheckedChange: (Boolean) -> Unit,
+    checked: Boolean,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = text,
+            fontWeight = FontWeight.Bold
+        )
+        Switch(
+            checked = checked,
+            enabled = enabled,
+            onCheckedChange = onCheckedChange
+        )
     }
 }
 
@@ -140,28 +160,6 @@ fun TimeSection(
 @Composable
 fun ActionCardPreview(
     @PreviewParameter(ClockPreviewProvider::class) state: CardUiState
-) {
-    ActionCard(
-        state = state,
-        onEvent = {}
-    )
-}
-
-@Preview
-@Composable
-fun ActionCardClockPreview(
-    @PreviewParameter(SavedTimePreviewProvider::class) state: CardUiState
-) {
-    ActionCard(
-        state = state,
-        onEvent = {}
-    )
-}
-
-@Preview
-@Composable
-fun ActionCardClockTimePickerPreview(
-    @PreviewParameter(TimeoutPreviewProvider::class) state: CardUiState
 ) {
     ActionCard(
         state = state,

@@ -23,11 +23,6 @@ class MediaTimeoutCardViewModel(application: Application) : CardViewModel(
     init {
         updateTitle(context.getString(R.string.media_timeout_title))
         setAutoOffToggleDisabled()
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                setSavedState()
-            }
-        }
     }
 
     private fun setAutoOffToggleDisabled() {

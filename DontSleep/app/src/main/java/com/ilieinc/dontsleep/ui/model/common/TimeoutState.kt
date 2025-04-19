@@ -1,7 +1,7 @@
 package com.ilieinc.dontsleep.ui.model.common
 
 data class TimeoutState(
-    val selectedTime: SelectedTime = SelectedTime(
+    val selectedTime: SavedTime = SavedTime(
         hour = 0,
         minute = 0
     )

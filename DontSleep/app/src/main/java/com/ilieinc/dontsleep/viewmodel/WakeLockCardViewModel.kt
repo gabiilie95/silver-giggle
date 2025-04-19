@@ -26,9 +26,6 @@ class WakeLockCardViewModel(application: Application) : CardViewModel(
     init {
         updateTitle(context.getString(R.string.don_t_sleep))
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                setSavedState()
-            }
             refreshPermissionState()
         }
     }
