@@ -1,19 +1,23 @@
 package com.ilieinc.core.viewmodel.base
 
 import android.app.Application
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
 abstract class DialogViewModel(
-    private val onDismissRequestedCallback: () -> Unit,
     application: Application
 ) : AndroidViewModel(application) {
     protected val context get() = getApplication<Application>()
 
+    private val _onDismissSharedFlow = MutableSharedFlow<Unit?>()
+    val onDismissSharedFlow = _onDismissSharedFlow.asSharedFlow()
+
     open fun onDismissRequested() {
-        onDismissRequestedCallback()
+        viewModelScope.launch {
+            _onDismissSharedFlow.emit(Unit)
+        }
     }
 }

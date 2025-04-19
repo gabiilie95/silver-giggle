@@ -48,4 +48,6 @@
     <string name="switch_timepicker_mode">Switch to %1$s</string>
     <string name="clock_input">Clock Picker</string>
     <string name="digital_input">Digital Input</string>
+    <string name="twelve_hour">12hr</string>
+    <string name="twenty_four_hour">24hr</string>
 </resources>

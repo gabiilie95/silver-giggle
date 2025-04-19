@@ -12,6 +12,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.ilieinc.core.data.CoreDataStore.PERMISSION_NOTIFICATION_SHOWN_PREF_KEY
 import com.ilieinc.core.data.dataStore
 import com.ilieinc.core.data.getValue
+import androidx.core.net.toUri
 
 object PermissionHelper {
     fun hasDrawOverPermission(context: Context) = Settings.canDrawOverlays(context)
@@ -22,7 +23,7 @@ object PermissionHelper {
     fun requestDrawOverPermission(context: Context) {
         val intent = Intent(
             Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-            Uri.parse("package:" + context.packageName)
+            ("package:" + context.packageName).toUri()
         )
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)

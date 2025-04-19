@@ -18,4 +18,5 @@ sealed interface CardUiEvent {
     data class OnExpandedDropdownChanged(val expanded: Boolean) : CardUiEvent
     data class OnSavedTimeSelectionChange(val savedTime: SavedTime) : CardUiEvent
     data class OnSwitchTimePickerModeButtonClick(val timepickerMode: ClockState.TimepickerMode) : CardUiEvent
+    data class On24HourModeChange(val is24hour: Boolean) : CardUiEvent
 }

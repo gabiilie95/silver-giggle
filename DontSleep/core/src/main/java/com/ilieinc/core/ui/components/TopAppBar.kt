@@ -23,7 +23,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilieinc.core.R
+import com.ilieinc.core.compose.DialogDismissEventHandler
 import com.ilieinc.core.util.StateHelper
 import com.ilieinc.core.viewmodel.RatingDialogViewModel
 import kotlinx.coroutines.launch
@@ -32,7 +35,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun ApplicationTopAppBar() {
     val context = LocalContext.current
-    val activity = (context as Activity)
     val useDynamicColors by StateHelper.useDynamicColors.collectAsState()
     var showRateDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -76,10 +78,8 @@ fun ApplicationTopAppBar() {
     })
     if (showRateDialog) {
         RatingDialog(
-            RatingDialogViewModel(
-                onDismissRequestedCallback = { showRateDialog = false },
-                activity.application
-            )
+            viewModel = hiltViewModel<RatingDialogViewModel>(),
+            onDismiss = { showRateDialog = false },
         )
     }
 }

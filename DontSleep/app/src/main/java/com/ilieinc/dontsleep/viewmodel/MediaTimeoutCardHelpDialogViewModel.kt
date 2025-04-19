@@ -3,12 +3,14 @@ package com.ilieinc.dontsleep.viewmodel
 import android.app.Application
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.viewmodel.base.HelpDialogViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class MediaTimeoutCardHelpDialogViewModel(
-    onDismissRequestedCallback: () -> Unit,
+@HiltViewModel
+class MediaTimeoutCardHelpDialogViewModel @Inject constructor(
     application: Application,
-) : HelpDialogViewModel(onDismissRequestedCallback, application) {
+) : HelpDialogViewModel(application) {
     init {
         setDetails()
     }

@@ -26,7 +26,7 @@ import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnChangeHelpDialogVisibility
 import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnChangePermissionDialogVisibility
 import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnStatusToggleChange
 import com.ilieinc.dontsleep.ui.model.CardUiState
-import com.ilieinc.dontsleep.util.previewprovider.ClockPreviewProvider
+import com.ilieinc.dontsleep.util.previewprovider.TimePickerPreviewProvider
 
 @Composable
 fun ActionCard(
@@ -83,6 +83,7 @@ fun ActionCard(
                             modifier = Modifier.fillMaxWidth(),
                             text = stringResource(R.string.status),
                             checked = enabled,
+                            enabled = enableButtonEnabled,
                             onCheckedChange = { onEvent(OnStatusToggleChange(it)) }
                         )
                         if (showTimeoutSectionToggle) {
@@ -159,7 +160,7 @@ fun TimeSection(
 @Preview
 @Composable
 fun ActionCardPreview(
-    @PreviewParameter(ClockPreviewProvider::class) state: CardUiState
+    @PreviewParameter(TimePickerPreviewProvider::class)state: CardUiState
 ) {
     ActionCard(
         state = state,

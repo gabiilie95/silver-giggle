@@ -51,7 +51,7 @@ fun TimeoutSection(
                         .inflate(R.layout.layout_time_picker, null)
                     val timePicker =
                         layout.findViewById<TimePicker>(R.id.time_picker).apply {
-                            isEnabled = !state.enabled
+                            isEnabled = state.editControlsEnabled
                             setIs24HourView(true)
                             this.hour = selectedTime.hour
                             this.minute = selectedTime.minute
@@ -63,7 +63,7 @@ fun TimeoutSection(
                 },
                 update = { timePicker ->
                     with(timePicker) {
-                        isEnabled = !state.enabled
+                        isEnabled = state.editControlsEnabled
                         hour = selectedTime.hour
                         minute = selectedTime.minute
                     }

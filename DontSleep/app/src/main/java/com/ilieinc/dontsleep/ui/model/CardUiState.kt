@@ -14,8 +14,12 @@ data class CardUiState(
     @Transient val showTimeoutSectionToggle: Boolean = true,
     @Transient val showPermissionDialog: Boolean = false,
     @Transient val showHelpDialog: Boolean = false,
-    @Transient val permissionRequired: Boolean = false,
+    @Transient val permissionRequired: Boolean = false
 ) {
+    val enableButtonEnabled get() = enabled || when (timeoutMode) {
+        TimeoutMode.CLOCK -> clockState.selectedTime != null
+        else -> true
+    }
     val editControlsEnabled get() = !enabled
     val selectedTime
         get() = when (timeoutMode) {

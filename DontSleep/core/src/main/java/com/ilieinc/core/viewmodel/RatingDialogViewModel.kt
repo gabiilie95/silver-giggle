@@ -2,18 +2,19 @@ package com.ilieinc.core.viewmodel
 
 import android.app.Application
 import android.content.Intent
-import android.net.Uri
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.ilieinc.core.util.Logger
 import com.ilieinc.core.viewmodel.base.DialogViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class RatingDialogViewModel(
-    onDismissRequestedCallback: () -> Unit,
+@HiltViewModel
+class RatingDialogViewModel @Inject constructor(
     application: Application
-) : DialogViewModel(onDismissRequestedCallback, application) {
+) : DialogViewModel(application) {
     fun requestReview() {
-        with(Uri.parse("market://details?id=${getApplication<Application>().packageName}")) {
+        with("market://details?id=${getApplication<Application>().packageName}".toUri()) {
             with(Intent(Intent.ACTION_VIEW, this)) {
                 try {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK

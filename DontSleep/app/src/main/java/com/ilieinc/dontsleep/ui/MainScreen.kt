@@ -7,19 +7,32 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilieinc.core.ui.components.ApplicationTopAppBar
 import com.ilieinc.core.ui.theme.AppTheme
 import com.ilieinc.core.util.StateHelper.needToShowReviewSnackbar
@@ -68,8 +81,16 @@ fun MainScreen(
                     .fillMaxWidth()
                     .verticalScroll(scrollState)
             ) {
-                WakeLockTimerCard()
-                MediaTimeoutTimerCard()
+                WakeLockTimerCard(
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .animateContentSize()
+                )
+                MediaTimeoutTimerCard(
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .animateContentSize()
+                )
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && activity is MainActivity
                     && !hasNotificationPermission
                 ) {
@@ -105,9 +126,15 @@ fun AndroidTNotificationPermissionButton(
 }
 
 @Composable
-private fun WakeLockTimerCard(viewModel: WakeLockCardViewModel = viewModel()) {
+fun WakeLockTimerCard(
+    modifier: Modifier = Modifier,
+    viewModel: WakeLockCardViewModel = hiltViewModel()
+) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    UiCard(viewModel)
+    UiCard(
+        modifier = modifier,
+        viewModel = viewModel
+    )
     LaunchedEffect(Unit) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.refreshPermissionState()
@@ -116,18 +143,25 @@ private fun WakeLockTimerCard(viewModel: WakeLockCardViewModel = viewModel()) {
 }
 
 @Composable
-private fun MediaTimeoutTimerCard(viewModel: MediaTimeoutCardViewModel = viewModel()) {
-    UiCard(viewModel)
+fun MediaTimeoutTimerCard(
+    modifier: Modifier = Modifier,
+    viewModel: MediaTimeoutCardViewModel = hiltViewModel()
+) {
+    UiCard(
+        modifier = modifier,
+        viewModel = viewModel
+    )
 }
 
 @Composable
-private fun UiCard(viewModel: CardViewModel) {
+private fun UiCard(
+    viewModel: CardViewModel,
+    modifier: Modifier = Modifier
+) {
     with(viewModel) {
         val state by state.collectAsState()
         ActionCard(
-            modifier = Modifier
-                .padding(5.dp)
-                .animateContentSize(),
+            modifier = modifier,
             state = state,
             onEvent = ::onEvent
         )
@@ -144,9 +178,10 @@ private fun UiCard(viewModel: CardViewModel) {
 @Composable
 private fun MainScreenPreview() {
     AppTheme {
-        MainScreen(false, rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission(),
-            onResult = {}
-        ))
+        MainScreen(
+            false, rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission(),
+                onResult = {}
+            ))
     }
 }

@@ -6,9 +6,8 @@ import com.ilieinc.core.viewmodel.base.DialogViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 abstract class PermissionDialogViewModel(
-    onDismissRequestedCallback: () -> Unit,
     application: Application
-) : DialogViewModel(onDismissRequestedCallback, application) {
+) : DialogViewModel(application) {
     val state = MutableStateFlow(PermissionDialogUiModel())
 
     abstract fun requestPermission()

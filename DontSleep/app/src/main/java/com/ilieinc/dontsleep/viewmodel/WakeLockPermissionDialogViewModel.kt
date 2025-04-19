@@ -4,12 +4,14 @@ import android.app.Application
 import com.ilieinc.core.util.PermissionHelper
 import com.ilieinc.core.viewmodel.PermissionDialogViewModel
 import com.ilieinc.dontsleep.R
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class WakeLockPermissionDialogViewModel(
-    onDismissRequestedCallback: () -> Unit,
+@HiltViewModel
+class WakeLockPermissionDialogViewModel @Inject constructor(
     application: Application
-) : PermissionDialogViewModel(onDismissRequestedCallback, application) {
+) : PermissionDialogViewModel(application) {
 
     init {
         setTitleAndDescription()
