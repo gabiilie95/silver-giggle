@@ -6,11 +6,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.ilieinc.core.R
+import com.ilieinc.core.compose.DialogDismissEventHandler
 import com.ilieinc.core.viewmodel.PermissionDialogViewModel
 import com.ilieinc.core.viewmodel.RatingDialogViewModel
 
 @Composable
-fun RatingDialog(viewModel: RatingDialogViewModel) {
+fun RatingDialog(viewModel: RatingDialogViewModel, onDismiss: () -> Unit) {
+    DialogDismissEventHandler(
+        dialogViewModel = viewModel,
+        onDismiss = onDismiss
+    )
     with(viewModel) {
         AlertDialog(onDismissRequest = this::onDismissRequested,
             title = { Text(text = stringResource(R.string.rate_title)) },

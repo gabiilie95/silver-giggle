@@ -28,9 +28,16 @@ import com.ilieinc.core.util.DeviceAdminHelper
 import com.ilieinc.core.util.PermissionHelper
 import com.ilieinc.core.util.StateHelper
 import com.ilieinc.dontsleep.ui.MainScreen
+import com.ilieinc.dontsleep.viewmodel.MainActivityViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var viewModel: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +84,16 @@ class MainActivity : ComponentActivity() {
             }
         }
         DeviceAdminHelper.init(applicationContext)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.setActivityRunning(true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.setActivityRunning(false)
     }
 
     private fun setWindowInsetAppearance(

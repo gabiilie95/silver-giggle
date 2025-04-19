@@ -6,8 +6,11 @@ data class SavedTime(
 ) {
     val isAfternoon: Boolean
         get() = hour >= 12
-    val formattedTime: String
-        get() = "%02d:%02d %s".format(
+
+    fun getFormattedTime(is24Hour: Boolean) = if (is24Hour) {
+        "%02d:%02d".format(hour, minute)
+    } else {
+        "%02d:%02d %s".format(
             with(hour) {
                 if (isAfternoon && this != 12) {
                     this - 12
@@ -20,6 +23,7 @@ data class SavedTime(
                 "AM"
             }
         )
+    }
 
     object Comparator : kotlin.Comparator<SavedTime> {
         override fun compare(o1: SavedTime?, o2: SavedTime?): Int {

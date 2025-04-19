@@ -27,9 +27,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
-import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
@@ -38,6 +38,7 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -102,32 +103,34 @@ fun ClockSection(
                 initialHour = initialHour,
                 initialMinute = initialMinutes
             )
-            when (state.clockState.timepickerMode) {
-                ClockState.TimepickerMode.DIGITAL_INPUT -> {
-                    timePickerState.is24hour = false
-                    TimeInput(
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(vertical = 16.dp),
-                        state = timePickerState
-                    )
-                }
+            key(state.clockState) {
+                timePickerState.is24hour = state.clockState.is24hour
+                when (state.clockState.timepickerMode) {
+                    ClockState.TimepickerMode.DIGITAL_INPUT -> {
+                        TimeInput(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(vertical = 16.dp),
+                            state = timePickerState
+                        )
+                    }
 
-                ClockState.TimepickerMode.CLOCK_PICKER -> {
-                    timePickerState.is24hour = true
-                    TimePicker(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
-                        state = timePickerState
-                    )
+                    ClockState.TimepickerMode.CLOCK_PICKER -> {
+                        TimePicker(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp),
+                            state = timePickerState
+                        )
+                    }
                 }
             }
             ManageSavedTimesButton(
                 modifier = Modifier.fillMaxWidth(),
+                state = state.clockState,
+                timePickerState = timePickerState,
                 editMode = editMode,
                 enabled = state.editControlsEnabled,
-                timePickerState = timePickerState,
                 onEvent = onEvent
             )
         } else {
@@ -167,6 +170,7 @@ private fun SwitchTimePickerMode(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ManageSavedTimesButton(
+    state: ClockState,
     timePickerState: TimePickerState,
     editMode: EditMode,
     enabled: Boolean,
@@ -183,6 +187,11 @@ private fun ManageSavedTimesButton(
         ) {
             Text(text = stringResource(R.string.cancel))
         }
+
+        Change24HourButtonSwitch(
+            state = state,
+            onEvent = onEvent
+        )
 
         Button(
             enabled = enabled,
@@ -296,7 +305,8 @@ private fun SavedTimesDropdown(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             value = if (state.savedTimes.any()) {
-                state.selectedTime?.formattedTime ?: stringResource(R.string.select_time)
+                state.selectedTime?.getFormattedTime(state.is24hour)
+                    ?: stringResource(R.string.select_time)
             } else {
                 stringResource(R.string.no_saved_times)
             },
@@ -336,8 +346,10 @@ private fun SavedTimesDropdown(
                     Color.Unspecified
                 }
                 DropdownMenuItem(
-                    modifier = Modifier.widthIn(min = 180.dp).background(itemBackground),
-                    text = { Text(item.formattedTime) },
+                    modifier = Modifier
+                        .widthIn(min = 180.dp)
+                        .background(itemBackground),
+                    text = { Text(item.getFormattedTime(state.is24hour)) },
                     onClick = { onEvent(OnSavedTimeSelectionChange(item)) },
                     colors = MenuDefaults.itemColors(
                         textColor = MaterialTheme.colorScheme.contentColorFor(itemBackground)
@@ -345,6 +357,29 @@ private fun SavedTimesDropdown(
                 )
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun Change24HourButtonSwitch(
+    state: ClockState,
+    onEvent: (CardUiEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(stringResource(R.string.twelve_hour))
+        Switch(
+            checked = state.is24hour,
+            onCheckedChange = {
+                onEvent(On24HourModeChange(it))
+            },
+        )
+        Text(stringResource(R.string.twenty_four_hour))
     }
 }
 

@@ -13,7 +13,21 @@ import com.ilieinc.core.util.Logger
 import com.ilieinc.core.util.StateHelper.startForegroundService
 import com.ilieinc.core.util.StateHelper.stopService
 import com.ilieinc.dontsleep.ui.model.CardUiEvent
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.*
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.On24HourModeChange
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnAddButtonClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnAutoOffToggleChange
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnCancelButtonClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnChangeHelpDialogVisibility
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnChangePermissionDialogVisibility
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnConfirmEditClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnDeleteButtonClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnEditSavedTimeClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnExpandedDropdownChanged
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnSavedTimeSelectionChange
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnStatusToggleChange
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnSwitchTimePickerModeButtonClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnTimeoutModeButtonClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnTimeoutTimeChange
 import com.ilieinc.dontsleep.ui.model.CardUiState
 import com.ilieinc.dontsleep.ui.model.common.ClockState.EditMode
 import com.ilieinc.dontsleep.ui.model.common.ClockState.TimepickerMode
@@ -54,30 +68,7 @@ abstract class CardViewModel(
 
     init {
         viewModelScope.launch(ioScope) {
-            context.dataStore.getValue(statePreferenceKey, "").let { stateJson ->
-                if (stateJson.isNotEmpty()) {
-                    runCatching {
-                        _state.update { it.copy(isLoading = true) }
-                        val timeoutState = Gson().fromJson(stateJson, CardUiState::class.java).let {
-                            it.copy(
-                                clockState = it.clockState.copy(
-                                    savedTimes = it.clockState.savedTimes.toSortedSet(SavedTime.Comparator)
-                                )
-                            )
-                        }
-                        withContext(Dispatchers.Main) {
-                            _state.update { timeoutState }
-                        }
-                    }.onFailure {
-                        Logger.error("Failed to parse saved state", it)
-                        _state.update {
-                            CardUiState(isLoading = false)
-                        }
-                    }.onSuccess {
-                        _state.update { it.copy(isLoading = false) }
-                    }
-                }
-            }
+            loadSavedData()
             serviceRunning.collect { serviceRunning ->
                 _state.update {
                     it.copy(enabled = serviceRunning)
@@ -86,6 +77,40 @@ abstract class CardViewModel(
         }.invokeOnCompletion { exception ->
             if (exception != null) {
                 Logger.error("Failed to initialize CardViewModel", exception)
+            }
+        }
+    }
+
+    protected open suspend fun loadSavedData() {
+        runCatching {
+            context.dataStore.getValue(statePreferenceKey, "").let { stateJson ->
+                if (stateJson.isNotEmpty()) {
+                    _state.update { it.copy(isLoading = true) }
+                    val timeoutState = Gson().fromJson(stateJson, CardUiState::class.java).let {
+                        it.copy(
+                            clockState = it.clockState.copy(
+                                savedTimes = it.clockState.savedTimes.toSortedSet(SavedTime.Comparator)
+                            )
+                        )
+                    }
+                    withContext(Dispatchers.Main) {
+                        _state.update { timeoutState }
+                    }
+                    refreshPermissionState()
+                }
+            }
+        }.onFailure {
+            Logger.error("Failed to parse saved state", it)
+            _state.update {
+                CardUiState(
+                    isLoading = false
+                )
+            }
+        }.onSuccess {
+            _state.update {
+                it.copy(
+                    isLoading = false
+                )
             }
         }
     }
@@ -108,6 +133,7 @@ abstract class CardViewModel(
             is OnExpandedDropdownChanged -> onExpandedDropdownChanged(event.expanded)
             is OnSavedTimeSelectionChange -> onSelectionChange(event.savedTime)
             is OnSwitchTimePickerModeButtonClick -> onSwitchTimePickerModeButtonClick(event.timepickerMode)
+            is On24HourModeChange -> on24HourModeChange(event.is24hour)
         }
     }
 
@@ -244,6 +270,16 @@ abstract class CardViewModel(
                         TimepickerMode.DIGITAL_INPUT -> TimepickerMode.CLOCK_PICKER
                         TimepickerMode.CLOCK_PICKER -> TimepickerMode.DIGITAL_INPUT
                     }
+                )
+            ).also(::updateState)
+        }
+    }
+
+    private fun on24HourModeChange(is24hour: Boolean) {
+        _state.update {
+            it.copy(
+                clockState = it.clockState.copy(
+                    is24hour = is24hour
                 )
             ).also(::updateState)
         }

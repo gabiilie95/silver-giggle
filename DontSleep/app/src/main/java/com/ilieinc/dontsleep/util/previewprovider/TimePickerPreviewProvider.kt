@@ -8,12 +8,19 @@ import com.ilieinc.dontsleep.ui.model.common.SavedTime
 import com.ilieinc.dontsleep.ui.model.common.TimeoutState
 
 
-class ClockPreviewProvider : PreviewParameterProvider<CardUiState> {
+class TimePickerPreviewProvider : PreviewParameterProvider<CardUiState> {
     override val values: Sequence<CardUiState>
         get() = sequenceOf(
             CardUiState(
                 title = "Loading",
-                isLoading = true
+                isLoading = true,
+                timeoutEnabled = true,
+                enabled = true,
+                showTimeoutSectionToggle = true,
+                showPermissionDialog = false,
+                showHelpDialog = false,
+                permissionRequired = false,
+                clockState = ClockState(),
             ),
             CardUiState(
                 title = "Clock",

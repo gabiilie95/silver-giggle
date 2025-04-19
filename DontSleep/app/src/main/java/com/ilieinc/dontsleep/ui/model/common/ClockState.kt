@@ -4,6 +4,7 @@ data class ClockState(
     val selectedTime: SavedTime? = null,
     @Transient val editMode: EditMode? = null,
     val timepickerMode: TimepickerMode = TimepickerMode.DIGITAL_INPUT,
+    val is24hour: Boolean = false,
     val isDropdownExpanded: Boolean = false,
     val savedTimes: Set<SavedTime> = emptySet()
 ) {

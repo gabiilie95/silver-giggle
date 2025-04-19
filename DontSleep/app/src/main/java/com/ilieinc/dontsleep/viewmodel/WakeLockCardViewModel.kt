@@ -9,12 +9,15 @@ import com.ilieinc.core.util.StateHelper.stopService
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.data.DontSleepDataStore
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class WakeLockCardViewModel(application: Application) : CardViewModel(
+@HiltViewModel
+class WakeLockCardViewModel @Inject constructor(application: Application) : CardViewModel(
     application = application,
     serviceClass = WakeLockService::class.java,
     serviceRunning = WakeLockService.serviceRunning
@@ -25,9 +28,6 @@ class WakeLockCardViewModel(application: Application) : CardViewModel(
 
     init {
         updateTitle(context.getString(R.string.don_t_sleep))
-        viewModelScope.launch {
-            refreshPermissionState()
-        }
     }
 
     override fun refreshPermissionState() {

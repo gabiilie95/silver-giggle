@@ -15,4 +15,8 @@
         <item name="android:layout_margin">5dp</item>
     </style>
 
+    <style name="TransparentDialog" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
 </resources>
