@@ -13,21 +13,7 @@ import com.ilieinc.core.util.Logger
 import com.ilieinc.core.util.StateHelper.startForegroundService
 import com.ilieinc.core.util.StateHelper.stopService
 import com.ilieinc.dontsleep.ui.model.CardUiEvent
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.On24HourModeChange
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnAddButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnAutoOffToggleChange
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnCancelButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnChangeHelpDialogVisibility
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnChangePermissionDialogVisibility
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnConfirmEditClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnDeleteButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnEditSavedTimeClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnExpandedDropdownChanged
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnSavedTimeSelectionChange
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnStatusToggleChange
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnSwitchTimePickerModeButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnTimeoutModeButtonClick
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnTimeoutTimeChange
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.*
 import com.ilieinc.dontsleep.ui.model.CardUiState
 import com.ilieinc.dontsleep.ui.model.common.ClockState.EditMode
 import com.ilieinc.dontsleep.ui.model.common.ClockState.TimepickerMode
@@ -69,6 +55,7 @@ abstract class CardViewModel(
     init {
         viewModelScope.launch(ioScope) {
             loadSavedData()
+            onDataLoaded()
             serviceRunning.collect { serviceRunning ->
                 _state.update {
                     it.copy(enabled = serviceRunning)
@@ -89,7 +76,7 @@ abstract class CardViewModel(
                     val timeoutState = Gson().fromJson(stateJson, CardUiState::class.java).let {
                         it.copy(
                             clockState = it.clockState.copy(
-                                savedTimes = it.clockState.savedTimes.toSortedSet(SavedTime.Comparator)
+                                savedTimes = it.clockState.savedTimes.sortedWith(SavedTime.Comparator)
                             )
                         )
                     }
@@ -115,6 +102,8 @@ abstract class CardViewModel(
         }
     }
 
+    protected abstract fun onDataLoaded()
+
     open fun refreshPermissionState() {}
 
     open fun <T> onEvent(event: T) where T : CardUiEvent = viewModelScope.launch(ioScope) {
@@ -127,13 +116,21 @@ abstract class CardViewModel(
             is OnTimeoutModeButtonClick -> onTimeoutModeButtonClick(event.state)
             OnAddButtonClick -> onAddButtonClick()
             OnCancelButtonClick -> onCancelButtonClick()
-            is OnConfirmEditClick -> onConfirmEditClick(event.hour, event.minute, event.editMode)
+            is OnConfirmEditClick -> onConfirmEditClick(
+                hours = event.hour,
+                minutes = event.minute,
+                isFavorite = event.isFavorite,
+                editMode = event.editMode
+            )
+
             is OnEditSavedTimeClick -> onEditSavedTimeClick()
             OnDeleteButtonClick -> onDeleteButtonClick()
             is OnExpandedDropdownChanged -> onExpandedDropdownChanged(event.expanded)
             is OnSavedTimeSelectionChange -> onSelectionChange(event.savedTime)
             is OnSwitchTimePickerModeButtonClick -> onSwitchTimePickerModeButtonClick(event.timepickerMode)
             is On24HourModeChange -> on24HourModeChange(event.is24hour)
+            is OnItemFavoriteClick -> onItemFavoriteClick(event.savedTime)
+            is OnFavoriteItemStartClick -> onFavoriteItemStartClick(event.savedTime)
         }
     }
 
@@ -207,19 +204,28 @@ abstract class CardViewModel(
         }
     }
 
-    private fun onConfirmEditClick(hours: Int, minutes: Int, editMode: EditMode) {
-        val newTime = SavedTime(hours, minutes)
+    private fun onConfirmEditClick(
+        hours: Int,
+        minutes: Int,
+        isFavorite: Boolean,
+        editMode: EditMode
+    ) {
+        val newTime = SavedTime(
+            hour = hours,
+            minute = minutes,
+            isFavorite = editMode == EditMode.EDIT && isFavorite
+        )
         _state.update {
             it.copy(
                 clockState = it.clockState.copy(
                     editMode = null,
                     selectedTime = newTime,
-                    savedTimes = it.clockState.savedTimes.toMutableSet().apply {
+                    savedTimes = it.clockState.savedTimes.toMutableList().apply {
                         if (editMode == EditMode.EDIT) {
                             remove(it.clockState.selectedTime)
                         }
                         add(newTime)
-                    }.toSortedSet(SavedTime.Comparator)
+                    }.sortedWith(SavedTime.Comparator)
                 )
             ).also(::updateState)
         }
@@ -227,9 +233,9 @@ abstract class CardViewModel(
 
     private fun onDeleteButtonClick() {
         _state.update {
-            val updatedItems = it.clockState.savedTimes.toMutableSet().apply {
+            val updatedItems = it.clockState.savedTimes.toMutableList().apply {
                 remove(state.value.clockState.selectedTime)
-            }.toSortedSet(SavedTime.Comparator)
+            }.sortedWith(SavedTime.Comparator)
             it.copy(
                 clockState = it.clockState.copy(
                     selectedTime = updatedItems.firstOrNull(),
@@ -283,6 +289,32 @@ abstract class CardViewModel(
                 )
             ).also(::updateState)
         }
+    }
+
+    private fun onItemFavoriteClick(savedTime: SavedTime) {
+        _state.update {
+            it.copy(
+                clockState = it.clockState.copy(
+                    savedTimes = it.clockState.savedTimes.toMutableList().apply {
+                        if (contains(savedTime)) {
+                            remove(savedTime)
+                        }
+                        add(
+                            SavedTime(
+                                hour = savedTime.hour,
+                                minute = savedTime.minute,
+                                isFavorite = !savedTime.isFavorite
+                            )
+                        )
+                    }.sortedWith(SavedTime.Comparator)
+                )
+            ).also(::updateState)
+        }
+    }
+
+    private fun onFavoriteItemStartClick(savedTime: SavedTime) {
+        onSelectionChange(savedTime)
+        setEnabled(true)
     }
 
     private fun setEnabled(enabled: Boolean) {

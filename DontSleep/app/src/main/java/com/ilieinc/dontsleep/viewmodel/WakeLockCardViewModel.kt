@@ -26,7 +26,7 @@ class WakeLockCardViewModel @Inject constructor(application: Application) : Card
     override val showTimeoutSectionToggle = true
     override val statePreferenceKey = DontSleepDataStore.WAKE_LOCK_STATE_PREF_KEY
 
-    init {
+    override fun onDataLoaded() {
         updateTitle(context.getString(R.string.don_t_sleep))
     }
 

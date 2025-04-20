@@ -6,7 +6,7 @@ data class ClockState(
     val timepickerMode: TimepickerMode = TimepickerMode.DIGITAL_INPUT,
     val is24hour: Boolean = false,
     val isDropdownExpanded: Boolean = false,
-    val savedTimes: Set<SavedTime> = emptySet()
+    val savedTimes: List<SavedTime> = emptyList()
 ) {
     enum class EditMode {
         ADD,

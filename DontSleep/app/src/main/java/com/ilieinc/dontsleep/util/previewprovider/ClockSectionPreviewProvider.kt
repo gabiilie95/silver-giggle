@@ -11,7 +11,7 @@ class ClockSectionPreviewProvider : PreviewParameterProvider<CardUiState> {
         get() = sequenceOf(
             CardUiState(
                 clockState = ClockState(
-                    savedTimes = sortedSetOf(
+                    savedTimes = listOf(
                         SavedTime(1, 0),
                         SavedTime(2, 30),
                         SavedTime(3, 45)
@@ -23,7 +23,7 @@ class ClockSectionPreviewProvider : PreviewParameterProvider<CardUiState> {
             ),
             CardUiState(
                 clockState = ClockState(
-                    savedTimes = sortedSetOf(
+                    savedTimes = listOf(
                         SavedTime(1, 0),
                         SavedTime(2, 30),
                         SavedTime(3, 45)

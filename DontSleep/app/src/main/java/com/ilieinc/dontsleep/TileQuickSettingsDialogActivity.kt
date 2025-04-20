@@ -9,6 +9,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,15 +42,22 @@ class TileQuickSettingsDialogActivity : ComponentActivity() {
         } else {
             setContent {
                 AppTheme {
-                    Body(componentName)
+                    val scrollState = rememberScrollState()
+                    Body(
+                        componentName = componentName,
+                        modifier = Modifier.verticalScroll(scrollState)
+                    )
                 }
             }
         }
     }
 
     @Composable
-    fun Body(componentName: String) {
-        Column {
+    fun Body(
+        componentName: String,
+        modifier: Modifier = Modifier
+    ) {
+        Column(modifier = modifier) {
             when (componentName) {
                 WakeLockTileService::class.qualifiedName -> {
                     WakeLockTimerCard(

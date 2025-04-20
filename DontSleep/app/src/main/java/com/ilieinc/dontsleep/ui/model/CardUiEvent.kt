@@ -10,7 +10,7 @@ sealed interface CardUiEvent {
     data class OnChangeHelpDialogVisibility(val visible: Boolean) : CardUiEvent
     data class OnChangePermissionDialogVisibility(val visible: Boolean) : CardUiEvent
     data class OnTimeoutModeButtonClick(val state: CardUiState) : CardUiEvent
-    data class OnConfirmEditClick(val hour: Int, val minute: Int, val editMode: ClockState.EditMode) : CardUiEvent
+    data class OnConfirmEditClick(val hour: Int, val minute: Int, val isFavorite: Boolean, val editMode: ClockState.EditMode) : CardUiEvent
     object OnAddButtonClick : CardUiEvent
     object OnCancelButtonClick : CardUiEvent
     object OnEditSavedTimeClick : CardUiEvent
@@ -19,4 +19,6 @@ sealed interface CardUiEvent {
     data class OnSavedTimeSelectionChange(val savedTime: SavedTime) : CardUiEvent
     data class OnSwitchTimePickerModeButtonClick(val timepickerMode: ClockState.TimepickerMode) : CardUiEvent
     data class On24HourModeChange(val is24hour: Boolean) : CardUiEvent
+    data class OnItemFavoriteClick(val savedTime: SavedTime) : CardUiEvent
+    data class OnFavoriteItemStartClick(val savedTime: SavedTime) : CardUiEvent
 }

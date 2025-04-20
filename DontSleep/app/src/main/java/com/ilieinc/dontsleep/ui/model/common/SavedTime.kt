@@ -1,8 +1,11 @@
 package com.ilieinc.dontsleep.ui.model.common
 
+import java.util.UUID
+
 data class SavedTime(
     val hour: Int,
-    val minute: Int
+    val minute: Int,
+    val isFavorite: Boolean = false
 ) {
     val isAfternoon: Boolean
         get() = hour >= 12

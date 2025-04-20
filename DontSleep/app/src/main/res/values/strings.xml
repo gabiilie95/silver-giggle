@@ -50,4 +50,6 @@
     <string name="digital_input">Digital Input</string>
     <string name="twelve_hour">12hr</string>
     <string name="twenty_four_hour">24hr</string>
+    <string name="select">Select</string>
+    <string name="start">Start</string>
 </resources>
