@@ -2,6 +2,7 @@ package com.ilieinc.dontsleep.ui.component
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -15,10 +16,14 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -142,6 +147,12 @@ fun ClockSection(
                 enabled = state.editControlsEnabled,
                 onEvent = onEvent
             )
+            FavoriteTimesSection(
+                modifier = Modifier.fillMaxWidth(),
+                state = state.clockState,
+                enabled = state.editControlsEnabled,
+                onEvent = onEvent
+            )
         }
     }
 }
@@ -200,6 +211,7 @@ private fun ManageSavedTimesButton(
                     OnConfirmEditClick(
                         hour = timePickerState.hour,
                         minute = timePickerState.minute,
+                        isFavorite = state.selectedTime?.isFavorite ?: false,
                         editMode = editMode
                     )
                 )
@@ -290,6 +302,61 @@ private fun SavedTimesSection(
 }
 
 @Composable
+private fun FavoriteTimesSection(
+    state: ClockState,
+    enabled: Boolean,
+    onEvent: (CardUiEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        state.savedTimes.filter { it.isFavorite }.forEach {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable {
+                        if (enabled) {
+                            onEvent(OnSavedTimeSelectionChange(it))
+                        }
+                    }
+                    .background(
+                        color = if (it == state.selectedTime) {
+                            MaterialTheme.colorScheme.primaryContainer
+                        } else {
+                            Color.Transparent
+                        }
+                    )
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = it.getFormattedTime(state.is24hour),
+                    modifier = Modifier.padding(8.dp)
+                )
+                if (it == state.selectedTime && !enabled) {
+                    OutlinedButton(
+                        onClick = { onEvent(OnStatusToggleChange(false)) },
+                    ) {
+                        Text(stringResource(R.string.stop))
+                    }
+                } else {
+                    OutlinedButton(
+                        enabled = enabled,
+                        onClick = { onEvent(OnFavoriteItemStartClick(it)) },
+                    ) {
+                        Text(stringResource(R.string.start))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun SavedTimesDropdown(
     state: ClockState,
     enabled: Boolean,
@@ -324,14 +391,29 @@ private fun SavedTimesDropdown(
             onValueChange = {},
             readOnly = true,
             trailingIcon = {
-                IconButton(
-                    enabled = enabled,
-                    onClick = { onEvent(OnExpandedDropdownChanged(true)) }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.ArrowDropDown,
-                        contentDescription = null
-                    )
+                    if (state.selectedTime?.isFavorite == true) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = if (enabled) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                Color.Gray
+                            }
+                        )
+                    }
+                    IconButton(
+                        enabled = enabled,
+                        onClick = { onEvent(OnExpandedDropdownChanged(true)) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowDropDown,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         )
@@ -350,6 +432,25 @@ private fun SavedTimesDropdown(
                         .widthIn(min = 180.dp)
                         .background(itemBackground),
                     text = { Text(item.getFormattedTime(state.is24hour)) },
+                    trailingIcon = {
+                        IconButton(
+                            onClick = { onEvent(OnItemFavoriteClick(item)) },
+                            colors = IconButtonDefaults.iconButtonColors(
+                                contentColor = MaterialTheme.colorScheme.contentColorFor(
+                                    itemBackground
+                                )
+                            )
+                        ) {
+                            Icon(
+                                imageVector = if (item.isFavorite) {
+                                    Icons.Default.Star
+                                } else {
+                                    Icons.Default.StarOutline
+                                },
+                                contentDescription = null
+                            )
+                        }
+                    },
                     onClick = { onEvent(OnSavedTimeSelectionChange(item)) },
                     colors = MenuDefaults.itemColors(
                         textColor = MaterialTheme.colorScheme.contentColorFor(itemBackground)

@@ -24,7 +24,7 @@ class MediaTimeoutCardViewModel @Inject constructor(application: Application) : 
     override val showTimeoutSectionToggle = false
     override val statePreferenceKey = DontSleepDataStore.MEDIA_STATE_PREF_KEY
 
-    init {
+    override fun onDataLoaded() {
         updateTitle(context.getString(R.string.media_timeout_title))
         setAutoOffToggleDisabled()
     }

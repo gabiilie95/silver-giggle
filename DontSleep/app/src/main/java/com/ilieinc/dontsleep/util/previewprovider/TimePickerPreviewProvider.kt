@@ -27,7 +27,7 @@ class TimePickerPreviewProvider : PreviewParameterProvider<CardUiState> {
                 clockState = ClockState(
                     editMode = EditMode.ADD,
                     selectedTime = SavedTime(1, 30),
-                    savedTimes = sortedSetOf(
+                    savedTimes = listOf(
                         SavedTime(1, 30),
                         SavedTime(2, 45),
                         SavedTime(3, 15),
@@ -48,7 +48,7 @@ class TimePickerPreviewProvider : PreviewParameterProvider<CardUiState> {
                 clockState = ClockState(
                     editMode = EditMode.EDIT,
                     selectedTime = SavedTime(1, 30),
-                    savedTimes = sortedSetOf(
+                    savedTimes = listOf(
                         SavedTime(1, 30),
                         SavedTime(2, 45),
                         SavedTime(3, 15),
@@ -68,7 +68,7 @@ class TimePickerPreviewProvider : PreviewParameterProvider<CardUiState> {
                 title = "Saved Time",
                 clockState = ClockState(
                     selectedTime = SavedTime(1, 30),
-                    savedTimes = sortedSetOf(
+                    savedTimes = listOf(
                         SavedTime(1, 30),
                         SavedTime(2, 45),
                         SavedTime(3, 15),
