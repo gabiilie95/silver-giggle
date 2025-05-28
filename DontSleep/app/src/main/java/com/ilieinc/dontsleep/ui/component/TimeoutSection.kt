@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.viewinterop.AndroidView
+import com.ilieinc.core.ui.theme.AppTypography
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.ui.model.CardUiEvent
 import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnTimeoutTimeChange
@@ -38,10 +38,11 @@ fun TimeoutSection(
             Column(modifier = Modifier) {
                 Text(
                     text = stringResource(R.string.timeout),
-                    fontWeight = FontWeight.Bold
+                    style = AppTypography.titleMedium
                 )
                 Text(
-                    text = stringResource(R.string.hours_minutes)
+                    text = stringResource(R.string.hours_minutes),
+                    style = AppTypography.bodyMedium
                 )
             }
             AndroidView(

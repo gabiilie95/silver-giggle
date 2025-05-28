@@ -23,7 +23,7 @@ fun ThemedCard(
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(10.dp)
+                .padding(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

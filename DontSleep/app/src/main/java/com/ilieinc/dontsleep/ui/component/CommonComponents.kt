@@ -23,7 +23,6 @@ fun SwitchModesButton(
         CardUiState.TimeoutMode.TIMEOUT -> {
             OutlinedButton(
                 modifier = modifier,
-                contentPadding = PaddingValues(0.dp),
                 enabled = state.editControlsEnabled,
                 onClick = { onEvent(OnTimeoutModeButtonClick(state)) }
             ) {
@@ -34,7 +33,6 @@ fun SwitchModesButton(
         CardUiState.TimeoutMode.CLOCK -> {
             OutlinedButton(
                 modifier = modifier,
-                contentPadding = PaddingValues(0.dp),
                 enabled = state.editControlsEnabled,
                 onClick = { onEvent(OnTimeoutModeButtonClick(state)) }
             ) {

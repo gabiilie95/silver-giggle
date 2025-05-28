@@ -17,10 +17,10 @@ val AppTypography = Typography(
 	),
 	displayMedium = TextStyle(
 		fontFamily = Roboto,
-		fontWeight = FontWeight.W400,
+		fontWeight = FontWeight.SemiBold,
 		fontSize = 45.sp,
 		lineHeight = 52.sp,
-		letterSpacing = 0.sp,
+		letterSpacing = 0.2.sp,
 	),
 	displaySmall = TextStyle(
 		fontFamily = Roboto,
@@ -52,7 +52,7 @@ val AppTypography = Typography(
 	),
 	titleLarge = TextStyle(
 		fontFamily = Roboto,
-		fontWeight = FontWeight.W400,
+		fontWeight = FontWeight.Bold,
 		fontSize = 22.sp,
 		lineHeight = 28.sp,
 		letterSpacing = 0.sp,
@@ -80,7 +80,7 @@ val AppTypography = Typography(
 	),
 	bodyLarge = TextStyle(
 		fontFamily = Roboto,
-		fontWeight = FontWeight.W400,
+		fontWeight = FontWeight.Medium,
 		fontSize = 16.sp,
 		lineHeight = 24.sp,
 		letterSpacing = 0.5.sp,

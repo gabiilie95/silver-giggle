@@ -62,7 +62,7 @@ fun MainScreen(
         bottomBar = {
             Button(
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(8.dp)
                     .navigationBarsPadding()
                     .fillMaxWidth(),
                 onClick = { activity?.finish() }) {
@@ -83,12 +83,12 @@ fun MainScreen(
             ) {
                 WakeLockTimerCard(
                     modifier = Modifier
-                        .padding(5.dp)
+                        .padding(8.dp)
                         .animateContentSize()
                 )
                 MediaTimeoutTimerCard(
                     modifier = Modifier
-                        .padding(5.dp)
+                        .padding(8.dp)
                         .animateContentSize()
                 )
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && activity is MainActivity

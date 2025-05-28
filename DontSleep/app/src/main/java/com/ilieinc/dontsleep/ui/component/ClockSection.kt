@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Star
@@ -53,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.ilieinc.core.ui.theme.AppTypography
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.ui.model.CardUiEvent
 import com.ilieinc.dontsleep.ui.model.CardUiEvent.*
@@ -316,7 +316,7 @@ private fun FavoriteTimesSection(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(MaterialTheme.shapes.small)
                     .clickable {
                         if (enabled) {
                             onEvent(OnSavedTimeSelectionChange(it))
@@ -335,6 +335,7 @@ private fun FavoriteTimesSection(
             ) {
                 Text(
                     text = it.getFormattedTime(state.is24hour),
+                    style = AppTypography.bodyLarge,
                     modifier = Modifier.padding(8.dp)
                 )
                 if (it == state.selectedTime && !enabled) {
@@ -366,11 +367,11 @@ private fun SavedTimesDropdown(
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = modifier then Modifier
-            .clip(RoundedCornerShape(12.dp))
+            .clip(MaterialTheme.shapes.small)
     ) {
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
+            shape = MaterialTheme.shapes.small,
             value = if (state.savedTimes.any()) {
                 state.selectedTime?.getFormattedTime(state.is24hour)
                     ?: stringResource(R.string.select_time)
@@ -473,14 +474,20 @@ private fun Change24HourButtonSwitch(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(stringResource(R.string.twelve_hour))
+        Text(
+            text = stringResource(R.string.twelve_hour),
+            style = AppTypography.labelMedium
+        )
         Switch(
             checked = state.is24hour,
             onCheckedChange = {
                 onEvent(On24HourModeChange(it))
             },
         )
-        Text(stringResource(R.string.twenty_four_hour))
+        Text(
+            text = stringResource(R.string.twenty_four_hour),
+            style = AppTypography.labelMedium
+        )
     }
 }
 

@@ -5,6 +5,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Shapes
+import androidx.compose.ui.unit.dp
 
 private val LightThemeColors = lightColorScheme(
 
@@ -66,6 +69,12 @@ private val DarkThemeColors = darkColorScheme(
 	inversePrimary = md_theme_dark_inversePrimary,
 )
 
+val AppShapes = Shapes(
+	small = RoundedCornerShape(16.dp),
+	medium = RoundedCornerShape(24.dp),
+	large = RoundedCornerShape(32.dp)
+)
+
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
@@ -88,6 +97,7 @@ fun AppTheme(
 	MaterialTheme(
 		colorScheme = colors,
 		typography = AppTypography,
+		shapes = AppShapes,
 		content = content
 	)
 }
