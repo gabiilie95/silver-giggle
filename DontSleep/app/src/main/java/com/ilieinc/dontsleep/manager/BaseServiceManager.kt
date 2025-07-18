@@ -3,6 +3,7 @@ package com.ilieinc.dontsleep.manager
 import android.app.Notification
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.ilieinc.core.data.dataStore
 import com.ilieinc.core.data.getValueSynchronous
@@ -31,6 +32,7 @@ abstract class BaseServiceManager(
     var timeoutDateTime: Calendar = Calendar.getInstance()
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, exception ->
+        exception.message?.let { FirebaseCrashlytics.getInstance().log(it) }
         Logger.error("Coroutine exception in $serviceClass: ${exception.message}", exception)
     }
     private val ioScope = Dispatchers.IO + coroutineExceptionHandler
@@ -51,9 +53,21 @@ abstract class BaseServiceManager(
     }
 
     private fun initFields() {
-        state = with(context.dataStore.getValueSynchronous(serviceStatePreferenceKey, "")) {
-            Gson().fromJson(this, CardUiState::class.java)
-        }
+        state = runCatching {
+            with(context.dataStore.getValueSynchronous(serviceStatePreferenceKey, "")) {
+                Gson().fromJson(this, CardUiState::class.java)
+            }
+        }.fold(
+            onSuccess = { it },
+            onFailure = { ex ->
+                ex.message?.let {
+                    FirebaseCrashlytics.getInstance()
+                        .log("Error initializing state for $serviceClass $it")
+                }
+                Logger.error(ex)
+                CardUiState() // Return default state if error occurs
+            }
+        )
     }
 
     private fun initObservers() = CoroutineScope(ioScope).launch {

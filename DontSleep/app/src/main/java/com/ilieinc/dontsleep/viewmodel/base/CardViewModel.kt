@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.ilieinc.core.data.dataStore
 import com.ilieinc.core.data.getValue
@@ -40,6 +41,7 @@ abstract class CardViewModel(
     protected val context: Context get() = getApplication<Application>().applicationContext
 
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        exception.message?.let { FirebaseCrashlytics.getInstance().log(it) }
         Logger.error(exception)
     }
 
