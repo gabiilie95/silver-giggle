@@ -8,7 +8,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -16,10 +17,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,6 +43,7 @@ import com.ilieinc.core.ui.theme.AppTheme
 import com.ilieinc.core.util.StateHelper.needToShowReviewSnackbar
 import com.ilieinc.core.util.StateHelper.showReviewSnackbar
 import com.ilieinc.dontsleep.MainActivity
+import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.ui.component.ActionCard
 import com.ilieinc.dontsleep.ui.component.CardHelpDialog
 import com.ilieinc.dontsleep.ui.component.CardPermissionDialog
@@ -47,6 +53,7 @@ import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
 import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen(
     hasNotificationPermission: Boolean,
@@ -66,7 +73,10 @@ fun MainScreen(
                     .navigationBarsPadding()
                     .fillMaxWidth(),
                 onClick = { activity?.finish() }) {
-                Text("Close")
+                Text(
+                    text = stringResource(R.string.close),
+                    color = MaterialTheme.colorScheme.contentColorFor(ButtonDefaults.buttonColors().containerColor)
+                )
             }
         }
     ) { paddingValues ->
@@ -75,27 +85,30 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Column(
+            FlowRow(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .fillMaxWidth()
-                    .verticalScroll(scrollState)
+                    .verticalScroll(scrollState),
+                maxItemsInEachRow = 2
             ) {
-                WakeLockTimerCard(
-                    modifier = Modifier
-                        .padding(5.dp)
-                        .animateContentSize()
-                )
-                MediaTimeoutTimerCard(
-                    modifier = Modifier
-                        .padding(5.dp)
-                        .animateContentSize()
-                )
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && activity is MainActivity
                     && !hasNotificationPermission
                 ) {
                     AndroidTNotificationPermissionButton(activity, notificationPermissionResult)
                 }
+                WakeLockTimerCard(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(5.dp)
+                        .animateContentSize()
+                )
+                MediaTimeoutTimerCard(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(5.dp)
+                        .animateContentSize()
+                )
             }
         }
         if (activity != null) {

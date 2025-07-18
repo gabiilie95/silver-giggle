@@ -12,7 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -80,7 +83,10 @@ class TileQuickSettingsDialogActivity : ComponentActivity() {
                     .fillMaxWidth(),
                 onClick = ::finish
             ) {
-                Text(stringResource(R.string.close))
+                Text(
+                    text = stringResource(R.string.close),
+                    color = MaterialTheme.colorScheme.contentColorFor(ButtonDefaults.buttonColors().containerColor)
+                )
             }
         }
     }

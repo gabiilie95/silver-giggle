@@ -313,6 +313,12 @@ private fun FavoriteTimesSection(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         state.savedTimes.filter { it.isFavorite }.forEach {
+            val rowColor = if (it == state.selectedTime) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                Color.Transparent
+            }
+            val textColor = MaterialTheme.colorScheme.contentColorFor(rowColor)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -323,11 +329,7 @@ private fun FavoriteTimesSection(
                         }
                     }
                     .background(
-                        color = if (it == state.selectedTime) {
-                            MaterialTheme.colorScheme.primaryContainer
-                        } else {
-                            Color.Transparent
-                        }
+                        color = rowColor
                     )
                     .padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -335,20 +337,27 @@ private fun FavoriteTimesSection(
             ) {
                 Text(
                     text = it.getFormattedTime(state.is24hour),
+                    color = textColor,
                     modifier = Modifier.padding(8.dp)
                 )
                 if (it == state.selectedTime && !enabled) {
                     OutlinedButton(
                         onClick = { onEvent(OnStatusToggleChange(false)) },
                     ) {
-                        Text(stringResource(R.string.stop))
+                        Text(
+                            text = stringResource(R.string.stop),
+                            color = textColor
+                        )
                     }
                 } else {
                     OutlinedButton(
                         enabled = enabled,
                         onClick = { onEvent(OnFavoriteItemStartClick(it)) },
                     ) {
-                        Text(stringResource(R.string.start))
+                        Text(
+                            text = stringResource(R.string.start),
+                            color = textColor
+                        )
                     }
                 }
             }
