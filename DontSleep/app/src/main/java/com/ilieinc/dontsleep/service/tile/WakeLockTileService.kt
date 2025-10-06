@@ -1,10 +1,17 @@
 package com.ilieinc.dontsleep.service.tile
 
 import android.graphics.drawable.Icon
+import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import android.widget.Toast
+import com.google.gson.Gson
+import com.ilieinc.core.data.dataStore
+import com.ilieinc.core.data.getValueSynchronous
 import com.ilieinc.dontsleep.R
+import com.ilieinc.dontsleep.data.DontSleepDataStore
 import com.ilieinc.dontsleep.service.WakeLockService
+import com.ilieinc.dontsleep.ui.model.CardUiState
 import com.ilieinc.core.util.DeviceAdminHelper
 import com.ilieinc.core.util.PermissionHelper
 import com.ilieinc.core.util.StateHelper.TileStates
@@ -17,6 +24,11 @@ class WakeLockTileService : TileService() {
         get() = WakeLockService.isRunning(this)
 
     override fun onClick() {
+        if (!isStatusButtonEnabled()) {
+            Toast.makeText(applicationContext, getString(R.string.invalid_time_selected), Toast.LENGTH_SHORT).show()
+            refreshTileState()
+            return
+        }
         if (!enabled) {
             startForegroundService<WakeLockService>()
         } else {
@@ -37,14 +49,12 @@ class WakeLockTileService : TileService() {
     }
 
     private fun refreshTileState() {
-        val tileState = if (PermissionHelper.shouldRequestDrawOverPermission(this)) {
-            TileStates.Disabled
-        } else {
-            if (enabled) {
-                TileStates.On
-            } else {
-                TileStates.Off
-            }
+        val permissionMissing = PermissionHelper.shouldRequestDrawOverPermission(this)
+        val statusEnabled = isStatusButtonEnabled()
+        val tileState = when {
+            permissionMissing || !statusEnabled -> TileStates.Disabled
+            enabled -> TileStates.On
+            else -> TileStates.Off
         }
         qsTile.apply {
             when (tileState) {
@@ -55,6 +65,7 @@ class WakeLockTileService : TileService() {
                         this@WakeLockTileService,
                         R.drawable.baseline_mobile_friendly_24
                     )
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) subtitle = null
                 }
                 TileStates.Off -> {
                     label = "Sleep..."
@@ -63,6 +74,7 @@ class WakeLockTileService : TileService() {
                         this@WakeLockTileService,
                         R.drawable.baseline_mobile_off_24
                     )
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) subtitle = null
                 }
                 TileStates.Disabled -> {
                     label = "Sleep..."
@@ -71,9 +83,28 @@ class WakeLockTileService : TileService() {
                         this@WakeLockTileService,
                         R.drawable.baseline_mobile_off_24
                     )
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        subtitle = if (permissionMissing) {
+                            "Permission required"
+                        } else {
+                            "Invalid time selected"
+                        }
+                    }
                 }
             }
             updateTile()
         }
     }
+
+    private fun isStatusButtonEnabled() = runCatching {
+        val json = applicationContext.dataStore.getValueSynchronous(
+            DontSleepDataStore.WAKE_LOCK_STATE_PREF_KEY,
+            ""
+        )
+        if (json.isEmpty()) {
+            CardUiState().statusButtonEnabled
+        } else {
+            Gson().fromJson(json, CardUiState::class.java).statusButtonEnabled
+        }
+    }.getOrDefault(true)
 }

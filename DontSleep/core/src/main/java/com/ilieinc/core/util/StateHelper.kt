@@ -36,9 +36,7 @@ object StateHelper {
     private val _useDynamicColors = MutableStateFlow(true)
     val useDynamicColors = _useDynamicColors.asStateFlow()
 
-    fun deviceRequiresOverlay(): Boolean {
-        return overlayDevices.contains(Build.MANUFACTURER.lowercase(Locale.getDefault()))
-    }
+    fun deviceRequiresOverlay() = overlayDevices.contains(Build.MANUFACTURER.lowercase(Locale.getDefault()))
 
     fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
         val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager

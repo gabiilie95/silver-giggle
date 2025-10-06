@@ -56,7 +56,7 @@ class TileQuickSettingsDialogActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Body(
+    private fun Body(
         componentName: String,
         modifier: Modifier = Modifier
     ) {

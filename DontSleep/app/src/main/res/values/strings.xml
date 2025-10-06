@@ -52,4 +52,5 @@
     <string name="twenty_four_hour">24hr</string>
     <string name="select">Select</string>
     <string name="start">Start</string>
+    <string name="invalid_time_selected">Invalid time selected</string>
 </resources>
