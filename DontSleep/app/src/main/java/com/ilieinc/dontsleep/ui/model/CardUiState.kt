@@ -1,6 +1,7 @@
 package com.ilieinc.dontsleep.ui.model
 
 import com.ilieinc.dontsleep.ui.model.common.ClockState
+import com.ilieinc.dontsleep.ui.model.common.SavedTime
 import com.ilieinc.dontsleep.ui.model.common.TimeoutState
 
 data class CardUiState(
@@ -16,16 +17,22 @@ data class CardUiState(
     @Transient val showHelpDialog: Boolean = false,
     @Transient val permissionRequired: Boolean = false
 ) {
-    val enableButtonEnabled get() = enabled || when (timeoutMode) {
-        TimeoutMode.CLOCK -> clockState.selectedTime != null
-        else -> true
+    val statusButtonEnabled get() = enabled || !timeoutEnabled || when (timeoutMode) {
+        TimeoutMode.CLOCK -> isSelectedTimeValid(clockState.selectedTime)
+        TimeoutMode.TIMEOUT -> isSelectedTimeValid(timeoutState.selectedTime)
     }
+
     val editControlsEnabled get() = !enabled
+
     val selectedTime
         get() = when (timeoutMode) {
             TimeoutMode.TIMEOUT -> timeoutState.selectedTime
             TimeoutMode.CLOCK -> clockState.selectedTime
         }
+
+    private fun isSelectedTimeValid(selectedTime: SavedTime?) = with(selectedTime) {
+        this != null && (hour > 0 || minute > 0)
+    }
 
     enum class TimeoutMode {
         TIMEOUT,

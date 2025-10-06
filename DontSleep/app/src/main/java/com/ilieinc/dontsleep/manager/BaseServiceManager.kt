@@ -55,7 +55,7 @@ abstract class BaseServiceManager(
     private fun initFields() {
         state = runCatching {
             with(context.dataStore.getValueSynchronous(serviceStatePreferenceKey, "")) {
-                Gson().fromJson(this, CardUiState::class.java)
+                Gson().fromJson(this, CardUiState::class.java)!!
             }
         }.fold(
             onSuccess = { it },

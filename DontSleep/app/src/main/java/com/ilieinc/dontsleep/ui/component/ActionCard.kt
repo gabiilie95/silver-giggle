@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -82,8 +83,18 @@ fun ActionCard(
                         SwitchRow(
                             modifier = Modifier.fillMaxWidth(),
                             text = stringResource(R.string.status),
+                            supportingText = {
+                                if (!statusButtonEnabled) {
+                                    Text(
+                                        modifier = Modifier.padding(top = 6.dp, bottom = 2.dp),
+                                        text = stringResource(R.string.invalid_time_selected),
+                                        color = MaterialTheme.colorScheme.error,
+                                        style = AppTypography.bodySmall
+                                    )
+                                }
+                            },
                             checked = enabled,
-                            enabled = enableButtonEnabled,
+                            enabled = statusButtonEnabled,
                             onCheckedChange = { onEvent(OnStatusToggleChange(it)) }
                         )
                         if (showTimeoutSectionToggle) {
@@ -115,6 +126,7 @@ private fun SwitchRow(
     onCheckedChange: (Boolean) -> Unit,
     checked: Boolean,
     modifier: Modifier = Modifier,
+    supportingText: @Composable () -> Unit = {},
     enabled: Boolean = true
 ) {
     Row(
@@ -122,10 +134,13 @@ private fun SwitchRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = text,
-            fontWeight = FontWeight.Bold
-        )
+        Column {
+            Text(
+                text = text,
+                fontWeight = FontWeight.Bold
+            )
+            supportingText()
+        }
         Switch(
             checked = checked,
             enabled = enabled,
