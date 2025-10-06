@@ -25,7 +25,7 @@ class WakeLockTileService : TileService() {
 
     override fun onClick() {
         if (!isStatusButtonEnabled()) {
-            Toast.makeText(applicationContext, "Select a valid time first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, getString(R.string.invalid_time_selected), Toast.LENGTH_SHORT).show()
             refreshTileState()
             return
         }
