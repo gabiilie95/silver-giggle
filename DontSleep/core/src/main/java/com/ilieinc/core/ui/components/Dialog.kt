@@ -2,6 +2,8 @@ package com.ilieinc.core.ui.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -10,6 +12,7 @@ import com.ilieinc.core.compose.DialogDismissEventHandler
 import com.ilieinc.core.viewmodel.PermissionDialogViewModel
 import com.ilieinc.core.viewmodel.RatingDialogViewModel
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun RatingDialog(viewModel: RatingDialogViewModel, onDismiss: () -> Unit) {
     DialogDismissEventHandler(
@@ -25,14 +28,18 @@ fun RatingDialog(viewModel: RatingDialogViewModel, onDismiss: () -> Unit) {
                 )
             },
             confirmButton = {
-                Button(onClick = {
-                    requestReview()
-                }) {
+                Button(
+                    shapes = ButtonDefaults.shapes(),
+                    onClick = ::requestReview
+                ) {
                     Text(stringResource(R.string.rate_app))
                 }
             },
             dismissButton = {
-                Button(onClick = this::onDismissRequested) {
+                Button(
+                    shapes = ButtonDefaults.shapes(),
+                    onClick = ::onDismissRequested
+                ) {
                     Text(text = stringResource(R.string.dismiss))
                 }
             }
@@ -40,12 +47,17 @@ fun RatingDialog(viewModel: RatingDialogViewModel, onDismiss: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun NotificationInfoDialog(viewModel: PermissionDialogViewModel) {
     with(viewModel) {
-        AlertDialog(onDismissRequest = this::onDismissRequested,
+        AlertDialog(
+            onDismissRequest = ::onDismissRequested,
             confirmButton = {
-                Button(onClick = this::onDismissRequested) {
+                Button(
+                    shapes = ButtonDefaults.shapes(),
+                    onClick = ::onDismissRequested
+                ) {
                     Text(text = stringResource(R.string.dismiss))
                 }
             },

@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -29,6 +31,7 @@ import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnStatusToggleChange
 import com.ilieinc.dontsleep.ui.model.CardUiState
 import com.ilieinc.dontsleep.util.previewprovider.TimePickerPreviewProvider
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ActionCard(
     state: CardUiState,
@@ -50,7 +53,10 @@ fun ActionCard(
                         style = AppTypography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
-                    Button(onClick = { onEvent(OnChangeHelpDialogVisibility(true)) }) {
+                    Button(
+                        shapes = ButtonDefaults.shapes(),
+                        onClick = { onEvent(OnChangeHelpDialogVisibility(true)) }
+                    ) {
                         Text(text = stringResource(R.string.help))
                     }
                 }
@@ -73,6 +79,7 @@ fun ActionCard(
                     permissionRequired -> {
                         Button(
                             modifier = Modifier.align(Alignment.End),
+                            shapes = ButtonDefaults.shapes(),
                             onClick = { onEvent(OnChangePermissionDialogVisibility(true)) }
                         ) {
                             Text(text = stringResource(R.string.get_started))
@@ -175,7 +182,7 @@ fun TimeSection(
 @Preview
 @Composable
 fun ActionCardPreview(
-    @PreviewParameter(TimePickerPreviewProvider::class)state: CardUiState
+    @PreviewParameter(TimePickerPreviewProvider::class) state: CardUiState
 ) {
     ActionCard(
         state = state,

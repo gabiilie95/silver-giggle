@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -34,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -53,7 +54,7 @@ import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
 import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainScreen(
     hasNotificationPermission: Boolean,
@@ -72,6 +73,7 @@ fun MainScreen(
                     .padding(5.dp)
                     .navigationBarsPadding()
                     .fillMaxWidth(),
+                shapes = ButtonDefaults.shapes(),
                 onClick = { activity?.finish() }) {
                 Text(
                     text = stringResource(R.string.close),
@@ -100,13 +102,15 @@ fun MainScreen(
                 WakeLockTimerCard(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(5.dp)
+                        .padding(horizontal = 12.dp)
+                        .padding(bottom = 12.dp)
                         .animateContentSize()
                 )
                 MediaTimeoutTimerCard(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(5.dp)
+                        .padding(horizontal = 12.dp)
+                        .padding(bottom = 12.dp)
                         .animateContentSize()
                 )
             }

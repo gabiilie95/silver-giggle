@@ -66,6 +66,7 @@ private val DarkThemeColors = darkColorScheme(
 	inversePrimary = md_theme_dark_inversePrimary,
 )
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
@@ -84,8 +85,7 @@ fun AppTheme(
 		useDarkTheme -> DarkThemeColors
 		else -> LightThemeColors
 	}
-
-	MaterialTheme(
+    MaterialExpressiveTheme(
 		colorScheme = colors,
 		typography = AppTypography,
 		content = content

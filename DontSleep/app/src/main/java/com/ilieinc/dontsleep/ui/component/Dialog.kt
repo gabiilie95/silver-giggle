@@ -3,6 +3,8 @@ package com.ilieinc.dontsleep.ui.component
 import androidx.activity.compose.LocalActivity
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -64,6 +66,7 @@ fun CardPermissionDialog(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HelpDialog(
     state: HelpDialogUiState,
@@ -81,13 +84,19 @@ fun HelpDialog(
             title = { Text(title) },
             text = { Text(description) },
             confirmButton = {
-                Button(onClick = dialogViewModel::onDismissRequested) {
+                Button(
+                    shapes = ButtonDefaults.shapes(),
+                    onClick = dialogViewModel::onDismissRequested
+                ) {
                     Text(stringResource(R.string.ok))
                 }
             },
             dismissButton = {
                 if (showRevokePermissionButton) {
-                    Button(onClick = onRevokePermissionClick) {
+                    Button(
+                        shapes = ButtonDefaults.shapes(),
+                        onClick = onRevokePermissionClick
+                    ) {
                         Text(text = revokeButtonText)
                     }
                 }
@@ -96,6 +105,7 @@ fun HelpDialog(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PermissionDialog(
     uiModel: PermissionDialogUiModel,
@@ -110,13 +120,17 @@ fun PermissionDialog(
             confirmButton = {
                 Button(
                     onClick = onRequestPermission,
+                    shapes = ButtonDefaults.shapes(),
                     enabled = confirmButtonEnabled
                 ) {
                     Text(confirmButtonText)
                 }
             },
             dismissButton = {
-                Button(onClick = onDismissRequested) {
+                Button(
+                    shapes = ButtonDefaults.shapes(),
+                    onClick = onDismissRequested
+                ) {
                     Text(stringResource(R.string.no))
                 }
             }

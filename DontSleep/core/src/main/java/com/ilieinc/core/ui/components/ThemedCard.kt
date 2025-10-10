@@ -18,11 +18,11 @@ fun ThemedCard(
     body: @Composable () -> Unit
 ) {
     Card(
-        modifier
+        modifier = modifier,
+        colors = CardDefaults.cardColors()
     ) {
         Column(
-            Modifier
-                .padding(10.dp)
+            Modifier.padding(10.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

@@ -27,6 +27,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -157,6 +158,7 @@ fun ClockSection(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SwitchTimePickerMode(
     state: ClockState,
@@ -165,6 +167,7 @@ private fun SwitchTimePickerMode(
 ) {
     OutlinedButton(
         modifier = modifier,
+        shapes = ButtonDefaults.shapes(),
         onClick = { onEvent(OnSwitchTimePickerModeButtonClick(state.timepickerMode)) }
     ) {
         Text(
@@ -178,7 +181,7 @@ private fun SwitchTimePickerMode(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ManageSavedTimesButton(
     state: ClockState,
@@ -194,6 +197,7 @@ private fun ManageSavedTimesButton(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(
+            shapes = ButtonDefaults.shapes(),
             onClick = { onEvent(OnCancelButtonClick) }
         ) {
             Text(text = stringResource(R.string.cancel))
@@ -206,6 +210,7 @@ private fun ManageSavedTimesButton(
 
         Button(
             enabled = enabled,
+            shapes = ButtonDefaults.shapes(),
             onClick = {
                 onEvent(
                     OnConfirmEditClick(
@@ -234,6 +239,7 @@ private fun ManageSavedTimesButton(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SavedTimesSection(
     state: ClockState,
@@ -249,6 +255,7 @@ private fun SavedTimesSection(
         val savedTimes = state.savedTimes
         IconButton(
             enabled = enabled,
+            shapes = IconButtonDefaults.shapes(),
             colors = IconButtonDefaults.iconButtonColors(
                 contentColor = MaterialTheme.colorScheme.primary
             ),
@@ -271,6 +278,7 @@ private fun SavedTimesSection(
         if (state.selectedTime != null) {
             IconButton(
                 enabled = enabled,
+                shapes = IconButtonDefaults.shapes(),
                 colors = IconButtonDefaults.iconButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary
                 ),
@@ -286,6 +294,7 @@ private fun SavedTimesSection(
             if (state.selectedTime != null) {
                 IconButton(
                     enabled = enabled,
+                    shapes = IconButtonDefaults.shapes(),
                     colors = IconButtonDefaults.iconButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary
                     ),
@@ -301,6 +310,7 @@ private fun SavedTimesSection(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun FavoriteTimesSection(
     state: ClockState,
@@ -352,6 +362,7 @@ private fun FavoriteTimesSection(
                 } else {
                     OutlinedButton(
                         enabled = enabled,
+                        shapes = ButtonDefaults.shapes(),
                         onClick = { onEvent(OnFavoriteItemStartClick(it)) },
                     ) {
                         Text(

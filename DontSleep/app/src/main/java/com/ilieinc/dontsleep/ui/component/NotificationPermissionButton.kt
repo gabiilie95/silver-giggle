@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -20,12 +22,14 @@ import com.ilieinc.core.ui.components.NotificationInfoDialog
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @RequiresApi(33)
 @Composable
 fun RequestNotificationButton(viewModel: NotificationButtonDialogViewModel) {
     with(viewModel) {
         Button(
             modifier = Modifier.fillMaxWidth(),
+            shapes = ButtonDefaults.shapes(),
             onClick = { requestPermission() }) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
