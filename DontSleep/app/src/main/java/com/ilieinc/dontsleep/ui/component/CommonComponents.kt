@@ -1,9 +1,13 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.ilieinc.dontsleep.ui.component
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.Timer
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
@@ -24,6 +28,7 @@ fun SwitchModesButton(
             OutlinedButton(
                 modifier = modifier,
                 contentPadding = PaddingValues(0.dp),
+                shapes = ButtonDefaults.shapes(),
                 enabled = state.editControlsEnabled,
                 onClick = { onEvent(OnTimeoutModeButtonClick(state)) }
             ) {
@@ -35,6 +40,7 @@ fun SwitchModesButton(
             OutlinedButton(
                 modifier = modifier,
                 contentPadding = PaddingValues(0.dp),
+                shapes = ButtonDefaults.shapes(),
                 enabled = state.editControlsEnabled,
                 onClick = { onEvent(OnTimeoutModeButtonClick(state)) }
             ) {

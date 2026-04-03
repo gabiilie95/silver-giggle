@@ -3,7 +3,10 @@ package com.ilieinc.dontsleep.ui.model
 import com.ilieinc.dontsleep.ui.model.common.ClockState
 import com.ilieinc.dontsleep.ui.model.common.SavedTime
 import com.ilieinc.dontsleep.ui.model.common.TimeoutState
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 data class CardUiState(
     val title: String = "",
     val timeoutState: TimeoutState = TimeoutState(),
@@ -34,6 +37,7 @@ data class CardUiState(
         this != null && (hour > 0 || minute > 0)
     }
 
+    @Serializable
     enum class TimeoutMode {
         TIMEOUT,
         CLOCK

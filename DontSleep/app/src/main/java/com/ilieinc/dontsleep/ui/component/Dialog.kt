@@ -1,13 +1,17 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.ilieinc.dontsleep.ui.component
 
-import androidx.activity.compose.LocalActivity
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.ilieinc.core.compose.DialogDismissEventHandler
 import com.ilieinc.core.ui.model.PermissionDialogUiModel
 import com.ilieinc.core.viewmodel.base.DialogViewModel
@@ -21,23 +25,24 @@ import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
 import com.ilieinc.dontsleep.viewmodel.WakeLockHelpDialogViewModel
 import com.ilieinc.dontsleep.viewmodel.WakeLockPermissionDialogViewModel
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
+import com.ilieinc.dontsleep.viewmodel.base.HelpDialogViewModel
 
 @Composable
 fun CardHelpDialog(
     viewModel: CardViewModel
 ) {
-    val activity = LocalActivity.current ?: return
-    when (viewModel) {
-        is WakeLockCardViewModel -> WakeLockHelpDialogViewModel(activity.application)
-        is MediaTimeoutCardViewModel -> MediaTimeoutCardHelpDialogViewModel(activity.application)
+    val dialogViewModel: HelpDialogViewModel? = when (viewModel) {
+        is WakeLockCardViewModel -> hiltViewModel<WakeLockHelpDialogViewModel>()
+        is MediaTimeoutCardViewModel -> hiltViewModel<MediaTimeoutCardHelpDialogViewModel>()
         else -> null
-    }?.let { dialogViewModel ->
-        val state by dialogViewModel.state.collectAsState()
+    }
+    dialogViewModel?.let {
+        val state by it.state.collectAsState()
         HelpDialog(
             state = state,
-            dialogViewModel = dialogViewModel,
+            dialogViewModel = it,
             onDismissRequested = { viewModel.onEvent(OnChangeHelpDialogVisibility(false)) },
-            onRevokePermissionClick = dialogViewModel::revokePermission
+            onRevokePermissionClick = it::revokePermission
         )
     }
 }
@@ -46,20 +51,20 @@ fun CardHelpDialog(
 fun CardPermissionDialog(
     viewModel: CardViewModel
 ) {
-    val activity = LocalActivity.current ?: return
-    when (viewModel) {
-        is WakeLockCardViewModel -> WakeLockPermissionDialogViewModel(activity.application)
+    val dialogViewModel: WakeLockPermissionDialogViewModel? = when (viewModel) {
+        is WakeLockCardViewModel -> hiltViewModel<WakeLockPermissionDialogViewModel>()
         else -> null
-    }?.let { dialogViewModel ->
+    }
+    dialogViewModel?.let {
         DialogDismissEventHandler(
-            dialogViewModel = dialogViewModel,
+            dialogViewModel = it,
             onDismiss = { viewModel.onEvent(OnChangePermissionDialogVisibility(false)) }
         )
-        val state by dialogViewModel.state.collectAsState()
+        val state by it.state.collectAsState()
         PermissionDialog(
             state,
-            onRequestPermission = dialogViewModel::requestPermission,
-            onDismissRequested = dialogViewModel::onDismissRequested
+            onRequestPermission = it::requestPermission,
+            onDismissRequested = it::onDismissRequested
         )
     }
 }
@@ -81,13 +86,19 @@ fun HelpDialog(
             title = { Text(title) },
             text = { Text(description) },
             confirmButton = {
-                Button(onClick = dialogViewModel::onDismissRequested) {
+                Button(
+                    shapes = ButtonDefaults.shapes(),
+                    onClick = dialogViewModel::onDismissRequested
+                ) {
                     Text(stringResource(R.string.ok))
                 }
             },
             dismissButton = {
                 if (showRevokePermissionButton) {
-                    Button(onClick = onRevokePermissionClick) {
+                    Button(
+                        shapes = ButtonDefaults.shapes(),
+                        onClick = onRevokePermissionClick
+                    ) {
                         Text(text = revokeButtonText)
                     }
                 }

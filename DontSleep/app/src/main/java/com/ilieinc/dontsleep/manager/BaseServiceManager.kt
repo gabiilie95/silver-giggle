@@ -4,10 +4,10 @@ import android.app.Notification
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.gson.Gson
 import com.ilieinc.core.data.dataStore
-import com.ilieinc.core.data.getValueSynchronous
+import com.ilieinc.core.data.getValue
 import com.ilieinc.core.util.Logger
+import com.ilieinc.dontsleep.util.JsonUtils.deserializeFromJson
 import com.ilieinc.dontsleep.timer.StopServiceWorker
 import com.ilieinc.dontsleep.timer.TimerManager
 import com.ilieinc.dontsleep.ui.model.CardUiState
@@ -45,18 +45,17 @@ abstract class BaseServiceManager(
         this.context = context
     }
 
-    open fun onCreateService() {
+    open suspend fun onCreateService() {
         Logger.info("Starting service $serviceClass")
         initFields()
         job = initObservers()
         initTimeout(state)
     }
 
-    private fun initFields() {
+    private suspend fun initFields() {
         state = runCatching {
-            with(context.dataStore.getValueSynchronous(serviceStatePreferenceKey, "")) {
-                Gson().fromJson(this, CardUiState::class.java)!!
-            }
+            val json = context.dataStore.getValue(serviceStatePreferenceKey, "")
+            json.deserializeFromJson<CardUiState>() ?: CardUiState()
         }.fold(
             onSuccess = { it },
             onFailure = { ex ->
@@ -72,8 +71,8 @@ abstract class BaseServiceManager(
 
     private fun initObservers() = CoroutineScope(ioScope).launch {
         context.dataStore.data.collectLatest { prefs ->
-            prefs[serviceStatePreferenceKey]?.let {
-                state = Gson().fromJson(it, CardUiState::class.java)
+            prefs[serviceStatePreferenceKey]?.let { json ->
+                json.deserializeFromJson<CardUiState>()?.let { state = it }
             }
         }
     }

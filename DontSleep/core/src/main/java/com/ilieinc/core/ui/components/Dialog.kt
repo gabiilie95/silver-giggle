@@ -1,7 +1,11 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.ilieinc.core.ui.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -17,22 +21,25 @@ fun RatingDialog(viewModel: RatingDialogViewModel, onDismiss: () -> Unit) {
         onDismiss = onDismiss
     )
     with(viewModel) {
-        AlertDialog(onDismissRequest = this::onDismissRequested,
+        AlertDialog(
+            onDismissRequest = this::onDismissRequested,
             title = { Text(text = stringResource(R.string.rate_title)) },
             text = {
-                Text(
-                    text = stringResource(R.string.rate_description)
-                )
+                Text(text = stringResource(R.string.rate_description))
             },
             confirmButton = {
-                Button(onClick = {
-                    requestReview()
-                }) {
+                Button(
+                    onClick = ::requestReview,
+                    shapes = ButtonDefaults.shapes()
+                ) {
                     Text(stringResource(R.string.rate_app))
                 }
             },
             dismissButton = {
-                Button(onClick = this::onDismissRequested) {
+                Button(
+                    onClick = ::onDismissRequested,
+                    shapes = ButtonDefaults.shapes()
+                ) {
                     Text(text = stringResource(R.string.dismiss))
                 }
             }
@@ -43,9 +50,13 @@ fun RatingDialog(viewModel: RatingDialogViewModel, onDismiss: () -> Unit) {
 @Composable
 fun NotificationInfoDialog(viewModel: PermissionDialogViewModel) {
     with(viewModel) {
-        AlertDialog(onDismissRequest = this::onDismissRequested,
+        AlertDialog(
+            onDismissRequest = ::onDismissRequested,
             confirmButton = {
-                Button(onClick = this::onDismissRequested) {
+                Button(
+                    onClick = ::onDismissRequested,
+                    shapes = ButtonDefaults.shapes()
+                ) {
                     Text(text = stringResource(R.string.dismiss))
                 }
             },

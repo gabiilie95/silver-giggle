@@ -33,8 +33,8 @@ class MediaTimeoutServiceManager(
         }
     }
 
-    override val notification: Notification by lazy {
-        DontSleepNotificationManager.createTimeoutNotification<MediaTimeoutService>(
+    override val notification: Notification
+        get() = DontSleepNotificationManager.createTimeoutNotification<MediaTimeoutService>(
             context,
             R.drawable.baseline_timer_24,
             context.getString(R.string.app_name),
@@ -43,5 +43,4 @@ class MediaTimeoutServiceManager(
                 DateFormat.getTimeFormat(context).format(timeoutDateTime.time)
             )
         )
-    }
 }

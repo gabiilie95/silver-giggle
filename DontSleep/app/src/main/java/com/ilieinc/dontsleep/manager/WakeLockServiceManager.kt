@@ -33,8 +33,8 @@ class WakeLockServiceManager(
         }
     }
 
-    override val notification: Notification by lazy {
-        DontSleepNotificationManager.createTimeoutNotification<WakeLockService>(
+    override val notification: Notification
+        get() = DontSleepNotificationManager.createTimeoutNotification<WakeLockService>(
             context,
             R.drawable.baseline_mobile_friendly_24,
             context.getString(R.string.app_name),
@@ -47,5 +47,4 @@ class WakeLockServiceManager(
                 context.getString(R.string.timeout_notification_indefinite_text)
             }
         )
-    }
 }

@@ -4,8 +4,8 @@ plugins {
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.google.services)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.jetbrains.kotlin.android)
-    id("kotlin-kapt")
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -16,7 +16,7 @@ android {
         applicationId = "com.ilieinc.dontsleep"
         minSdk = 24
         targetSdk = 36
-        versionCode = 35
+        versionCode = 36
         versionName = "2.$versionCode"
         multiDexEnabled = true
     }
@@ -78,7 +78,7 @@ dependencies {
     // Dependency Injection
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     // Firebase
     implementation(platform(libs.firebase.bom))
@@ -93,8 +93,7 @@ dependencies {
     implementation(libs.kotlin.stdlib.jdk7)
 
     // Misc
-    implementation(libs.gson)
-    implementation(libs.jsoup)
+    implementation(libs.kotlinx.serialization.json)
 
     // Testing
     testImplementation(libs.junit)
