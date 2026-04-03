@@ -9,7 +9,6 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "DontSleep")
 
@@ -17,11 +16,6 @@ suspend fun <T : Any> DataStore<Preferences>.getValue(key: Preferences.Key<T>, d
     data.map { preferences ->
         preferences[key]
     }.firstOrNull() ?: defaultValue
-
-fun <T : Any> DataStore<Preferences>.getValueSynchronous(
-    key: Preferences.Key<T>,
-    defaultValue: T
-) = runBlocking { getValue(key, defaultValue) }
 
 suspend fun <T : Any> DataStore<Preferences>.setValue(key: Preferences.Key<T>, value: T) {
     edit { preferences ->

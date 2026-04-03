@@ -1,5 +1,8 @@
 package com.ilieinc.dontsleep.ui.model.common
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class TimeoutState(
     val selectedTime: SavedTime = SavedTime(
         hour = 0,

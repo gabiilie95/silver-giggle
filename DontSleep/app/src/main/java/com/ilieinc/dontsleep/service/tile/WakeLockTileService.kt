@@ -5,10 +5,10 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import android.widget.Toast
-import com.google.gson.Gson
 import com.ilieinc.core.data.dataStore
-import com.ilieinc.core.data.getValueSynchronous
+import com.ilieinc.core.data.getValue
 import com.ilieinc.dontsleep.R
+import com.ilieinc.dontsleep.util.JsonUtils.deserializeFromJson
 import com.ilieinc.dontsleep.data.DontSleepDataStore
 import com.ilieinc.dontsleep.service.WakeLockService
 import com.ilieinc.dontsleep.ui.model.CardUiState
@@ -17,14 +17,22 @@ import com.ilieinc.core.util.PermissionHelper
 import com.ilieinc.core.util.StateHelper.TileStates
 import com.ilieinc.core.util.StateHelper.startForegroundService
 import com.ilieinc.core.util.StateHelper.stopService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class WakeLockTileService : TileService() {
+
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private var cachedStatusEnabled = true
 
     private val enabled
         get() = WakeLockService.isRunning(this)
 
     override fun onClick() {
-        if (!isStatusButtonEnabled()) {
+        if (!cachedStatusEnabled) {
             Toast.makeText(applicationContext, getString(R.string.invalid_time_selected), Toast.LENGTH_SHORT).show()
             refreshTileState()
             return
@@ -40,6 +48,10 @@ class WakeLockTileService : TileService() {
     override fun onStartListening() {
         DeviceAdminHelper.init(applicationContext)
         refreshTileState()
+        scope.launch {
+            cachedStatusEnabled = loadStatusButtonEnabled()
+            launch(Dispatchers.Main) { refreshTileState() }
+        }
         super.onStartListening()
     }
 
@@ -48,9 +60,14 @@ class WakeLockTileService : TileService() {
         super.onStopListening()
     }
 
+    override fun onDestroy() {
+        scope.cancel()
+        super.onDestroy()
+    }
+
     private fun refreshTileState() {
         val permissionMissing = PermissionHelper.shouldRequestDrawOverPermission(this)
-        val statusEnabled = isStatusButtonEnabled()
+        val statusEnabled = cachedStatusEnabled
         val tileState = when {
             permissionMissing || !statusEnabled -> TileStates.Disabled
             enabled -> TileStates.On
@@ -96,15 +113,11 @@ class WakeLockTileService : TileService() {
         }
     }
 
-    private fun isStatusButtonEnabled() = runCatching {
-        val json = applicationContext.dataStore.getValueSynchronous(
+    private suspend fun loadStatusButtonEnabled(): Boolean = runCatching {
+        val json = applicationContext.dataStore.getValue(
             DontSleepDataStore.WAKE_LOCK_STATE_PREF_KEY,
             ""
         )
-        if (json.isEmpty()) {
-            CardUiState().statusButtonEnabled
-        } else {
-            Gson().fromJson(json, CardUiState::class.java).statusButtonEnabled
-        }
+        (json.deserializeFromJson<CardUiState>() ?: CardUiState()).statusButtonEnabled
     }.getOrDefault(true)
 }

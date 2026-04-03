@@ -1,6 +1,5 @@
 package com.ilieinc.core.ui.components
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -9,7 +8,11 @@ import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material.icons.outlined.InvertColors
 import androidx.compose.material.icons.outlined.InvertColorsOff
 import androidx.compose.material.icons.outlined.StarRate
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,10 +26,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.ilieinc.core.R
-import com.ilieinc.core.compose.DialogDismissEventHandler
 import com.ilieinc.core.util.StateHelper
 import com.ilieinc.core.viewmodel.RatingDialogViewModel
 import kotlinx.coroutines.launch
@@ -39,43 +40,44 @@ fun ApplicationTopAppBar() {
     var showRateDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    TopAppBar(title = {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                Icons.Default.Smartphone,
-                "Title Icon",
-                tint = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.background)
-            )
-            Text(
-                modifier = Modifier.padding(start = 5.dp),
-                text = stringResource(R.string.app_name),
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }, actions = {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            IconButton(onClick = {
-                scope.launch {
-                    StateHelper.setDynamicColorsEnabled(
-                        context = context,
-                        enabled = !useDynamicColors
-                    )
-                }
-            }) {
+    TopAppBar(
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    if (useDynamicColors) {
-                        Icons.Outlined.InvertColors
-                    } else {
-                        Icons.Outlined.InvertColorsOff
-                    },
-                    "Dynamic Colors Image"
+                    Icons.Default.Smartphone,
+                    "Title Icon"
+                )
+                Text(
+                    modifier = Modifier.padding(start = 5.dp),
+                    text = stringResource(R.string.app_name),
+                    fontWeight = FontWeight.Bold
                 )
             }
-        }
-        IconButton(onClick = { showRateDialog = true }) {
-            Icon(Icons.Outlined.StarRate, "Rating Image")
-        }
-    })
+        },
+        actions = {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                IconButton(onClick = {
+                    scope.launch {
+                        StateHelper.setDynamicColorsEnabled(
+                            context = context,
+                            enabled = !useDynamicColors
+                        )
+                    }
+                }) {
+                    Icon(
+                        if (useDynamicColors) {
+                            Icons.Outlined.InvertColors
+                        } else {
+                            Icons.Outlined.InvertColorsOff
+                        },
+                        "Dynamic Colors Image"
+                    )
+                }
+            }
+            IconButton(onClick = { showRateDialog = true }) {
+                Icon(Icons.Outlined.StarRate, "Rating Image")
+            }
+        })
     if (showRateDialog) {
         RatingDialog(
             viewModel = hiltViewModel<RatingDialogViewModel>(),

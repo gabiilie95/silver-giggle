@@ -1,8 +1,10 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.ilieinc.dontsleep.ui.component
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -21,19 +23,23 @@ import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimeInput
@@ -50,12 +56,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.ilieinc.core.ui.theme.AppTheme
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.ui.model.CardUiEvent
-import com.ilieinc.dontsleep.ui.model.CardUiEvent.*
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.On24HourModeChange
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnAddButtonClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnCancelButtonClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnConfirmEditClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnDeleteButtonClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnEditSavedTimeClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnExpandedDropdownChanged
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnFavoriteItemStartClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnItemFavoriteClick
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnSavedTimeSelectionChange
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnStatusToggleChange
+import com.ilieinc.dontsleep.ui.model.CardUiEvent.OnSwitchTimePickerModeButtonClick
 import com.ilieinc.dontsleep.ui.model.CardUiState
 import com.ilieinc.dontsleep.ui.model.common.ClockState
 import com.ilieinc.dontsleep.ui.model.common.ClockState.EditMode
@@ -144,13 +162,14 @@ fun ClockSection(
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
                 state = state.clockState,
-                enabled = state.editControlsEnabled,
+                controlsEnabled = state.editControlsEnabled,
                 onEvent = onEvent
             )
             FavoriteTimesSection(
                 modifier = Modifier.fillMaxWidth(),
                 state = state.clockState,
-                enabled = state.editControlsEnabled,
+                enabled = state.enabled,
+                controlsEnabled = state.editControlsEnabled,
                 onEvent = onEvent
             )
         }
@@ -165,6 +184,7 @@ private fun SwitchTimePickerMode(
 ) {
     OutlinedButton(
         modifier = modifier,
+        shapes = ButtonDefaults.shapes(),
         onClick = { onEvent(OnSwitchTimePickerModeButtonClick(state.timepickerMode)) }
     ) {
         Text(
@@ -194,6 +214,7 @@ private fun ManageSavedTimesButton(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(
+            shapes = ButtonDefaults.shapes(),
             onClick = { onEvent(OnCancelButtonClick) }
         ) {
             Text(text = stringResource(R.string.cancel))
@@ -206,6 +227,7 @@ private fun ManageSavedTimesButton(
 
         Button(
             enabled = enabled,
+            shapes = ButtonDefaults.shapes(),
             onClick = {
                 onEvent(
                     OnConfirmEditClick(
@@ -237,10 +259,9 @@ private fun ManageSavedTimesButton(
 @Composable
 private fun SavedTimesSection(
     state: ClockState,
-    enabled: Boolean,
+    controlsEnabled: Boolean,
     onEvent: (CardUiEvent) -> Unit,
     modifier: Modifier = Modifier
-
 ) {
     Row(
         modifier = modifier then Modifier.animateContentSize(),
@@ -248,7 +269,8 @@ private fun SavedTimesSection(
     ) {
         val savedTimes = state.savedTimes
         IconButton(
-            enabled = enabled,
+            enabled = controlsEnabled,
+            shapes = IconButtonDefaults.shapes(),
             colors = IconButtonDefaults.iconButtonColors(
                 contentColor = MaterialTheme.colorScheme.primary
             ),
@@ -265,12 +287,13 @@ private fun SavedTimesSection(
                 .padding(horizontal = 8.dp)
                 .wrapContentSize(Alignment.TopStart),
             state = state,
-            enabled = enabled,
+            enabled = controlsEnabled,
+            controlsEnabled = controlsEnabled,
             onEvent = onEvent
         )
         if (state.selectedTime != null) {
             IconButton(
-                enabled = enabled,
+                enabled = controlsEnabled,
                 colors = IconButtonDefaults.iconButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary
                 ),
@@ -285,7 +308,7 @@ private fun SavedTimesSection(
         if (savedTimes.isNotEmpty()) {
             if (state.selectedTime != null) {
                 IconButton(
-                    enabled = enabled,
+                    enabled = controlsEnabled,
                     colors = IconButtonDefaults.iconButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary
                     ),
@@ -305,6 +328,7 @@ private fun SavedTimesSection(
 private fun FavoriteTimesSection(
     state: ClockState,
     enabled: Boolean,
+    controlsEnabled: Boolean,
     onEvent: (CardUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -312,51 +336,48 @@ private fun FavoriteTimesSection(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        state.savedTimes.filter { it.isFavorite }.forEach {
-            val rowColor = if (it == state.selectedTime) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                Color.Transparent
-            }
-            val textColor = MaterialTheme.colorScheme.contentColorFor(rowColor)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .clickable {
-                        if (enabled) {
-                            onEvent(OnSavedTimeSelectionChange(it))
-                        }
-                    }
-                    .background(
-                        color = rowColor
-                    )
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        val favoriteTimes = state.savedTimes.filter { it.isFavorite }
+        favoriteTimes.forEachIndexed { index, it ->
+            val isSelected = it == state.selectedTime
+            val buttonEnabled = controlsEnabled || isSelected
+            ListItem(
+                modifier = Modifier.fillMaxWidth(),
+                checked = isSelected,
+                onCheckedChange = { _ ->
+                    onEvent(OnSavedTimeSelectionChange(it))
+                },
+                shapes = ListItemDefaults.segmentedShapes(index, favoriteTimes.size),
+                enabled = buttonEnabled
             ) {
-                Text(
-                    text = it.getFormattedTime(state.is24hour),
-                    color = textColor,
-                    modifier = Modifier.padding(8.dp)
-                )
-                if (it == state.selectedTime && !enabled) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        modifier = Modifier.padding(8.dp),
+                        text = it.getFormattedTime(state.is24hour)
+                    )
                     OutlinedButton(
-                        onClick = { onEvent(OnStatusToggleChange(false)) },
+                        enabled = buttonEnabled,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = LocalContentColor.current
+                        ),
+                        border = BorderStroke(0.5.dp, LocalContentColor.current),
+                        onClick = {
+                            if(isSelected) {
+                                onEvent(OnStatusToggleChange(!enabled))
+                            } else {
+                                onEvent(OnFavoriteItemStartClick(it))
+                            }
+                        }
                     ) {
                         Text(
-                            text = stringResource(R.string.stop),
-                            color = textColor
-                        )
-                    }
-                } else {
-                    OutlinedButton(
-                        enabled = enabled,
-                        onClick = { onEvent(OnFavoriteItemStartClick(it)) },
-                    ) {
-                        Text(
-                            text = stringResource(R.string.start),
-                            color = textColor
+                            text = if (enabled && isSelected) {
+                                stringResource(R.string.stop)
+                            } else {
+                                stringResource(R.string.start)
+                            }
                         )
                     }
                 }
@@ -369,6 +390,7 @@ private fun FavoriteTimesSection(
 private fun SavedTimesDropdown(
     state: ClockState,
     enabled: Boolean,
+    controlsEnabled: Boolean,
     onEvent: (CardUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -386,7 +408,7 @@ private fun SavedTimesDropdown(
             } else {
                 stringResource(R.string.no_saved_times)
             },
-            enabled = enabled,
+            enabled = controlsEnabled,
             interactionSource = interactionSource
                 .also { interactionSource ->
                     LaunchedEffect(interactionSource) {
@@ -407,7 +429,7 @@ private fun SavedTimesDropdown(
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = null,
-                            tint = if (enabled) {
+                            tint = if (controlsEnabled) {
                                 MaterialTheme.colorScheme.primary
                             } else {
                                 Color.Gray
@@ -415,7 +437,7 @@ private fun SavedTimesDropdown(
                         )
                     }
                     IconButton(
-                        enabled = enabled,
+                        enabled = controlsEnabled,
                         onClick = { onEvent(OnExpandedDropdownChanged(true)) }
                     ) {
                         Icon(
@@ -427,7 +449,7 @@ private fun SavedTimesDropdown(
             }
         )
         DropdownMenu(
-            expanded = enabled && state.isDropdownExpanded,
+            expanded = controlsEnabled && state.isDropdownExpanded,
             onDismissRequest = { onEvent(OnExpandedDropdownChanged(false)) },
         ) {
             state.savedTimes.forEach { item ->
@@ -493,11 +515,15 @@ private fun Change24HourButtonSwitch(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 fun ClockSectionPreview(@PreviewParameter(ClockSectionPreviewProvider::class) state: CardUiState) {
-    ClockSection(
-        state = state,
-        onEvent = {}
-    )
+    AppTheme {
+        Surface {
+            ClockSection(
+                state = state,
+                onEvent = {}
+            )
+        }
+    }
 }

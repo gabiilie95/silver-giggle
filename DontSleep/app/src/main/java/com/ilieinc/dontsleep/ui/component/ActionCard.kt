@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.ilieinc.dontsleep.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
@@ -6,7 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -15,10 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.ilieinc.core.ui.components.ThemedCard
+import com.ilieinc.core.ui.theme.AppTheme
 import com.ilieinc.core.ui.theme.AppTypography
 import com.ilieinc.dontsleep.R
 import com.ilieinc.dontsleep.ui.model.CardUiEvent
@@ -50,7 +55,10 @@ fun ActionCard(
                         style = AppTypography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
-                    Button(onClick = { onEvent(OnChangeHelpDialogVisibility(true)) }) {
+                    Button(
+                        shapes = ButtonDefaults.shapes(),
+                        onClick = { onEvent(OnChangeHelpDialogVisibility(true)) }
+                    ) {
                         Text(text = stringResource(R.string.help))
                     }
                 }
@@ -63,7 +71,7 @@ fun ActionCard(
             ) {
                 when {
                     isLoading -> {
-                        CircularProgressIndicator(
+                        CircularWavyProgressIndicator(
                             modifier = Modifier
                                 .padding(vertical = 24.dp)
                                 .align(Alignment.CenterHorizontally)
@@ -73,6 +81,7 @@ fun ActionCard(
                     permissionRequired -> {
                         Button(
                             modifier = Modifier.align(Alignment.End),
+                            shapes = ButtonDefaults.shapes(),
                             onClick = { onEvent(OnChangePermissionDialogVisibility(true)) }
                         ) {
                             Text(text = stringResource(R.string.get_started))
@@ -155,30 +164,30 @@ fun TimeSection(
     onEvent: (CardUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    with(state) {
-        when (state.timeoutMode) {
-            CardUiState.TimeoutMode.TIMEOUT -> TimeoutSection(
-                modifier = modifier,
-                state = state,
-                onEvent = onEvent
-            )
+    when (state.timeoutMode) {
+        CardUiState.TimeoutMode.TIMEOUT -> TimeoutSection(
+            modifier = modifier,
+            state = state,
+            onEvent = onEvent
+        )
 
-            CardUiState.TimeoutMode.CLOCK -> ClockSection(
-                modifier = modifier,
-                state = state,
-                onEvent = onEvent
-            )
-        }
+        CardUiState.TimeoutMode.CLOCK -> ClockSection(
+            modifier = modifier,
+            state = state,
+            onEvent = onEvent
+        )
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 fun ActionCardPreview(
-    @PreviewParameter(TimePickerPreviewProvider::class)state: CardUiState
+    @PreviewParameter(TimePickerPreviewProvider::class) state: CardUiState
 ) {
-    ActionCard(
-        state = state,
-        onEvent = {}
-    )
+    AppTheme {
+        ActionCard(
+            state = state,
+            onEvent = {}
+        )
+    }
 }

@@ -6,13 +6,14 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.gson.Gson
 import com.ilieinc.core.data.dataStore
 import com.ilieinc.core.data.getValue
 import com.ilieinc.core.data.setValue
 import com.ilieinc.core.util.Logger
 import com.ilieinc.core.util.StateHelper.startForegroundService
 import com.ilieinc.core.util.StateHelper.stopService
+import com.ilieinc.dontsleep.util.JsonUtils.deserializeFromJson
+import com.ilieinc.dontsleep.util.JsonUtils.serializeToJson
 import com.ilieinc.dontsleep.ui.model.CardUiEvent
 import com.ilieinc.dontsleep.ui.model.CardUiEvent.*
 import com.ilieinc.dontsleep.ui.model.CardUiState
@@ -21,6 +22,8 @@ import com.ilieinc.dontsleep.ui.model.common.ClockState.TimepickerMode
 import com.ilieinc.dontsleep.ui.model.common.SavedTime
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -75,15 +78,17 @@ abstract class CardViewModel(
             context.dataStore.getValue(statePreferenceKey, "").let { stateJson ->
                 if (stateJson.isNotEmpty()) {
                     _state.update { it.copy(isLoading = true) }
-                    val timeoutState = Gson().fromJson(stateJson, CardUiState::class.java).let {
+                    val timeoutState = stateJson.deserializeFromJson<CardUiState>()?.let {
                         it.copy(
                             clockState = it.clockState.copy(
                                 savedTimes = it.clockState.savedTimes.sortedWith(SavedTime.Comparator)
                             )
                         )
                     }
-                    withContext(Dispatchers.Main) {
-                        _state.update { timeoutState }
+                    if (timeoutState != null) {
+                        withContext(Dispatchers.Main) {
+                            _state.update { timeoutState }
+                        }
                     }
                     refreshPermissionState()
                 }
@@ -330,11 +335,15 @@ abstract class CardViewModel(
         }
     }
 
+    private var saveJob: Job? = null
+
     private fun updateState(state: CardUiState) {
-        viewModelScope.launch(ioScope) {
+        saveJob?.cancel()
+        saveJob = viewModelScope.launch(ioScope) {
+            delay(SAVE_DEBOUNCE_MS)
             context.dataStore.setValue(
                 statePreferenceKey,
-                Gson().toJson(state)
+                state.serializeToJson()
             )
         }
     }
@@ -353,5 +362,9 @@ abstract class CardViewModel(
 
     private fun onChangePermissionDialogVisibility(visible: Boolean) {
         _state.update { it.copy(showPermissionDialog = visible) }
+    }
+
+    private companion object {
+        const val SAVE_DEBOUNCE_MS = 300L
     }
 }

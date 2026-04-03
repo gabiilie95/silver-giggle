@@ -1,7 +1,8 @@
 package com.ilieinc.dontsleep.ui.model.common
 
-import java.util.UUID
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class SavedTime(
     val hour: Int,
     val minute: Int,
