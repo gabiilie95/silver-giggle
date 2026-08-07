@@ -10,15 +10,14 @@ plugins {
 
 android {
     namespace = "com.ilieinc.dontsleep"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "com.ilieinc.dontsleep"
-        minSdk = 24
-        targetSdk = 36
-        versionCode = 36
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+        versionCode = 37
         versionName = "2.$versionCode"
-        multiDexEnabled = true
     }
 
     buildTypes {
@@ -35,12 +34,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
     }
 
     kotlin {
-        jvmToolchain(21)
+        jvmToolchain(libs.versions.jvmTarget.get().toInt())
     }
 }
 
