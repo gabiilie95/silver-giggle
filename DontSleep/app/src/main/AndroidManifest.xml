@@ -72,13 +72,11 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="@string/special_use_explanation" />
         </service>
+        <!-- No PROPERTY_SPECIAL_USE_FGS_SUBTYPE here: the platform only reads it for the
+             specialUse foreground service type, which this service does not declare. -->
         <service
             android:name=".service.MediaTimeoutService"
-            android:foregroundServiceType="mediaPlayback">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="@string/special_use_explanation" />
-        </service>
+            android:foregroundServiceType="mediaPlayback" />
 
     </application>
 

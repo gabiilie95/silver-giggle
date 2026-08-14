@@ -1,6 +1,5 @@
 package com.ilieinc.core.util
 
-import android.app.ActivityManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -38,24 +37,25 @@ object StateHelper {
 
     fun deviceRequiresOverlay() = overlayDevices.contains(Build.MANUFACTURER.lowercase(Locale.getDefault()))
 
-    fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
-        val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        for (activity in manager.getRunningServices(Int.MAX_VALUE)) {
-            if (activity.service.className == serviceClass.name) {
-                return true
-            }
-        }
-        return false
-    }
-
+    /**
+     * Returns false instead of throwing when the platform refuses the start. Android 12+
+     * rejects foreground service starts made without a background-start exemption, and
+     * that rejection reaches the caller as well as the service itself.
+     */
     inline fun Context.startForegroundService(
         serviceClass: Class<*>,
         extraActions: (intent: Intent) -> Unit = {}
-    ) = ContextCompat.startForegroundService(this, Intent(this, serviceClass).apply {
-        extraActions(this)
-    })
+    ): Boolean = runCatching {
+        ContextCompat.startForegroundService(this, Intent(this, serviceClass).apply {
+            extraActions(this)
+        })
+        true
+    }.getOrElse {
+        Logger.error("Could not start ${serviceClass.simpleName}", it)
+        false
+    }
 
-    inline fun <reified T> Context.startForegroundService(extraActions: (intent: Intent) -> Unit = {}) where T : Service =
+    inline fun <reified T> Context.startForegroundService(extraActions: (intent: Intent) -> Unit = {}): Boolean where T : Service =
         this.startForegroundService(T::class.java, extraActions)
 
     fun Context.stopService(serviceClass: Class<*>) {

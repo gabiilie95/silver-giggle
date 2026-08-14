@@ -19,22 +19,15 @@ class MediaTimeoutServiceManager(
     serviceStatePreferenceKey = MEDIA_STATE_PREF_KEY,
     serviceId = serviceId
 ) {
-    override val foregroundServiceTypeFlag by lazy {
-        when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
-            }
-
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
-            }
-
-            else -> null
+    override val foregroundServiceType =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+        } else {
+            FOREGROUND_SERVICE_TYPE_UNSPECIFIED
         }
-    }
 
-    override val notification: Notification
-        get() = DontSleepNotificationManager.createTimeoutNotification<MediaTimeoutService>(
+    override fun buildNotification(): Notification =
+        DontSleepNotificationManager.createTimeoutNotification<MediaTimeoutService>(
             context,
             R.drawable.baseline_timer_24,
             context.getString(R.string.app_name),

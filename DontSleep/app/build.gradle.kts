@@ -16,7 +16,7 @@ android {
         applicationId = "com.ilieinc.dontsleep"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 37
+        versionCode = libs.versions.appVersionCode.get().toInt()
         versionName = "2.$versionCode"
     }
 
