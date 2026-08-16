@@ -69,6 +69,24 @@ fun CardPermissionDialog(
     }
 }
 
+/** One-off note shown to people who just updated the app. See UpdateNoticeHelper. */
+@Composable
+fun UpdateNoticeDialog(onDismissRequested: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismissRequested,
+        title = { Text(stringResource(R.string.update_notice_title)) },
+        text = { Text(stringResource(R.string.update_notice_description)) },
+        confirmButton = {
+            Button(
+                shapes = ButtonDefaults.shapes(),
+                onClick = onDismissRequested
+            ) {
+                Text(stringResource(R.string.ok))
+            }
+        }
+    )
+}
+
 @Composable
 fun HelpDialog(
     state: HelpDialogUiState,

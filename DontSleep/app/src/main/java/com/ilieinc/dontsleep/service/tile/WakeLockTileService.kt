@@ -4,6 +4,7 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import android.text.format.DateFormat
 import android.widget.Toast
 import com.ilieinc.core.data.dataStore
 import com.ilieinc.core.data.getValue
@@ -23,6 +24,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Date
 
 class WakeLockTileService : TileService() {
 
@@ -56,6 +58,11 @@ class WakeLockTileService : TileService() {
         // its current value, which doubles as the initial render.
         scope.launch {
             WakeLockService.serviceRunning.collect { refreshTileState() }
+        }
+        // The shutoff time only lands once the service has read its persisted state, which
+        // is after it starts running.
+        scope.launch {
+            WakeLockService.serviceTimeout.collect { refreshTileState() }
         }
         scope.launch {
             cachedStatusEnabled = withContext(Dispatchers.IO) { loadStatusButtonEnabled() }
@@ -99,7 +106,9 @@ class WakeLockTileService : TileService() {
                         this@WakeLockTileService,
                         R.drawable.baseline_mobile_friendly_24
                     )
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) subtitle = null
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        subtitle = shutoffSubtitle()
+                    }
                 }
                 TileStates.Off -> {
                     label = "Sleep..."
@@ -128,6 +137,14 @@ class WakeLockTileService : TileService() {
             }
             updateTile()
         }
+    }
+
+    /** The same shutoff time the notification shows, or null when there is not one. */
+    private fun shutoffSubtitle() = WakeLockService.serviceTimeout.value?.let { shutoffTime ->
+        getString(
+            R.string.tile_subtitle_until,
+            DateFormat.getTimeFormat(this).format(Date(shutoffTime))
+        )
     }
 
     private suspend fun loadStatusButtonEnabled(): Boolean = runCatching {
