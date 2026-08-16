@@ -31,9 +31,13 @@ class MediaTimeoutServiceManager(
             context,
             R.drawable.baseline_timer_24,
             context.getString(R.string.app_name),
-            context.getString(
-                R.string.media_timeout_notification_text,
-                DateFormat.getTimeFormat(context).format(timeoutDateTime.time)
-            )
+            // Null until the persisted state has loaded. Showing no time beats showing one
+            // that is only a placeholder.
+            timeoutDateTime?.let { stopTime ->
+                context.getString(
+                    R.string.media_timeout_notification_text,
+                    DateFormat.getTimeFormat(context).format(stopTime.time)
+                )
+            } ?: context.getString(R.string.media_timeout_notification_indefinite_text)
         )
 }

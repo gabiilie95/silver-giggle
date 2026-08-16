@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 abstract class BaseServiceManager(
@@ -50,7 +51,13 @@ abstract class BaseServiceManager(
      */
     abstract fun buildNotification(): Notification
 
-    var timeoutDateTime: Calendar = Calendar.getInstance()
+    /**
+     * When the service shuts itself off, or null while that is not known yet and whenever
+     * nothing is going to stop it on its own. Never a placeholder: the notification renders
+     * a time straight out of this, and a guessed one reads as a real shutoff time.
+     */
+    @Volatile
+    var timeoutDateTime: Calendar? = null
         private set
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, exception ->
@@ -104,19 +111,28 @@ abstract class BaseServiceManager(
         }
     }
 
-    private fun initTimeout(state: CardUiState) {
+    private suspend fun initTimeout(state: CardUiState) {
         timeout = if (state.timeoutEnabled) {
             getTimeout(state)
         } else {
             INDEFINITE_TIMEOUT
         }
-        timeoutDateTime = Calendar.getInstance().apply {
+        if (!state.timeoutEnabled) {
+            // The wake lock's own expiry is the only limit, and that is not a shutoff time
+            // worth showing anyone.
+            timeoutDateTime = null
+            return
+        }
+        val stopTime = Calendar.getInstance().apply {
             add(Calendar.MILLISECOND, timeout.toInt())
         }
-        if (state.timeoutEnabled) {
+        timeoutDateTime = stopTime
+        // Scheduling reaches WorkManager, which initializes itself on first use now, so it
+        // stays off the main thread.
+        withContext(Dispatchers.IO) {
             TimerManager.setTimedTask<StopServiceWorker>(
                 context,
-                timeoutDateTime.time,
+                stopTime.time,
                 serviceTaskTag,
                 mutableMapOf(StopServiceWorker.SERVICE_NAME_EXTRA to serviceClass.name)
             )

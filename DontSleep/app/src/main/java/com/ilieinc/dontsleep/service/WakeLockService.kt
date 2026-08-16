@@ -28,6 +28,9 @@ class WakeLockService : BaseService(
         private val _serviceRunning = MutableStateFlow(false)
         val serviceRunning = _serviceRunning.asStateFlow()
 
+        private val _serviceTimeout = MutableStateFlow<Long?>(null)
+        val serviceTimeout = _serviceTimeout.asStateFlow()
+
         fun isRunning() = _serviceRunning.value
 
         private const val OVERLAY_FLAGS = 2098585
@@ -35,6 +38,7 @@ class WakeLockService : BaseService(
 
     override val binder: ServiceBinder = ServiceBinder(this)
     override val runningState = _serviceRunning
+    override val timeoutState = _serviceTimeout
 
     private val wakeLock = NamedWakeLock()
     private var overlay: View? = null
@@ -49,7 +53,7 @@ class WakeLockService : BaseService(
         }
     }
 
-    override fun onServiceStateReady() {
+    override suspend fun onServiceStateReady() {
         // Re-arm with the real timeout. The scheduled worker is what normally stops the
         // service; the lock timeout is only a backstop if the process outlives it.
         if (wakeLock.lock != null) {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACTION_MANAGE_OVERLAY_PERMISSION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
@@ -77,6 +78,25 @@
         <service
             android:name=".service.MediaTimeoutService"
             android:foregroundServiceType="mediaPlayback" />
+
+        <receiver
+            android:name=".timer.TimedTaskReceiver"
+            android:exported="false" />
+
+        <!-- WorkManager builds a SystemJobScheduler as soon as it is created, and on API 34+
+             that constructor calls JobScheduler.forNamespace(). Some ROMs report 34+ without
+             shipping that method, so the call throws NoSuchMethodError. Initialized from here
+             it takes the whole process down before the app ever runs; on demand it only fails
+             the caller, and TimerManager falls back to AlarmManager on those devices. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                tools:node="remove" />
+        </provider>
 
     </application>
 

@@ -31,9 +31,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -51,10 +55,13 @@ import com.ilieinc.dontsleep.ui.component.ActionCard
 import com.ilieinc.dontsleep.ui.component.CardHelpDialog
 import com.ilieinc.dontsleep.ui.component.CardPermissionDialog
 import com.ilieinc.dontsleep.ui.component.RequestNotificationButton
+import com.ilieinc.dontsleep.ui.component.UpdateNoticeDialog
+import com.ilieinc.dontsleep.util.UpdateNoticeHelper
 import com.ilieinc.dontsleep.viewmodel.MediaTimeoutCardViewModel
 import com.ilieinc.dontsleep.viewmodel.NotificationButtonDialogViewModel
 import com.ilieinc.dontsleep.viewmodel.WakeLockCardViewModel
 import com.ilieinc.dontsleep.viewmodel.base.CardViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -63,8 +70,14 @@ fun MainScreen(
     notificationPermissionResult: ManagedActivityResultLauncher<String, Boolean>
 ) {
     val activity = LocalActivity.current
+    val context = LocalContext.current.applicationContext
+    val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
     val scrollState = rememberScrollState()
+    var showUpdateNotice by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        showUpdateNotice = UpdateNoticeHelper.needToShowUpdateNotice(context)
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { ApplicationTopAppBar() },
@@ -114,6 +127,14 @@ fun MainScreen(
                         .animateContentSize()
                 )
             }
+        }
+        if (showUpdateNotice) {
+            UpdateNoticeDialog(
+                onDismissRequested = {
+                    showUpdateNotice = false
+                    scope.launch { UpdateNoticeHelper.markUpdateNoticeShown(context) }
+                }
+            )
         }
         if (activity != null) {
             LaunchedEffect(snackBarHostState) {

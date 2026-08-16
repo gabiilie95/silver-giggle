@@ -14,6 +14,8 @@
     <string name="timeout_notification_indefinite_text">Keeping device awake.</string>
     <string name="sleep_notification_text">"Turning screen off at %s.</string>
     <string name="media_timeout_notification_text">"Pausing media playback at %s.</string>
+    <string name="media_timeout_notification_indefinite_text">Media timer running.</string>
+    <string name="tile_subtitle_until">Until %1$s</string>
     <string name="special_permission_grant_title">Special Permission Grant</string>
     <string name="special_permission_grant_body">In order to use this feature, you must grant a special permission to the application.\nThis permission allows the application to turn off your screen.\n\nDo you want to continue?</string>
     <string name="yes">Yes</string>
@@ -54,4 +56,6 @@
     <string name="start">Start</string>
     <string name="invalid_time_selected">Invalid time selected</string>
     <string name="service_start_failed">Couldn\'t start right now, try again from the app</string>
+    <string name="update_notice_title">A Quick Note</string>
+    <string name="update_notice_description">Hey! I\'m sorry if you have experienced crashes recently. This application is a work in progress and also a learning experience for me, and I did some major under the hood changes recently. I\'ll be checking crashes and fixing them as quickly as I can! Thanks again for using this!</string>
 </resources>

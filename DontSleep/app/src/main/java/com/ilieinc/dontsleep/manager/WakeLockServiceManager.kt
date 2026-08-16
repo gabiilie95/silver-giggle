@@ -31,13 +31,13 @@ class WakeLockServiceManager(
             context,
             R.drawable.baseline_mobile_friendly_24,
             context.getString(R.string.app_name),
-            if (state.timeoutEnabled) {
+            // Null until the persisted state has loaded, which is why this is not keyed off
+            // state.timeoutEnabled alone: the notification is built once before that.
+            timeoutDateTime?.let { stopTime ->
                 context.getString(
                     R.string.timeout_notification_text,
-                    DateFormat.getTimeFormat(context).format(timeoutDateTime.time)
+                    DateFormat.getTimeFormat(context).format(stopTime.time)
                 )
-            } else {
-                context.getString(R.string.timeout_notification_indefinite_text)
-            }
+            } ?: context.getString(R.string.timeout_notification_indefinite_text)
         )
 }

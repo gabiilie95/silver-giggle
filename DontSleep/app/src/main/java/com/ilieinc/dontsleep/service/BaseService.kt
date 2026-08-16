@@ -1,7 +1,6 @@
 package com.ilieinc.dontsleep.service
 
 import android.app.ForegroundServiceStartNotAllowedException
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
@@ -32,6 +31,12 @@ abstract class BaseService(
 
     /** Mirrors the service lifetime for the cards and the quick settings tiles. */
     protected abstract val runningState: MutableStateFlow<Boolean>
+
+    /**
+     * When the service shuts itself off, as epoch millis, for the quick settings tiles.
+     * Null while the persisted state is still loading and when nothing will stop it.
+     */
+    protected abstract val timeoutState: MutableStateFlow<Long?>
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Logger.error("Error starting ${javaClass.simpleName}", throwable)
@@ -64,6 +69,7 @@ abstract class BaseService(
         // Everything that depends on it runs in onServiceStateReady().
         serviceScope.launch {
             serviceManager.onCreateService()
+            timeoutState.value = serviceManager.timeoutDateTime?.timeInMillis
             onServiceStateReady()
             refreshNotification()
         }
@@ -86,6 +92,7 @@ abstract class BaseService(
                 .onFailure { Logger.error("Error stopping ${javaClass.simpleName}", it) }
             serviceManager.onDestroyService()
             runningState.value = false
+            timeoutState.value = null
         }
         super.onDestroy()
     }
@@ -93,8 +100,8 @@ abstract class BaseService(
     /** Runs once the service is in the foreground, before the persisted state is available. */
     protected open fun onServiceStarted() = Unit
 
-    /** Runs on the main thread once the manager has loaded the persisted state. */
-    protected open fun onServiceStateReady() = Unit
+    /** Runs once the manager has loaded the persisted state. */
+    protected open suspend fun onServiceStateReady() = Unit
 
     /** Runs on teardown. A failure here never prevents the rest of the teardown. */
     protected open fun onServiceStopping() = Unit
@@ -123,9 +130,20 @@ abstract class BaseService(
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                 throwable is ForegroundServiceStartNotAllowedException
 
+    /**
+     * Re-posts through startForeground() rather than NotificationManager.notify(). Both
+     * update the notification, but notify() is dropped outright when POST_NOTIFICATIONS is
+     * denied — which is exactly when the foreground notification is still on screen showing
+     * whatever was posted first. Re-posting an already-foregrounded service is not a
+     * foreground start, so no start restriction applies to it.
+     */
     private fun refreshNotification() = runCatching {
-        getSystemService(NotificationManager::class.java)
-            ?.notify(serviceManager.serviceId, serviceManager.buildNotification())
+        ServiceCompat.startForeground(
+            this,
+            serviceManager.serviceId,
+            serviceManager.buildNotification(),
+            serviceManager.foregroundServiceType
+        )
     }.onFailure {
         Logger.error("Could not refresh the ${javaClass.simpleName} notification", it)
     }
