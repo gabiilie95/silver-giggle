@@ -53,4 +53,5 @@
     <string name="select">Select</string>
     <string name="start">Start</string>
     <string name="invalid_time_selected">Invalid time selected</string>
+    <string name="service_start_failed">Couldn\'t start right now, try again from the app</string>
 </resources>

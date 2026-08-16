@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 
 abstract class CardViewModel(
     application: Application,
@@ -325,13 +326,16 @@ abstract class CardViewModel(
     }
 
     private fun setEnabled(enabled: Boolean) {
-        if (enabled) {
+        val applied = if (enabled) {
             startService()
         } else {
             stopService()
+            true
         }
+        // Only claim the toggle moved if the start was actually accepted; Android can
+        // refuse it. The serviceRunning flow reconciles this once the service reports in.
         _state.update {
-            it.copy(enabled = enabled)
+            it.copy(enabled = enabled && applied)
         }
     }
 
@@ -340,7 +344,7 @@ abstract class CardViewModel(
     private fun updateState(state: CardUiState) {
         saveJob?.cancel()
         saveJob = viewModelScope.launch(ioScope) {
-            delay(SAVE_DEBOUNCE_MS)
+            delay(SAVE_DEBOUNCE_MS.milliseconds)
             context.dataStore.setValue(
                 statePreferenceKey,
                 state.serializeToJson()
@@ -348,9 +352,8 @@ abstract class CardViewModel(
         }
     }
 
-    open fun startService() {
-        context.startForegroundService(serviceClass)
-    }
+    /** Returns false when the platform refused to start the service. */
+    open fun startService() = context.startForegroundService(serviceClass)
 
     open fun stopService() {
         context.stopService(serviceClass)

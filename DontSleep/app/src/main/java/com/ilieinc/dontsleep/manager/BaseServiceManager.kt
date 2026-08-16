@@ -25,11 +25,33 @@ abstract class BaseServiceManager(
     private val serviceTaskTag: String,
     val serviceId: Int,
 ) {
+    companion object {
+        /** Used until the persisted state has loaded, and whenever it cannot be read. */
+        const val DEFAULT_TIMEOUT = 500_000L
+
+        /** ~24 days, the longest span that still fits [Calendar.add]'s millisecond field. */
+        const val INDEFINITE_TIMEOUT = Int.MAX_VALUE.toLong()
+
+        /**
+         * Same value as ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE, spelled out because that
+         * constant is API 29+ and now deprecated, while the value has always been 0.
+         * Only API 34+ requires a real type, so this covers everything below it.
+         */
+        const val FOREGROUND_SERVICE_TYPE_UNSPECIFIED = 0
+    }
+
     protected lateinit var context: Context
 
-    abstract val foregroundServiceTypeFlag: Int?
-    abstract val notification: Notification
+    abstract val foregroundServiceType: Int
+
+    /**
+     * Built on demand rather than cached: the service posts one notification before the
+     * persisted state is available and refreshes it once the real timeout is known.
+     */
+    abstract fun buildNotification(): Notification
+
     var timeoutDateTime: Calendar = Calendar.getInstance()
+        private set
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, exception ->
         exception.message?.let { FirebaseCrashlytics.getInstance().log(it) }
@@ -38,8 +60,13 @@ abstract class BaseServiceManager(
     private val ioScope = Dispatchers.IO + coroutineExceptionHandler
 
     private var job: Job? = null
+
+    @Volatile
     protected var state: CardUiState = CardUiState()
-    var timeout: Long = 500000
+
+    @Volatile
+    var timeout: Long = DEFAULT_TIMEOUT
+        private set
 
     fun initContext(context: Context) {
         this.context = context
@@ -81,10 +108,11 @@ abstract class BaseServiceManager(
         timeout = if (state.timeoutEnabled) {
             getTimeout(state)
         } else {
-            Int.MAX_VALUE.toLong()
+            INDEFINITE_TIMEOUT
         }
-        timeoutDateTime = Calendar.getInstance()
-        timeoutDateTime.add(Calendar.MILLISECOND, timeout.toInt())
+        timeoutDateTime = Calendar.getInstance().apply {
+            add(Calendar.MILLISECOND, timeout.toInt())
+        }
         if (state.timeoutEnabled) {
             TimerManager.setTimedTask<StopServiceWorker>(
                 context,
@@ -95,37 +123,38 @@ abstract class BaseServiceManager(
         }
     }
 
-    private fun getTimeout(state: CardUiState): Long {
-        return runCatching {
-            val selectedTime = state.selectedTime
-            requireNotNull(selectedTime)
-            when (state.timeoutMode) {
-                CardUiState.TimeoutMode.TIMEOUT -> {
-                    (selectedTime.hour * 60 * 60 * 1000 + selectedTime.minute * 60 * 1000).toLong()
-                }
+    private fun getTimeout(state: CardUiState): Long = runCatching {
+        val selectedTime = requireNotNull(state.selectedTime)
+        when (state.timeoutMode) {
+            CardUiState.TimeoutMode.TIMEOUT -> {
+                (selectedTime.hour * 60 * 60 * 1000 + selectedTime.minute * 60 * 1000).toLong()
+            }
 
-                CardUiState.TimeoutMode.CLOCK -> {
-                    val currentTime = Calendar.getInstance().apply {
-                        set(Calendar.HOUR_OF_DAY, selectedTime.hour)
-                        set(Calendar.MINUTE, selectedTime.minute)
-                        if (before(Calendar.getInstance()))
-                            add(Calendar.DAY_OF_YEAR, 1)
+            CardUiState.TimeoutMode.CLOCK -> {
+                val targetTime = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, selectedTime.hour)
+                    set(Calendar.MINUTE, selectedTime.minute)
+                    if (before(Calendar.getInstance())) {
+                        add(Calendar.DAY_OF_YEAR, 1)
                     }
-                    return currentTime.timeInMillis - System.currentTimeMillis()
                 }
+                targetTime.timeInMillis - System.currentTimeMillis()
             }
-        }.fold(
-            onSuccess = { it },
-            onFailure = {
-                Logger.error("Error getting timeout", it)
-                System.currentTimeMillis()
-            }
-        )
-    }
+        }
+    }.fold(
+        // A timeout outside this range would overflow the Int that Calendar.add() takes
+        // and push the stop time into the past, leaving the service running forever.
+        onSuccess = { it.coerceIn(0, INDEFINITE_TIMEOUT) },
+        onFailure = {
+            Logger.error("Error getting timeout", it)
+            DEFAULT_TIMEOUT
+        }
+    )
 
     open fun onDestroyService() = runCatching {
         TimerManager.cancelTask(context, serviceTaskTag)
         job?.cancel()
+        job = null
     }.onFailure {
         Logger.error("Error stopping service $serviceClass", it)
     }

@@ -19,22 +19,15 @@ class WakeLockServiceManager(
     serviceStatePreferenceKey = WAKE_LOCK_STATE_PREF_KEY,
     serviceId = serviceId
 ) {
-    override val foregroundServiceTypeFlag by lazy {
-        when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-            }
-
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
-            }
-
-            else -> null
+    override val foregroundServiceType =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+        } else {
+            FOREGROUND_SERVICE_TYPE_UNSPECIFIED
         }
-    }
 
-    override val notification: Notification
-        get() = DontSleepNotificationManager.createTimeoutNotification<WakeLockService>(
+    override fun buildNotification(): Notification =
+        DontSleepNotificationManager.createTimeoutNotification<WakeLockService>(
             context,
             R.drawable.baseline_mobile_friendly_24,
             context.getString(R.string.app_name),

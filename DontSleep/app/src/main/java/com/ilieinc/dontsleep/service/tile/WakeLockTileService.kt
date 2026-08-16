@@ -22,58 +22,75 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class WakeLockTileService : TileService() {
 
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private var listeningScope: CoroutineScope? = null
     private var cachedStatusEnabled = true
 
-    private val enabled
-        get() = WakeLockService.isRunning(this)
-
     override fun onClick() {
-        if (!cachedStatusEnabled) {
-            Toast.makeText(applicationContext, getString(R.string.invalid_time_selected), Toast.LENGTH_SHORT).show()
+        val running = WakeLockService.isRunning()
+        if (!running && !cachedStatusEnabled) {
+            showToast(R.string.invalid_time_selected)
             refreshTileState()
             return
         }
-        if (!enabled) {
-            startForegroundService<WakeLockService>()
-        } else {
+        if (running) {
             stopService<WakeLockService>()
+        } else if (!startForegroundService<WakeLockService>()) {
+            // Android can refuse the start outright; say so rather than leaving the tile
+            // looking like it worked.
+            showToast(R.string.service_start_failed)
         }
         refreshTileState()
     }
 
     override fun onStartListening() {
-        DeviceAdminHelper.init(applicationContext)
-        refreshTileState()
-        scope.launch {
-            cachedStatusEnabled = loadStatusButtonEnabled()
-            launch(Dispatchers.Main) { refreshTileState() }
-        }
         super.onStartListening()
+        DeviceAdminHelper.init(applicationContext)
+        val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+        listeningScope = scope
+        // Follows the service for as long as the tile is visible, so a timeout that stops
+        // it in the background shows up without waiting for the next tap. The flow replays
+        // its current value, which doubles as the initial render.
+        scope.launch {
+            WakeLockService.serviceRunning.collect { refreshTileState() }
+        }
+        scope.launch {
+            cachedStatusEnabled = withContext(Dispatchers.IO) { loadStatusButtonEnabled() }
+            refreshTileState()
+        }
     }
 
     override fun onStopListening() {
-        refreshTileState()
+        listeningScope?.cancel()
+        listeningScope = null
         super.onStopListening()
     }
 
     override fun onDestroy() {
-        scope.cancel()
+        listeningScope?.cancel()
+        listeningScope = null
         super.onDestroy()
     }
 
+    private fun showToast(messageId: Int) {
+        Toast.makeText(applicationContext, getString(messageId), Toast.LENGTH_SHORT).show()
+    }
+
     private fun refreshTileState() {
+        // Null until the tile is bound, and again once it is unbound.
+        val tile = qsTile ?: return
         val permissionMissing = PermissionHelper.shouldRequestDrawOverPermission(this)
-        val statusEnabled = cachedStatusEnabled
+        val enabled = WakeLockService.isRunning()
         val tileState = when {
-            permissionMissing || !statusEnabled -> TileStates.Disabled
+            // A running service always stays stoppable, whatever the saved time says.
+            permissionMissing || (!enabled && !cachedStatusEnabled) -> TileStates.Disabled
             enabled -> TileStates.On
             else -> TileStates.Off
         }
-        qsTile.apply {
+        tile.apply {
             when (tileState) {
                 TileStates.On -> {
                     label = "Don't Sleep!"
